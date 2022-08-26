@@ -24,9 +24,9 @@
 #endif
 
 // parameters needed for slicing layer
-#define h_inp 256
-#define w_inp 320 
-#define channels 3
+#define H_INP 256
+#define W_INP 320 
+#define CHANNELS 3
 
 
 
@@ -55,16 +55,14 @@ void copy_inputs() {
     #ifdef __EMUL__
     File_Input_1 = __OPEN_READ(fs, "Input_1.bin");
     #else
-    // File_Input_1 = __OPEN_READ(fs, "../../../Input_1.bin");
-    File_Input_1 = __OPEN_READ(fs, "../../../Input_1_original.bin");
-    // File_Input_1 = __OPEN_READ(fs, "../../../Input_1_python_sliced.bin");
+    File_Input_1 = __OPEN_READ(fs, "../../../Input_1.bin");
     #endif
 
-    // read input file to L2 empy buffer instead of Input_1
+    // read input file to L2 empty buffer instead of Input_1
     ret_Input_1 = __READ(
         File_Input_1, 
-        model_L2_Memory_Dyn + (h_inp * w_inp * channels), 
-        (h_inp * w_inp * channels)*sizeof(signed char)
+        model_L2_Memory_Dyn + (H_INP * W_INP * CHANNELS), 
+        (H_INP * W_INP * CHANNELS)*sizeof(signed char)
         // 245760 * sizeof(signed char)
     );
 
@@ -86,12 +84,12 @@ static void cluster()
     #endif
 
     // slice the input buffer and copy it to Input_1 
-    slicing_3_channel(
-        model_L2_Memory_Dyn + (h_inp * w_inp * channels), 
+    slicing_chw_channel(
+        model_L2_Memory_Dyn + (H_INP * W_INP * CHANNELS), 
         Input_1, 
-        h_inp, 
-        w_inp,
-        channels
+        H_INP, 
+        W_INP,
+        CHANNELS
         );
 
     #ifdef PERF
