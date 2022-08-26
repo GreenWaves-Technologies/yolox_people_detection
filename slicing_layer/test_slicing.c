@@ -12,6 +12,7 @@ struct Names{
 
 int main(void) {
 
+
     struct Names test_data[60];
     char  test_data_source[100] = "./data/test_chw_source";
     char  test_data_target[100] = "./data/test_chw_target";
@@ -45,7 +46,6 @@ int main(void) {
 
         if ( test_data[i].name[0] != '.' ){
 
-            // get dimentions
             char tmp[20];
             char tmp1[20];
             char tmp2[20];
@@ -53,34 +53,35 @@ int main(void) {
             strcpy(tmp, test_data[i].name);
             strcpy(tmp1, test_data[i].name);
             strcpy(tmp2, test_data[i].name);
+
             int c, h, w; 
-            if (strstr(test_data_source, "chw")){
+            if (strstr(test_data_source, "chw") != NULL){
                 char * token = strtok(tmp, "_");
                 c = atoi(strtok(NULL, "_"));
                 h = atoi(strtok(NULL, "_"));
                 w = atoi(strtok(NULL, "."));
-            }else{
+            }
+            else if (strstr(test_data_source, "hwc") != NULL){
+                char * token = strtok(tmp, "_");
                 h = atoi(strtok(NULL, "_"));
                 w = atoi(strtok(NULL, "_"));
                 c = atoi(strtok(NULL, "."));
-            } 
-            // printf("%d %d %d\n", c, h, w);
-
+            }
+            else{
+                printf("error: source data format not supported\n");
+                return -1;
+            }
+            
             char test_path[100] = "./data/test_chw_source/"; 
             char target_path[100] = "./data/test_chw_target/"; 
 
             strcat(test_path, tmp1); 
             strcat(target_path, tmp2); 
 
-            // printf("%s \n", test_path);
-            // printf("%s \n", target_path);
-
-            // check what append if singed char is used
             unsigned int data_size = w * h * c;
             unsigned char * data = malloc(w * h  * c * sizeof(unsigned char));
             unsigned char * sliced = malloc(w * h  * c * sizeof(unsigned char));
             unsigned char * target = malloc(w * h  * c * sizeof(unsigned char));
-            // unsigned char target[w * h  * 3];
 
             FILE *ptr;
             ptr = fopen(test_path, "rb");
@@ -92,21 +93,22 @@ int main(void) {
 
             for(int i = 0; i < data_size; i++){
                 sliced[i] = data[i];
-                // printf("%u ", data[i]);
             }
 
-            slicing_3hw_channel(sliced, h, w, c);
+            slicing_chw_channel(sliced, h, w, c);
+            // slicing_hwc_channel(sliced, h, w, c);
 
             int sum = 0;
             for(int i = 0; i < data_size; i++){
                 sum += (sliced[i] - target[i]);
             }
+
             if (sum == 0){
                 printf("test - %s : \t+\n", test_data[i].name); 
             }else{
                 printf("test - %s : \t-\n", test_data[i].name); 
-
             }
+
             free(data);
             free(sliced);
             free(target);

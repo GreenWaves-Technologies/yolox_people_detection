@@ -74,7 +74,12 @@ def generate_and_test(**kwargs):
         high=kwargs["high"], size=kwargs["size"], 
         channels=kwargs["channels"], order=kwargs["order"])
 
-    pass_tests(source_path="./data/test_chw_source/")
+    pass_tests(source_path=f"./data/test_{kwargs['order']}_source/")
 
 if __name__ == "__main__":
+
+    print("testing slicing_chw_c_style:")
     generate_and_test(size=30, low=10, high=100, channels=3, order='chw')
+
+    print("testing slicing_hwc_c_style:")
+    generate_and_test(size=30, low=10, high=100, channels=3, order='hwc')

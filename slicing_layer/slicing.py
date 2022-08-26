@@ -1,10 +1,11 @@
+from re import S
+from tkinter import E
 import numpy as np
 import os
-# from test_slicing import generate_test_data, pass_tests
+from utils import read_bin, save_bin
 
 def slicing_channel_fist(array):
     assert len(array.shape) == 3, "wrong input shape"
-    c, h, w = array.shape
 
     #slicing here since delited it in the model
     patch_top_left = array[..., ::2, ::2]
@@ -24,12 +25,10 @@ def slicing_channel_fist(array):
 
 def slicing_channel_last(array):
     assert len(array.shape) == 3, "wrong input shape"
-    c, h, w = array.shape
 
-    #slicing here since delited it in the model
     patch_top_left = array[::2, ::2, :]
-    patch_top_right = array[::2, 1::2, :]
     patch_bot_left = array[1::2, ::2, :]
+    patch_top_right = array[::2, 1::2, :]
     patch_bot_right = array[1::2, 1::2, :]
     array = np.concatenate(
         (
@@ -42,16 +41,6 @@ def slicing_channel_last(array):
     )
     return array
 
-def save_bin(array, path):
-    with open(path, "wb") as in_f:
-        array.astype(np.uint8, order='C', casting='unsafe', copy=True).tofile(in_f)
-
-
-def read_bin(path):
-    array = np.fromfile(path, dtype=np.uint8)
-    return array
-
-
 def slicing_chw_c_style(array, h, w, chnl):
 
     cout = 0 
@@ -61,159 +50,142 @@ def slicing_chw_c_style(array, h, w, chnl):
         for j in range(0, h // 2):
             k = j * (2 * w)  
             for i in range(0, w // 2): 
-                # print("idx", k + i * 2)
                 tmp[cout] = array[k + i * 2 + c *(w  * h)]
-                # tmp[cout] = array[k + i * 2]
                 cout += 1
 
-    # # print("=")
-    # # # bottom left
+    # bottom left
     for c in range(0, chnl):
         # print("c = ", c )
         for j in range(0, h // 2):
             k = j * (2 * w) + w  
             for i in range(0, w // 2): 
-                # print("idx", k + i * 2 + c * (w * h))
                 tmp[cout] = array[k + i * 2 + c *(w  * h)]
                 cout += 1
 
-    # # # top right 
+    # top right 
     for c in range(0, chnl):
         for j in range(0, h // 2):
             k = j * (2 * w) + 1  
             for i in range(0, w // 2): 
-                # print("idx", k + i * 2 + c * (w * h))
                 tmp[cout] = array[k + i * 2 + c * (w * h)]
                 cout += 1
 
-    # # # bottom right
+    # bottom right
     for c in range(0, chnl):
         for j in range(0, h // 2):
             k = j * (2 * w) + w + 1 
-            # print("idx", k + i * 2 + c * (w * h))
             for i in range(0, w // 2): 
                 tmp[cout] = array[k + i * 2 + c * (w * h)]
                 cout += 1
     return tmp
 
-def slicing_hwc_c_style(array, h, w, chnl):
 
-    cout = 0 
-    tmp = array.copy()
-    print(array.shape, w, h, chnl)
+def slicing_hwc_c_style(array, h, w, channels):
 
-    # for col in range(h // 2):
-        # for row in range(w // 2):
-            # for c in range(chnl):
-                # print(col*h*chnl + row*chnl + c, (2*col  )*w*chnl + (2*row)* chnl + c, sep='\t')
-                # tmp[col*h*chnl + row*chnl + c] = array[(4*col)*w*chnl + (4*row)* chnl + c]
+    tmp_array = array.copy()
+    cur = 0
+    tmp1 = 0 
+    tmp2 = w * channels 
+    comp = (w * h * channels) // (h // 2) 
 
-    
+    larger, smaller = (h, w) if h > w else (w, h)
 
-    if h > w : 
-        split = (( w  * 3)) // (w // 2)  
-    else:
-        split = (h * ( w // 2 * 3)) // (w // 2) 
-
-    split_cout = 0
-    split_add = 0
-    for i in range(0, (h * ( w // 2 * 3)), w // 2 * 3):
-        for j in range(0, w):
-
-            if j % 2 == 0:
-                k = 3 * (j // 2)
-            else:
-                k = 3 * (w + j // 2)  
-
-            if i >= split:
-
-                if h > w:
-                    split += (( w  * 3)) // (w // 2)  
+    for j in range(0, larger):
+        for i in range(0, smaller):
+            for c in range(0, channels):
+                if i % 2 == 0:                
+                    tmp_array[cur] = array[tmp1]
+                    tmp1 += 1
                 else:
-                    split += split
+                    tmp_array[cur] = array[tmp2]
+                    tmp2 += 1 
+                cur += 1
 
-                split_cout +=1
-                split_add += (w * 3)
+                if  cur % comp == 0: 
+                    tmp1 += w * channels
+                    tmp2 += w * channels
 
-            k += i
-            if h >= w: 
-                k += split_add
-            
-            # print('===', k, array[k], i, j, split, split_cout, sep='\t')
-      
-            for c in range(0, chnl): 
-                tmp[cout] = array[k + c]
-                cout += 1
-    return tmp
+    return tmp_array
 
 
-def generate_and_test():
-    generate_test_data(low=1, high=255, path="./date/test_data_chw", size=10, channels=3, order='chw')
-    pass_tests("./data/test_data_chw_source/")
+def slicing_hw1_style(array, h, w):
+
+    tmp_array = array.copy()
+    cur = 0
+    tmp1 = 0 
+    tmp2 = w 
+    comp = (w * h) // (h // 2) 
+    larger, smaller = (h, w) if h > w else (w, h)
+
+    for j in range(0, larger):
+        for i in range(0, smaller):
+            if i % 2 == 0:                
+                tmp_array[cur] = array[tmp1]
+                tmp1 += 1
+            else:
+                tmp_array[cur] = array[tmp2]
+                tmp2 += 1 
+
+            cur += 1
+            if  cur % comp == 0: 
+                tmp1 += w
+                tmp2 += w
+
+    return tmp_array
 
 if __name__ == "__main__":
 
     np.random.seed(1)
-    generate_and_test()
-    # generate_test_data(low=10, high=255, path="test_data", size=100, channels=3, order='chw')
-    # pass_tests(source_path="./test_data_chw_source/")
+
+    ##### main part #####
+    h = 4
+    w = 2
+    c = 3
+
+    # array = np.arange(h * w * c).reshape(h, w, c)
+    # save_bin(array, f"array_{w}_{h}_{c}.bin")
+    # array_python = read_bin(f"array_{w}_{h}_{c}.bin")
+    # print(array_python)
 
 
-    # array = np.arange(9,dtype=np.uint8).reshape(3, 3)[..., None]
-    # print(array.shape)
+    # array_scliced_python = slicing_channel_last(array)
+    # save_bin(array_scliced_python, f"array_scliced_{w}_{h}_{c}.bin")
+    # array_sliced_bin = read_bin(f"array_scliced_{w}_{h}_{c}.bin")
+    # print(array_sliced_bin)
 
-    # # array = np.arange(4,dtype=np.uint8).reshape(2, 2)[..., None]
-    # array = np.arange(16,dtype=np.uint8).reshape(4, 4)[...,None]
-    # # array = np.arange(16,dtype=np.uint8).reshape(8, 2)[...,None]
-    # # array = np.arange(16,dtype=np.uint8).reshape(2, 8)[...,None]
-    # # array = np.arange(16,dtype=np.uint8).reshape(2, 8)[...,None]
-    # # array = np.arange(36,dtype=np.uint8).reshape(6, 6)[..., None]
-    # # array = np.arange(4 * 8, dtype=np.uint8).reshape(4, 8)[..., None]
-    # # array = np.arange(4 * 8, dtype=np.uint8).reshape(8, 4)[..., None]
-    # # array = np.arange(8 * 8, dtype=np.uint8).reshape(8, 8)[..., None]
+    # for h in range(2, 400, 2 ):
+    #     for w in range(4, 400, 2):
+    h = 2
+    w = 4
+    c = 3
+    array = np.arange(h * w * c, dtype=np.uint64).reshape(h, w, c)
+    # array = np.random.randint(low=0, high=255, size=(h * w * c), dtype=np.uint8).reshape(h, w, c )
+    
+    # test the dataset on the slicing function
+    h, w, c = array.shape
+    print(array)
+    print(array.shape)
 
-    # # array = np.array([[1, 2], 
-    # #                   [3, 4]], dtype=np.uint8)[..., None]
-    # array = np.concatenate([array] * 3, axis=-1) 
-    # h, w, c = array.shape
+    save_bin(array, "./array.bin")
+    array_python = read_bin("./array.bin")
 
-    # # array = np.array([[1, 2], 
-    # #                   [3, 4]], dtype=np.uint8)[None]
-    # # array = np.concatenate([array] * 3, axis=0) 
-    # print(array)
+    print(array_python)
+    print(array_python.shape)
 
-    # print(array.shape)
-    # save_bin(array, path="./mat_4_4.bin")
-    # print(read_bin('./mat_4_4.bin'))
+    array_scliced_python = slicing_channel_last(array)
 
+    print(array_scliced_python)
+    print(array_scliced_python.shape)
 
-    # print(slicing_channel_last(array).shape)
+    save_bin(array_scliced_python, "array_scliced_python.bin")
+    array_sliced_bin = read_bin("array_scliced_python.bin")
 
-    # save_bin(slicing_channel_last(array), path="./mat_4_4_python_sliced.bin")
-    # print("sliced python version")
-    # print(read_bin('./mat_4_4_python_sliced.bin'))
+    print(array_sliced_bin)
+    print(array_sliced_bin.shape)
 
-    # print("sliced C style version")
-    # print(slicing_hwc_c_style(read_bin("./mat_4_4.bin"), h=h, w=w, chnl=c))
-
-
-    # a = read_bin('./mat_4_4_python_sliced.bin')
-    # b = slicing_hwc_c_style(read_bin("./mat_4_4.bin"), h=h, w=w, chnl=c)
-    # print("===== mis match =====")
-    # print(np.sum(a - b ))
-
-    # # # print(array.shape)
-    # # # print(array)
-    # # save_bin(array, path="./test_data/mat_4_4.bin")
-    # # # print(read_bin('./test_data/mat_42_594.bin'))
-
-    # # # array_orig = read_bin('./test_1.bin')
-    # # array_slicied = slicing(array)
-    # # save_bin(array_slicied, path="./test_target/mat_4_4.bin")
-
-    # # print("============== sliced correct ==================")
-    # # array = slicing(array) 
-    # # # print(array.shape) 
-    # # # print(array) 
-    # # save_bin(array)
-    # # print(read_bin('./test_1.bin'))
+    # call the fucntion 
+    sliced_c_stype = slicing_hwc_c_style(array_python, h, w, channels=c) 
+    mistach = np.sum(sliced_c_stype - array_sliced_bin)
+    print(f"mistach = {mistach} w = {w} h = {h}")
+    assert mistach == 0, f"mismatch: {mistach} h={h} w={w} c={c}"
+            
