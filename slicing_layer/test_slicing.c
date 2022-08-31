@@ -114,9 +114,6 @@ int main(void) {
                 return -1;
             }
 
-            // slicing_chw_channel(input, ouput, h, w, c);
-            // slicing_hwc_channel(input, ouput, h, w, c);
-
             int sum = 0;
             for(int i = 0; i < data_size; i++){
                 sum += (ouput[i] - target[i]);

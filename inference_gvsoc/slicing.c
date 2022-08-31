@@ -50,3 +50,39 @@ void slicing_chw_channel(signed char * Input, signed char * Output, int h, int w
 
 }
 
+void slicing_hwc_channel(signed char * Input, signed char * Output, int h, int w, int channels){
+
+    unsigned int cur = 0; 
+    unsigned int tmp1 = 0;
+    unsigned int tmp2 = w * channels;
+    unsigned int comp = (w * h * channels) / (h / 2);
+
+    int larger, smaller;
+    if(h > w){
+        larger = h;
+        smaller = w;
+    }
+    else{
+        larger = w;
+        smaller = h;
+    }
+
+    for(int j = 0; j < larger; j++){
+        for(int i = 0; i < smaller; i++){
+            for(int c = 0; c < channels; c++){
+                if (i % 2 == 0){
+                    Output[cur] = Input[tmp1];
+                    tmp1++;
+                }else{
+                    Output[cur] = Input[tmp2];
+                    tmp2++;
+                }
+                cur++;
+                if (cur % comp == 0){
+                    tmp1 += w * channels;
+                    tmp2 += w * channels;
+                }
+            }
+        }
+    }
+}
