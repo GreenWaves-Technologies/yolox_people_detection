@@ -2,7 +2,7 @@
 #include <dirent.h> 
 #include <string.h>
 #include <stdlib.h>
-#include "slicing.h"
+#include "../inference_gvsoc/slicing.h"
 
 
 struct Names{
@@ -12,11 +12,15 @@ struct Names{
 
 int main(void) {
 
-
+    
     struct Names test_data[60];
-    char  test_data_source[100] = "./data/test_chw_source";
-    char  test_data_target[100] = "./data/test_chw_target";
 
+    char  test_data_source[100] = "./data/test_chw_source/";
+    char  test_data_target[100] = "./data/test_chw_target/";
+
+    // char  test_data_source[100] = "./data/test_hwc_source/";
+    // char  test_data_target[100] = "./data/test_hwc_target/";
+    
     // list dir and save file names 
     DIR *d;
     struct dirent *dir;
@@ -30,6 +34,7 @@ int main(void) {
             if (tmp[0] == '.') {
                 continue;
             }
+            // printf("%s\n", tmp);
             while(*tmp != '\0'){
                 test_data[cout].name[i] = *tmp;
                 tmp++;
@@ -40,8 +45,8 @@ int main(void) {
         }
         closedir(d);
     }
-    
-    // main test loop
+
+    // // main test loop
     for (int i = 0; i < cout; i++){
 
         if ( test_data[i].name[0] != '.' ){
@@ -72,35 +77,49 @@ int main(void) {
                 return -1;
             }
             
-            char test_path[100] = "./data/test_chw_source/"; 
-            char target_path[100] = "./data/test_chw_target/"; 
+            //copy test_data_source to test_path
+            char test_path[100];
+            strcpy(test_path, test_data_source);
+
+            char target_path[100];
+            strcpy(target_path, test_data_target);
 
             strcat(test_path, tmp1); 
             strcat(target_path, tmp2); 
 
             unsigned int data_size = w * h * c;
-            unsigned char * data = malloc(w * h  * c * sizeof(unsigned char));
-            unsigned char * sliced = malloc(w * h  * c * sizeof(unsigned char));
+            unsigned char * input = malloc(w * h  * c * sizeof(unsigned char));
+            unsigned char * ouput = malloc(w * h  * c * sizeof(unsigned char));
             unsigned char * target = malloc(w * h  * c * sizeof(unsigned char));
 
+            // read input data 
             FILE *ptr;
             ptr = fopen(test_path, "rb");
-            fread(data, data_size, 1, ptr);
+            fread(input, data_size, 1, ptr);
 
+            // reaade target data
             FILE *ptr1;
             ptr1 = fopen(target_path, "rb");
             fread(target, data_size, 1, ptr1);
 
-            for(int i = 0; i < data_size; i++){
-                sliced[i] = data[i];
+            // slicing
+            if (strstr(test_data_source, "chw") != NULL){
+                slicing_chw_channel(input, ouput, h, w, c);
+            }
+            else if (strstr(test_data_source, "hwc") != NULL){
+                slicing_hwc_channel(input, ouput, h, w, c);
+            }
+            else{
+                printf("error: source data format not supported\n");
+                return -1;
             }
 
-            slicing_chw_channel(sliced, h, w, c);
-            // slicing_hwc_channel(sliced, h, w, c);
+            // slicing_chw_channel(input, ouput, h, w, c);
+            // slicing_hwc_channel(input, ouput, h, w, c);
 
             int sum = 0;
             for(int i = 0; i < data_size; i++){
-                sum += (sliced[i] - target[i]);
+                sum += (ouput[i] - target[i]);
             }
 
             if (sum == 0){
@@ -109,8 +128,8 @@ int main(void) {
                 printf("test - %s : \t-\n", test_data[i].name); 
             }
 
-            free(data);
-            free(sliced);
+            free(input);
+            free(ouput);
             free(target);
         }
 
