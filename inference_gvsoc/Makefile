@@ -23,7 +23,8 @@ include common/model_decl.mk
 # PULP_APP = $(MODEL_PREFIX)
 
 APP = $(MODEL_PREFIX)
-APP_SRCS += $(MODEL_PREFIX).c $(MODEL_GEN_C) $(MODEL_EXPRESSIONS) $(MODEL_COMMON_SRCS) $(CNN_LIB)
+# APP_SRCS += $(MODEL_PREFIX).c $(MODEL_GEN_C) $(MODEL_EXPRESSIONS) $(MODEL_COMMON_SRCS) $(CNN_LIB)
+APP_SRCS += main.c $(MODEL_GEN_C) $(MODEL_EXPRESSIONS) $(MODEL_COMMON_SRCS) $(CNN_LIB)
 APP_SRCS += slicing.c
 
 APP_CFLAGS += -g -O3 -mno-memcpy -fno-tree-loop-distribute-patterns
