@@ -6,12 +6,8 @@ This repository contains the code for the inference of [YOLOX](https://arxiv.org
 # Setup
 
 ```bash
-cd <GAP_SDK_HOME>
-source sourceme.sh 
+source <GAP_SDK_HOME>/configs/gap9_v2.sh
 ```
-
-Select option 3 from the menu
-
 
 
 # GVSOC inference
