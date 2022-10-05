@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <math.h>
-#include "decoding.h"
 #include <stdlib.h>
+#include "decoding.h"
 
 void decoding(float * Input, tTuple * feature_maps, float * strides, int size){
 
