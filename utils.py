@@ -166,10 +166,14 @@ def clip_stats(stats, n_std):
             clipped_stats[layer]['range_out'][0]['max'] = min(max_, mean + n_std * std)
     return clipped_stats
 
+def check_input_dims(G, arr):
+    assert G.inputs_dim[0] == list(arr.shape), \
+        f"Incorrect input size for {G.name} model. Got: {arr.shape} expected:{G.inputs_dim[0]}"
 
 def make_parser():
     parser = argparse.ArgumentParser("Parser")
-    parser.add_argument("--path", type=str, default="./onnx_weights/yolox_nano_rgb_256x320_coco.onnx" )
+    # parser.add_argument("--path", type=str, default="./onnx_weights/yolox_nano_rgb_256x320_coco.onnx" )
+    parser.add_argument("--path", type=str, default="./onnx_weights/model.onnx" )
     parser.add_argument("--coco_path", type=str, default="/home/abduragim/data/coco/val2017") 
     # parser.add_argument("--coco_path", type=str, default="/home/abduragim/data/coco/train2017") 
     # parser.add_argument("--ann_pickle", type=str, default="./data/coco_train_dataset_person_annotations.pickle")
