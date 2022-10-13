@@ -39,11 +39,18 @@ float strides[STACK_SIZE] = {8, 16, 32};
 #define NMS_THRESH 0.30
 #define CONF_THRESH 0.30
 #define OUPUTU_SIZE 10080
+unsigned int * num_val_boxes;// = (unsigned int *) pi_l2_malloc(sizeof(unsigned int));
+
+// parameters needed for function to_boxes
+int top_k_boxes = 10;
+Box * bboxes = (Box *)  pi_l2_malloc(top_k_boxes * sizeof(Box));
 
 // cycles count variables
 unsigned int slicing_cycles;
 unsigned int decoding_cycles;
 unsigned int filter_boxes_cycles;
+
+
 
 
 AT_HYPERFLASH_EXT_ADDR_TYPE model_L3_Flash = 0;
@@ -134,9 +141,10 @@ static void cluster()
 
     printf("\t\t***Start filter boxes ***\n");
     // unsigned int * num_val_boxes = (unsigned int *) __ALLOC_L2 (sizeof(unsigned int));
-    unsigned int * num_val_boxes = (unsigned int *) pi_l2_malloc(sizeof(unsigned int));
-    num_val_boxes = 0;
+    *num_val_boxes = 0;
+
     printf("\n%d\n", num_val_boxes); 
+
     filter_boxes_cycles = gap_cl_readhwtimer();
     filter_boxes(
         Output_1, 
@@ -153,16 +161,9 @@ static void cluster()
     printf("\n%d\n", num_val_boxes); 
     printf("\t\t***Start conver boxes ***\n");
 
-    // if (*num_val_boxes == 0){
-    //     Box * bboxes = pi_l2_malloc(1 * sizeof(Box));
-    // }else{
-    //     Box * bboxes = pi_l2_malloc((*num_val_boxes) * sizeof(Box));
-    // }
+    // to_bboxes((F16 *)(model_L2_Memory_Dyn + OUPUTU_SIZE * sizeof(F16)), bboxes, *num_val_boxes);
 
-    Box * bboxes = (Box *)  pi_l2_malloc(1 * sizeof(Box));
-    to_bboxes((F16 *)(model_L2_Memory_Dyn + OUPUTU_SIZE * sizeof(F16)), bboxes, *num_val_boxes);
 
-     
 
 // ------------------------- END -------------------------
 
