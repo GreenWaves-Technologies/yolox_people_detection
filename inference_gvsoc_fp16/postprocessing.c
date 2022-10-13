@@ -4,7 +4,7 @@
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 
-void xywh2xyxy(float * input, unsigned int rows){
+void xywh2xyxy(f16 * input, unsigned int rows){
     float width, height, x1, y1, x2, y2;
     int count = 0;
 
@@ -50,8 +50,12 @@ void filter_boxes(f16 * Input, f16 * Output, float conf_thresh, unsigned int row
 }
 
 void to_bboxes(f16 * input, Box * output, int num_val_boxes){
+    printf("inside to_bboxes \n \n");
     int count = 0;
+    printf("num_val_boxes: %d \n", num_val_boxes);
+
     for (int i = 0; i < num_val_boxes; i++){
+        printf("here \n\n");
         output[i].x1 = input[count + 0];
         output[i].y1 = input[count + 1];
         output[i].x2 = input[count + 2];
@@ -84,17 +88,28 @@ float iou(Box * box1, Box * box2){
 
     float iou = intersection_area / (box1_area + box2_area - intersection_area);
 
-    assert (iou >= 0.0);
-    assert (iou <= 1.0);
+    if (iou < 0.0){
+        printf("iou < 0.0 \n");
+        exit(0);
+    }else if (iou > 1.0){
+        printf("iou > 1.0 \n");
+        exit(0);
+    }
+
+    // assert (iou >= 0.0);
+    // assert (iou <= 1.0);
 
     return iou;
 
 }
 
-void nms(Box * boxes, float * Output, float nms_thresh, int num_val_boxes, int * val_final_boxes){
+void nms(Box * boxes, f16 * Output, f16 nms_thresh, int num_val_boxes, int * val_final_boxes){
+
+    printf("inside nms \n \n");
+    printf("num_val_boxes: %d \n", num_val_boxes);
 
     for (int i = 0; i < num_val_boxes; i++){
-
+        printf("in nms loop %d \n", i);
         if (boxes[i].alive == 1){
 
             for (int j = 0; j < num_val_boxes; j++){
@@ -113,6 +128,7 @@ void nms(Box * boxes, float * Output, float nms_thresh, int num_val_boxes, int *
         }
     }
 
+    printf("val_final_boxes: %d \n", *val_final_boxes);
     int count = 0;
     for (int i = 0; i < num_val_boxes; i++){
         if (boxes[i].alive == 1){
@@ -127,6 +143,7 @@ void nms(Box * boxes, float * Output, float nms_thresh, int num_val_boxes, int *
             (*val_final_boxes) += 1;
         }
     }
+    printf("val_final_boxes: %d \n", *val_final_boxes);
 }
 
 
