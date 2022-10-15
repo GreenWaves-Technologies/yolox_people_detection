@@ -9,7 +9,7 @@ typedef struct{
 
 void xywh2xyxy(f16 * array, unsigned int rows);
 
-void filter_boxes(f16 * Input, f16 * Output, float conf_thresh, unsigned int rows, unsigned int  * num_val_boxes);
+void filter_boxes(f16 * Input, f16 * Output, f16 conf_thresh, unsigned int rows, unsigned int  * num_val_boxes);
 
 void to_bboxes(f16 * input, Box * output, int num_val_boxes);
 

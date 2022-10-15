@@ -1,9 +1,8 @@
 #include "Gap.h"
 
 typedef struct{
-    float h;
-    float w;
+    f16 h;
+    f16 w;
 } tTuple;
 
-// void decoding(float * Input, tTuple * feature_maps, float * strides, int size);
-void decoding(f16 * Input, tTuple * feature_maps, float * strides, int size);
+void decoding(f16 * Input, tTuple * feature_maps, f16 * strides, int size);

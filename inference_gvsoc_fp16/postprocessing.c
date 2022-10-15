@@ -26,22 +26,30 @@ void xywh2xyxy(f16 * input, unsigned int rows){
 }
 
 
-void filter_boxes(f16 * Input, f16 * Output, float conf_thresh, unsigned int rows, unsigned int  * num_val_boxes){
+void filter_boxes(f16 * Input, f16 * Output, f16 conf_thresh, unsigned int rows, unsigned int  * num_val_boxes){
 
-    unsigned int count = 0, last_valid_idx = 0;
-    float conf = 0.0;
+    
+    // printf(" \n %d \n", rows);
+    // for (int i=0; i < rows; i++){
+    //     Output[i] = 0.00;
+    //     printf("%d %f \n", i,  Output[i]);
+    // }
+
+    
+    // printf("\n pointer L2 address in the function: %p \n", Output);
+    int count = 0; 
+    int last_valid_idx = 0;
     for (int i = 0; i < rows; i++){
-        conf = Input[count + 4] * Input[count + 5];
         // printf("row: %d Input4: %f Input5: %f Conf: %f conf_thresh: %f \n", i,  Input[count + 4], Input[count + 5],conf, conf_thresh);
         if (Input[count + 4] * Input[count + 5] > conf_thresh){
-            // printf("Input4: %f Input: %f Conf: %f\n", conf, Input[count + 4], Input[count + 5]);
+            // printf("MULT conf: %f OBJ conf: %f CLS conf: %f\n", conf, Input[count + 4], Input[count + 5]);
             Output[last_valid_idx + 0] = Input[count + 0];
             Output[last_valid_idx + 1] = Input[count + 1];
             Output[last_valid_idx + 2] = Input[count + 2];
             Output[last_valid_idx + 3] = Input[count + 3];
             Output[last_valid_idx + 4] = Input[count + 4];
             Output[last_valid_idx + 5] = Input[count + 5];
-            Output[last_valid_idx + 6] = 0.0; 
+            Output[last_valid_idx + 6] = (f16) 0.0; 
             last_valid_idx += 7;
             *num_val_boxes += 1;
         }
@@ -50,12 +58,12 @@ void filter_boxes(f16 * Input, f16 * Output, float conf_thresh, unsigned int row
 }
 
 void to_bboxes(f16 * input, Box * output, int num_val_boxes){
-    printf("inside to_bboxes \n \n");
+    // printf("inside to_bboxes \n \n");
     int count = 0;
-    printf("num_val_boxes: %d \n", num_val_boxes);
+    // printf("num_val_boxes: %d \n", num_val_boxes);
 
     for (int i = 0; i < num_val_boxes; i++){
-        printf("here \n\n");
+        // printf("here \n\n");
         output[i].x1 = input[count + 0];
         output[i].y1 = input[count + 1];
         output[i].x2 = input[count + 2];
@@ -103,13 +111,19 @@ float iou(Box * box1, Box * box2){
 
 }
 
-void nms(Box * boxes, f16 * Output, f16 nms_thresh, int num_val_boxes, int * val_final_boxes){
+void nms(
+    Box * boxes, 
+    f16 * Output, 
+    f16 nms_thresh, 
+    int num_val_boxes, 
+    int * val_final_boxes
+    ){
 
-    printf("inside nms \n \n");
-    printf("num_val_boxes: %d \n", num_val_boxes);
+    // printf("inside nms \n \n");
+    // printf("num_val_boxes: %d \n", num_val_boxes);
 
     for (int i = 0; i < num_val_boxes; i++){
-        printf("in nms loop %d \n", i);
+        // printf("in nms loop %d \n", i);
         if (boxes[i].alive == 1){
 
             for (int j = 0; j < num_val_boxes; j++){
@@ -128,7 +142,7 @@ void nms(Box * boxes, f16 * Output, f16 nms_thresh, int num_val_boxes, int * val
         }
     }
 
-    printf("val_final_boxes: %d \n", *val_final_boxes);
+    // printf("val_final_boxes: %d \n", *val_final_boxes);
     int count = 0;
     for (int i = 0; i < num_val_boxes; i++){
         if (boxes[i].alive == 1){
@@ -143,7 +157,7 @@ void nms(Box * boxes, f16 * Output, f16 nms_thresh, int num_val_boxes, int * val
             (*val_final_boxes) += 1;
         }
     }
-    printf("val_final_boxes: %d \n", *val_final_boxes);
+    // printf("val_final_boxes: %d \n", *val_final_boxes);
 }
 
 
