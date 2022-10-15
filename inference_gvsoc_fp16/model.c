@@ -32,15 +32,14 @@
 
 // parameters needed for decoding layer
 #define STRIDE_SIZE 3
-tTuple feature_maps[STACK_SIZE] = {{32, 40}, {16, 20}, {8, 10}};
-float strides[STACK_SIZE] = {8, 16, 32};
+tTuple feature_maps[STACK_SIZE] = {{32.0, 40.0}, {16.0, 20.0}, {8.0, 10.0}};
+float16 strides[STACK_SIZE] = {8.0, 16.0, 32.0};
 
 // parameters needed for xywh2xyxy layer
 #define RAWS 1680
 
 // parameters needed for postprocessing layer
 #define CONF_THRESH 0.30
-#define OUPUTU_SIZE 10080
 unsigned int * num_val_boxes;
 
 // parameters needed for function to_boxes
@@ -49,7 +48,7 @@ Box bboxes[top_k_boxes];
 
 // parameters needed for nms
 #define NMS_THRESH 0.30
-int * val_bboxes;
+int final_valid_boxes;
 
 // cycles count variables
 unsigned int slicing_cycles;
@@ -92,6 +91,19 @@ void copy_inputs() {
     __CLOSE(File_Input_1);
     __FS_DEINIT(fs);
 
+    // READ OUTPUT
+    printf("\t\t***Reading output file***\n");
+    void *File_Output_1;
+    int ret_Output_1 = 0;
+    File_Output_1 = __OPEN_READ(fs, "../../../decoding_layer/input.bin");
+    ret_Output_1 = __READ(File_Output_1, Output_1, 10080*sizeof(F16));
+    __CLOSE(File_Output_1);
+    __FS_DEINIT(fs);
+
+    // for (int i = 0; i < 10; i++) {
+    //     printf("%f ", Output_1[i]);
+    // }
+    // printf("\n");
 }
 
 
@@ -121,9 +133,20 @@ static void cluster()
 
 // ------------------------- INFERENCE -------------------------
     printf("\t\t***Inference***\n");
-    modelCNN(Output_1);
+    // modelCNN(Output_1);
+
+    // polulate Output_1 with nan values
+    // for (int i = 0; i < 10080; i++) {
+    //     Output_1[i] = 0.0/0.0;
+    // }
+
+    // for (int i = 0; i < 10; i++) {
+    //     printf("%f ", Output_1[i]);
+    // }
+    // printf("\n");
 
 // ------------------------- save output -------------------------
+
     // switch_fs_t fs;
     // __FS_INIT(fs);
     // void *File_Output_1;
@@ -135,7 +158,9 @@ static void cluster()
 
 // ------------------------- DECODING -------------------------
 
+
     printf("\t\t***Start decoding***\n");
+    printf("gap_cl_readhwtimer() = %d \n", gap_cl_readhwtimer());
     decoding_cycles = gap_cl_readhwtimer();
     decoding(
         Output_1,
@@ -143,62 +168,119 @@ static void cluster()
         strides, 
         STRIDE_SIZE
     );
+    printf("gap_cl_readhwtimer() = %d \n", gap_cl_readhwtimer());
     decoding_cycles = gap_cl_readhwtimer() - decoding_cycles;
 
+    // for (int i=0; i < 10; i++){
+    //     printf("%f ", Output_1[i]);
+    // }
+    // printf("\n");
 // ------------------------- POST PROCESSING -------------------------
 
 // ------------------------- xywh2xyxy -------------------------
     printf("\t\t***Start xywh2xyxy***\n");
+
     xywh2xyxy_cycles = gap_cl_readhwtimer();
-    xywh2xyxy(Output_1, (unsigned int) (RAWS));
+    xywh2xyxy(Output_1, (int) (RAWS));
     xywh2xyxy_cycles = gap_cl_readhwtimer() - xywh2xyxy_cycles;
 
+    // for (int i=0; i < 10; i++){
+    //     printf("%f ", Output_1[i]);
+    // }
+    // printf("\n");
+
 // ------------------------- filter boxes -------------------------
-
     printf("\t\t***Start filter boxes ***\n");
+
+    // printf("\n%d\n", *num_val_boxes); 
+
+    //cast model_L2_Memory_Dyn to float16
+    f16 * model_L2_Memory_Dyn = (f16 *) model_L2_Memory_Dyn;
     *num_val_boxes = 0;
-
-    printf("\n%d\n", *num_val_boxes); 
-
     filter_boxes_cycles = gap_cl_readhwtimer();
     filter_boxes(
         Output_1, 
-        (F16 *)(model_L2_Memory_Dyn + OUPUTU_SIZE * sizeof(F16)), 
+        (model_L2_Memory_Dyn + 10080), 
         CONF_THRESH, 
-        OUPUTU_SIZE, 
+        RAWS, 
         num_val_boxes
         );
     filter_boxes_cycles = gap_cl_readhwtimer() - filter_boxes_cycles;
 
-// ------------------------- Conver boxes -------------------------
-    printf("\n%d\n", *num_val_boxes); 
-    printf("\t\t***Start conver boxes ***\n");
+    // for (int i=0; i < 15; i++){
+    //     printf("%f ", (model_L2_Memory_Dyn + 10080)[i]);
+    // }
+    // printf("\n");
 
-    // boxes only contains the top_k_boxes boxes with the highest confidence
-    // consider allocating bboxes dinamicly according to num_val_boxes
-    // otherwise, the function to_boxes will not work properly in all cases
+// ------------------------- Conver boxes -------------------------
+    // printf("\n%d\n", *num_val_boxes); 
+    // printf("\t\t***Start conver boxes ***\n");
+
+    // // boxes only contains the top_k_boxes boxes with the highest confidence
+    // // consider allocating bboxes dinamicly according to num_val_boxes
+    // // otherwise, the function to_boxes will not work properly in all cases
 
     bbox_cycles = gap_cl_readhwtimer();
-    to_bboxes((F16 *)(model_L2_Memory_Dyn + OUPUTU_SIZE * sizeof(F16)), bboxes, *num_val_boxes);
+    to_bboxes(
+        (model_L2_Memory_Dyn + 10080), 
+        bboxes, 
+        *num_val_boxes
+        );
     bbox_cycles = gap_cl_readhwtimer() - bbox_cycles;
 
-    printf("\n%d\n", *num_val_boxes); 
+    // printf("\n%d\n", *num_val_boxes); 
+
+    // for (int i=0; i < 20; i++){
+    //     printf("%f ", bboxes[i].x1);
+    //     printf("%f ", bboxes[i].y1);
+    //     printf("%f ", bboxes[i].x2);
+    //     printf("%f ", bboxes[i].y2);
+    //     printf("%f ", bboxes[i].obj_conf);
+    //     printf("%d ", bboxes[i].cls_conf);
+    //     printf("%d ", bboxes[i].cls_id);
+    //     printf("%d ", bboxes[i].alive);
+    //     printf("\n");
+    // }
 
 // ------------------------- nms -------------------------
+
     printf("\t\t***Start nms ***\n");
-    printf("num_val_boxes points at %p\n", num_val_boxes);
-    printf("val_bboxes points at %p\n", val_bboxes);
-    // *val_bboxes = 0;
+
+    // printf("num_val_boxes points at %p\n", num_val_boxes);
+    // printf("val_bboxes points at %p\n", final_valid_boxes);
+
+    // printf("num_val_boxes value is %d\n", *num_val_boxes);
+    // printf("val_bboxes value at %d\n", final_valid_boxes);
+
+
+    // printf("before nms num_val_boxes: %d\n", *num_val_boxes);
+    // printf("\n%d\n", *num_val_boxes); 
+
+    final_valid_boxes = 0;
     nms_cycles = gap_cl_readhwtimer();
-    printf("before nms num_val_boxes: %d\n", *num_val_boxes);
-    printf("\n%d\n", *num_val_boxes); 
-    nms(bboxes, (F16 *)(model_L2_Memory_Dyn + OUPUTU_SIZE * sizeof(F16)), NMS_THRESH, *num_val_boxes, val_bboxes);
+    nms(
+        bboxes, 
+        (model_L2_Memory_Dyn + 10080), 
+        NMS_THRESH, 
+        *num_val_boxes, 
+        &final_valid_boxes
+        );
     nms_cycles = gap_cl_readhwtimer() - nms_cycles;
 
+    // printf("num_val_boxes value is %d\n", *num_val_boxes);
+    // printf("val_bboxes value at %d\n", final_valid_boxes);
+
+    // for (int i=0; i < final_valid_boxes; i++){
+    //     for(int j=0; j < 7; j++){
+    //         printf("%f ", (model_L2_Memory_Dyn + 10080)[i*7 + j]);
+    //     }
+    //     printf("\n");
+    // }
 // ------------------------- END -------------------------
     printf("\t\t***Runner completed***\n");
-
 }
+
+
 
 int test_model(void)
 {
@@ -266,6 +348,7 @@ int test_model(void)
     modelCNN_Destruct();
 
 #ifdef PERF
+// #ifndef PERF
     {
       printf("\t\t***Performance***\n");
       unsigned int TotalCycles = 0, TotalOper = 0;
