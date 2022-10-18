@@ -160,7 +160,6 @@ static void cluster()
 
 
     printf("\t\t***Start decoding***\n");
-    printf("gap_cl_readhwtimer() = %d \n", gap_cl_readhwtimer());
     decoding_cycles = gap_cl_readhwtimer();
     decoding(
         Output_1,
@@ -168,7 +167,6 @@ static void cluster()
         strides, 
         STRIDE_SIZE
     );
-    printf("gap_cl_readhwtimer() = %d \n", gap_cl_readhwtimer());
     decoding_cycles = gap_cl_readhwtimer() - decoding_cycles;
 
     // for (int i=0; i < 10; i++){
@@ -270,14 +268,27 @@ static void cluster()
     // printf("num_val_boxes value is %d\n", *num_val_boxes);
     // printf("val_bboxes value at %d\n", final_valid_boxes);
 
-    // for (int i=0; i < final_valid_boxes; i++){
-    //     for(int j=0; j < 7; j++){
-    //         printf("%f ", (model_L2_Memory_Dyn + 10080)[i*7 + j]);
-    //     }
-    //     printf("\n");
-    // }
+    printf("final_valid_boxes: %d\n", final_valid_boxes);
+    for (int i=0; i < final_valid_boxes; i++){
+        for(int j=0; j < 7; j++){
+            printf("%f ", (model_L2_Memory_Dyn + 10080)[i*7 + j]);
+        }
+        printf("\n");
+    }
 // ------------------------- END -------------------------
     printf("\t\t***Runner completed***\n");
+
+// ------------------------- SAVE OUTPUT -------------------------
+
+    switch_fs_t fs;
+    __FS_INIT(fs);
+    void *File_Output_2;
+    int ret_Output_2 = 0;
+    File_Output_2 = __OPEN_WRITE(fs, "../../../output.bin");
+    ret_Output_2 = __WRITE(File_Output_2, (model_L2_Memory_Dyn + 10080), final_valid_boxes*7*sizeof(F16));
+    __CLOSE(File_Output_2);
+    __FS_DEINIT(fs);
+
 }
 
 
@@ -347,8 +358,8 @@ int test_model(void)
     printf("\t\t***Destructor***\n");
     modelCNN_Destruct();
 
-#ifdef PERF
-// #ifndef PERF
+// #ifdef PERF
+#ifndef PERF
     {
       printf("\t\t***Performance***\n");
       unsigned int TotalCycles = 0, TotalOper = 0;
@@ -362,6 +373,7 @@ int test_model(void)
         printf("%45s: Cycles: %12u, Cyc%%: %5.1f%%, Operations: %12u, Op%%: %5.1f%%, Operations/Cycle: %f\n", AT_GraphNodeNames[i], AT_GraphPerf[i], 100*((float) (AT_GraphPerf[i]) / TotalCycles), AT_GraphOperInfosNames[i], 100*((float) (AT_GraphOperInfosNames[i]) / TotalOper), ((float) AT_GraphOperInfosNames[i])/ AT_GraphPerf[i]);
       }
 
+      TotalCycles += 93732917;
       // slicing cycles
       printf("%45s: Cycles: %12u, Cyc%%: %5.1f%%, Operations: %12u, Op%%: %5.1f%%, Operations/Cycle: %f\n", "Slicing", slicing_cycles, 100 * ((float) (slicing_cycles) / TotalCycles), NULL, NULL, NULL);
       
