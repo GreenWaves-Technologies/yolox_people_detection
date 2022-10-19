@@ -97,10 +97,10 @@ float iou(Box * box1, Box * box2){
     float iou = intersection_area / (box1_area + box2_area - intersection_area);
 
     if (iou < 0.0){
-        printf("iou < 0.0 \n");
+        printf("iou: %f < 0.0 \n", iou);
         exit(0);
-    }else if (iou > 1.0){
-        printf("iou > 1.0 \n");
+    }else if (iou > 1.0 && (iou - 1.0) > 1e-3){
+        printf("iou: %f > 1.0 \n", iou);
         exit(0);
     }
 

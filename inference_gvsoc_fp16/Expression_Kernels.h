@@ -1,10 +1,9 @@
 #ifndef MODEL_BASIC_KERNELS_H
 #define MODEL_BASIC_KERNELS_H
-
 #include "Gap.h"
 #include "math_funcs.h"
-#include "CNN_FloatType.h"
 #include "CNN_Defines_fp16.h"
+#include "CNN_FloatType.h"
 
 typedef struct {
     unsigned int I0;
