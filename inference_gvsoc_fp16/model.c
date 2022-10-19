@@ -95,7 +95,8 @@ void copy_inputs() {
     printf("\t\t***Reading output file***\n");
     void *File_Output_1;
     int ret_Output_1 = 0;
-    File_Output_1 = __OPEN_READ(fs, "../../../decoding_layer/input.bin");
+    // File_Output_1 = __OPEN_READ(fs, "../../../decoding_layer/input.bin");
+    File_Output_1 = __OPEN_READ(fs, "../../../input_val.bin");
     ret_Output_1 = __READ(File_Output_1, Output_1, 10080*sizeof(F16));
     __CLOSE(File_Output_1);
     __FS_DEINIT(fs);
