@@ -2,7 +2,7 @@
 #include "slicing.h"
 
 // void slicing_chw_channel(signed char * Input, signed char * Output, int h, int w, int chnls){
-void slicing_chw_channel(f16 * Input, f16 * Output, int h, int w, int chnls){
+void slicing_chw_channel(char * Input, f16 * Output, int h, int w, int chnls){
 
     unsigned int count = 0;
     unsigned int k = 0; 
@@ -52,7 +52,7 @@ void slicing_chw_channel(f16 * Input, f16 * Output, int h, int w, int chnls){
 
 }
 
-void slicing_hwc_channel(signed char * Input, signed char * Output, int h, int w, int channels){
+void slicing_hwc_channel(char * Input, f16 * Output, int h, int w, int channels){
 
     unsigned int cur = 0; 
     unsigned int tmp1 = 0;
