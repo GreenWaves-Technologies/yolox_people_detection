@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include "slicing.h"
 
-// void slicing_chw_channel(signed char * Input, signed char * Output, int h, int w, int chnls){
 void slicing_chw_channel(char * Input, f16 * Output, int h, int w, int chnls){
 
     unsigned int count = 0;

@@ -7,7 +7,7 @@
 
 typedef struct{
     char name[30]; 
-}FilesNames;
+}FilesName;
 
 
 int main(){
@@ -18,7 +18,7 @@ int main(){
     // list files in source dictionary
     char test_data_source[20] = "./source/";
     char test_data_target[20] = "./target/";
-    FilesNames file_names[60];
+    FilesName file_names[60];
 
     DIR *d;
     struct dirent *dir;
