@@ -1,15 +1,10 @@
 import numpy as np
+import os
 from time import time
 
 
-def exp(x, e=2.718281828459045):
-    try:
-        # return np.exp(x)
-        # return e ** x
-        output = e ** x
-    except RuntimeWarning:
-        print("overflow error for x ", x)
-    return output
+def exp(x):
+    return np.exp(x)
 
 
 ## naive implementation speed O(N * 6) and space O(1)
@@ -75,24 +70,24 @@ if __name__ == "__main__":
     # feature_map_sizes = [(8, 8), (4, 4), (2, 2)]
     feature_map_sizes = [(32, 40), (16, 20), (8, 10)]
 
-    ## read file outputs.bin
-    with open("./source/data.bin", "rb") as f:
-        outputs = np.fromfile(f, dtype=np.float32)
-    print(outputs.shape)
-    print(outputs[-10:])
+    for file_name in os.listdir("./source"):  
 
-    # with open("./targets.bin", "rb") as f:
-    #     target = np.fromfile(f, dtype=np.float32)
+        # read file outputs.bin
+        with open(f"./source/{file_name}", "rb") as f:
+            outputs = np.fromfile(f, dtype=np.float32)
+            
+        with open(f"./target/{file_name}", "rb") as f:
+            target = np.fromfile(f, dtype=np.float32)
 
-    # timeit(decode_C_style, outputs.copy(), feature_map_sizes, strides)
-    # timeit(decode_C_style_imp, outputs.copy(), feature_map_sizes, strides)
+        timeit(decode_C_style, outputs.copy(), feature_map_sizes, strides)
+        timeit(decode_C_style_imp, outputs.copy(), feature_map_sizes, strides)
 
-    # outputs_1 = decode_C_style(outputs.copy(), feature_map_sizes, strides)
-    # print(np.allclose(outputs_1, target)) 
-    # outputs_2 = decode_C_style_imp(outputs.copy(), feature_map_sizes, strides)
-    # print(np.allclose(outputs_2, target)) 
+        outputs_1 = decode_C_style(outputs.copy(), feature_map_sizes, strides)
+        print(np.allclose(outputs_1, target)) 
+        outputs_2 = decode_C_style_imp(outputs.copy(), feature_map_sizes, strides)
+        print(np.allclose(outputs_2, target)) 
 
 
-    # print("finished")
+    print("\n\n\t\t =============== finished =============== \t\t")
 
     

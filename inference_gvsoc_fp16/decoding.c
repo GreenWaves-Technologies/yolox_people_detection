@@ -1,8 +1,7 @@
 #include <stdio.h>
-#include <math.h>
 #include <stdlib.h>
 #include "decoding.h"
-#include "/home/abduragim/projects/gap_sdk/tools/autotiler_v3/DSP_Libraries/FastFloatApprox.h"
+#include "FastFloatApprox.h"
 
 void decoding(f16 * Input, tTuple * feature_maps, f16 * strides, int size){
 
