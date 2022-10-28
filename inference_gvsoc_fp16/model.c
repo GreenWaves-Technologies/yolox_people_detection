@@ -15,6 +15,7 @@
 #include "gaplib/fs_switch.h"
 #include "slicing.h"
 #include "decoding.h"
+#include "postprocessing.h"
 
 #ifdef __EMUL__
 #define pmsis_exit(n) exit(n)
@@ -34,10 +35,30 @@
 tTuple feature_maps[STACK_SIZE] = {{32.0, 40.0}, {16.0, 20.0}, {8.0, 10.0}};
 float16 strides[STACK_SIZE] = {8.0, 16.0, 32.0};
 
+// parameters needed for xywh2xyxy layer
+#define RAWS 1680
 
+// parameters needed for postprocessing layer
+#define CONF_THRESH 0.30
+// #define CONF_THRESH 0.02
+unsigned int * num_val_boxes;
+
+// parameters needed for function to_boxes
+#define top_k_boxes 70 
+Box bboxes[top_k_boxes];
+
+// parameters needed for nms
+#define NMS_THRESH 0.30
+// #define NMS_THRESH 0.65
+int final_valid_boxes;
 // cycles count variables
 unsigned int slicing_cycles;
 unsigned int decoding_cycles;
+unsigned int xywh2xyxy_cycles;
+unsigned int filter_boxes_cycles;
+unsigned int bbox_cycles;
+unsigned int nms_cycles;
+
 
 
 AT_HYPERFLASH_EXT_ADDR_TYPE model_L3_Flash = 0;
@@ -89,7 +110,6 @@ static void cluster()
 
     slicing_cycles = gap_cl_readhwtimer();
     slicing_chw_channel(
-        // (F16 *)(model_L2_Memory_Dyn + (H_INP * W_INP * CHANNELS)), 
         model_L2_Memory_Dyn + (H_INP * W_INP * CHANNELS), 
         Input_1, 
         H_INP, 
@@ -100,7 +120,7 @@ static void cluster()
 
 // ------------------------- INFERENCE -------------------------
     printf("\t\t***Inference***\n");
-    modelCNN(Output_1);
+    // modelCNN(Output_1);
 
 // ------------------------- DECODING -------------------------
     printf("\t\t***Start decoding***\n");
@@ -113,6 +133,56 @@ static void cluster()
     );
     decoding_cycles = gap_cl_readhwtimer() - decoding_cycles;
 // ------------------------- POST PROCESSING -------------------------
+
+// ------------------------- xywh2xyxy -------------------------
+    printf("\t\t***Start xywh2xyxy***\n");
+
+    xywh2xyxy_cycles = gap_cl_readhwtimer();
+    xywh2xyxy(Output_1, (int) (RAWS));
+    xywh2xyxy_cycles = gap_cl_readhwtimer() - xywh2xyxy_cycles;
+
+// ------------------------- filter_boxes -------------------------
+    printf("\t\t***Start filter boxes ***\n");
+
+    //cast model_L2_Memory_Dyn to float16
+    f16 * model_L2_Memory_Dyn_casted = (f16 *) model_L2_Memory_Dyn;
+    *num_val_boxes = 0;
+    filter_boxes_cycles = gap_cl_readhwtimer();
+    filter_boxes(
+        Output_1, 
+        (model_L2_Memory_Dyn_casted + 10080), 
+        CONF_THRESH, 
+        RAWS, 
+        num_val_boxes
+        );
+    filter_boxes_cycles = gap_cl_readhwtimer() - filter_boxes_cycles;
+
+
+// ------------------------- Conver boxes -------------------------
+    printf("\t\t***Start conver boxes ***\n");
+
+    bbox_cycles = gap_cl_readhwtimer();
+    to_bboxes(
+        (model_L2_Memory_Dyn_casted + 10080), 
+        bboxes, 
+        *num_val_boxes
+        );
+    bbox_cycles = gap_cl_readhwtimer() - bbox_cycles;
+
+
+// ------------------------- nms -------------------------
+    printf("\t\t***Start nms ***\n");
+
+    final_valid_boxes = 0;
+    nms_cycles = gap_cl_readhwtimer();
+    nms(
+        bboxes, 
+        Output_1,
+        NMS_THRESH, 
+        *num_val_boxes, 
+        &final_valid_boxes
+        );
+    nms_cycles = gap_cl_readhwtimer() - nms_cycles;
 
 // ------------------------- END -------------------------
     printf("\t\t***Runner completed***\n");
@@ -186,26 +256,40 @@ int test_model(void)
 #ifdef PERF
 // #ifndef PERF
     {
-      printf("\t\t***Performance***\n");
-      unsigned int TotalCycles = 0, TotalOper = 0;
-      printf("\n");
-      for (unsigned int i=0; i<(sizeof(AT_GraphPerf)/sizeof(unsigned int)); i++) {
-        TotalCycles += AT_GraphPerf[i]; TotalOper += AT_GraphOperInfosNames[i];
-      }
-    
+        printf("\t\t***Performance***\n");
+        unsigned int TotalCycles = 0, TotalOper = 0;
+        printf("\n");
+        for (unsigned int i=0; i<(sizeof(AT_GraphPerf)/sizeof(unsigned int)); i++) {
+            TotalCycles += AT_GraphPerf[i]; TotalOper += AT_GraphOperInfosNames[i];
+        }
+        
 
-      for (unsigned int i=0; i<(sizeof(AT_GraphPerf)/sizeof(unsigned int)); i++) {
-        printf("%45s: Cycles: %12u, Cyc%%: %5.1f%%, Operations: %12u, Op%%: %5.1f%%, Operations/Cycle: %f\n", AT_GraphNodeNames[i], AT_GraphPerf[i], 100*((float) (AT_GraphPerf[i]) / TotalCycles), AT_GraphOperInfosNames[i], 100*((float) (AT_GraphOperInfosNames[i]) / TotalOper), ((float) AT_GraphOperInfosNames[i])/ AT_GraphPerf[i]);
-      }
+        for (unsigned int i=0; i<(sizeof(AT_GraphPerf)/sizeof(unsigned int)); i++) {
+            printf("%45s: Cycles: %12u, Cyc%%: %5.1f%%, Operations: %12u, Op%%: %5.1f%%, Operations/Cycle: %f\n", AT_GraphNodeNames[i], AT_GraphPerf[i], 100*((float) (AT_GraphPerf[i]) / TotalCycles), AT_GraphOperInfosNames[i], 100*((float) (AT_GraphOperInfosNames[i]) / TotalOper), ((float) AT_GraphOperInfosNames[i])/ AT_GraphPerf[i]);
+        }
 
-      // slicing cycles
-      printf("%45s: Cycles: %12u, Cyc%%: %5.1f%%, Operations: %12u, Op%%: %5.1f%%, Operations/Cycle: %f\n", "Slicing", slicing_cycles, 100 * ((float) (slicing_cycles) / TotalCycles), NULL, NULL, NULL);
-      
-      // decoding cycles
-      printf("%45s: Cycles: %12u, Cyc%%: %5.1f%%, Operations: %12u, Op%%: %5.1f%%, Operations/Cycle: %f\n", "Decoding", decoding_cycles, 100 * ((float) (decoding_cycles) / TotalCycles), NULL, NULL, NULL);
+        TotalCycles += 93732917;
+        // slicing cycles
+        printf("%45s: Cycles: %12u, Cyc%%: %5.1f%%, Operations: %12u, Op%%: %5.1f%%, Operations/Cycle: %f\n", "Slicing", slicing_cycles, 100 * ((float) (slicing_cycles) / TotalCycles), NULL, NULL, NULL);
+        
+        // decoding cycles
+        printf("%45s: Cycles: %12u, Cyc%%: %5.1f%%, Operations: %12u, Op%%: %5.1f%%, Operations/Cycle: %f\n", "Decoding", decoding_cycles, 100 * ((float) (decoding_cycles) / TotalCycles), NULL, NULL, NULL);
 
-      printf("%45s: Cycles: %12u, Cyc%%: 100.0%%, Operations: %12u, Op%%: 100.0%%, Operations/Cycle: %f\n", "Total Inference", TotalCycles, TotalOper, ((float) TotalOper)/ TotalCycles);
-      printf("\n");
+        // xywh2xyxy cycles
+        printf("%45s: Cycles: %12u, Cyc%%: %5.1f%%, Operations: %12u, Op%%: %5.1f%%, Operations/Cycle: %f\n", "xywh2xyxy", xywh2xyxy_cycles, 100 * ((float) (xywh2xyxy_cycles) / TotalCycles), NULL, NULL, NULL);
+
+        // filter boxes cycles
+        printf("%45s: Cycles: %12u, Cyc%%: %5.1f%%, Operations: %12u, Op%%: %5.1f%%, Operations/Cycle: %f\n", "Filter boxes", filter_boxes_cycles, 100 * ((float) (filter_boxes_cycles) / TotalCycles), NULL, NULL, NULL);
+
+        // bbox cycles
+        printf("%45s: Cycles: %12u, Cyc%%: %5.1f%%, Operations: %12u, Op%%: %5.1f%%, Operations/Cycle: %f\n", "seq2bboxes", bbox_cycles, 100 * ((float) (bbox_cycles) / TotalCycles), NULL, NULL, NULL);
+
+        // nms cycles
+        printf("%45s: Cycles: %12u, Cyc%%: %5.1f%%, Operations: %12u, Op%%: %5.1f%%, Operations/Cycle: %f\n", "NMS", nms_cycles, 100 * ((float) (nms_cycles) / TotalCycles), NULL, NULL, NULL);
+
+        printf("\n");
+        printf("%45s: Cycles: %12u, Cyc%%: 100.0%%, Operations: %12u, Op%%: 100.0%%, Operations/Cycle: %f\n", "Total Inference", TotalCycles, TotalOper, ((float) TotalOper)/ TotalCycles);
+        printf("\n");
     }
 #endif
 
