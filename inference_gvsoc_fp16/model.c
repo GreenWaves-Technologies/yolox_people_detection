@@ -13,6 +13,7 @@
 #include "model.h"
 #include "modelKernels.h"
 #include "gaplib/fs_switch.h"
+#include "gaplib/ImgIO.h"
 #include "slicing.h"
 #include "decoding.h"
 #include "postprocessing.h"
@@ -24,6 +25,12 @@
 #ifndef STACK_SIZE
 #define STACK_SIZE      1024
 #endif
+
+
+// ------------------------- PARAMETERS -------------------------
+
+//input_file_name
+char *input_file_name = "../../../000000001296.ppm";
 
 // parameters needed for slicing layer
 #define H_INP 256
@@ -60,17 +67,76 @@ unsigned int filter_boxes_cycles;
 unsigned int bbox_cycles;
 unsigned int nms_cycles;
 
-
-
 AT_HYPERFLASH_EXT_ADDR_TYPE model_L3_Flash = 0;
-
 
 /* Inputs */
 /* Outputs */
 L2_MEM F16 Output_1[10080];
 
+// ------------------------------------------------------------------------
+
+//parameters for drawing boxes
+#define MAX(a, b)        (((a)>(b))?(a):(b))
+#define MIN(a, b)        (((a)<(b))?(a):(b))
+
+
+void DrawRectangle(
+    unsigned char *Img, 
+    int W, 
+    int H, 
+    int x, 
+    int y, 
+    int w, 
+    int h, 
+    unsigned char Value
+    ){
+
+    int x0, x1, y0, y1;
+
+    y0 = Max(Min(y, H - 1), 0);
+    y1 = Max(Min(y + h - 1, H - 1), 0);
+    printf("y0: %d, y1: %d \n", y0, y1);
+
+    x0 = x;
+    if (x0 >= 0 && x0 < W) {
+        for (int i = y0; i <= y1; i++)
+            for(int c = 0; c < CHANNELS; c++)
+                Img[CHANNELS*(i * W + x0) + c] = Value;
+    }
+
+    // x1 = x + w - 1;
+    x1 = w - 1;
+    if (x1 >= 0 && x1 < W) {
+        for (int i = y0; i <= y1; i++)
+            for(int c = 0; c < CHANNELS; c++)
+                Img[CHANNELS*(i * W + x1) + c] = Value;
+    }
+
+    x0 = Max(Min(x, W - 1), 0);
+    // x1 = Max(Min(x + w - 1, W - 1), 0);
+    x1 = w - 1;
+    printf("x0: %d, x1: %d \n", x0, x1);
+
+    y0 = y;
+    if (y0 >= 0 && y0 < H) {
+        for (int i = x0; i <= x1; i++)
+            for(int c = 0; c < CHANNELS; c++)
+                Img[CHANNELS*(y0 * W + i) + c] = Value;
+    }
+
+    y1 = y + h - 1;
+    if (y1 >= 0 && y1 < H) {
+        for (int i = x0; i <= x1; i++)
+            for(int c = 0; c < CHANNELS; c++)
+                Img[CHANNELS*(y1 * W + i) + c] = Value;
+    }
+}
+
+
+
 /* Copy inputs function */
 void copy_inputs() {
+
     switch_fs_t fs;
     __FS_INIT(fs);
 
@@ -78,9 +144,10 @@ void copy_inputs() {
     void *File_Input_1;
     int ret_Input_1 = 0;
     #ifdef __EMUL__
-    File_Input_1 = __OPEN_READ(fs, "../../../Input_1_Unsliced.bin");
+    // File_Input_1 = __OPEN_READ(fs, "../../../Input_1_Unsliced.bin");
     #else
-    File_Input_1 = __OPEN_READ(fs, "../../../Input_1_Unsliced.bin");
+    // File_Input_1 = __OPEN_READ(fs, "../../../Input_1_Unsliced.bin");
+    File_Input_1 = __OPEN_READ(fs, "../../../../Girl_Image_Unsliced.bin");
     #endif
 
     ret_Input_1 = __READ(
@@ -92,6 +159,28 @@ void copy_inputs() {
     __CLOSE(File_Input_1);
     __FS_DEINIT(fs);
 
+
+    // -------------------------- READ IMAGE FROM PPM FILE --------------------------
+    
+    // printf("\n\t\t*** READING INPUT FROM PPM FILE ***\n");
+    // printf("##########################################################\n");
+    // printf(" model_L2_Memory_Dyn points at: %p \n", model_L2_Memory_Dyn);
+    // int status = ReadImageFromFile(
+    //     input_file_name,
+    //     W_INP, 
+    //     H_INP, 
+    //     CHANNELS, 
+    //     model_L2_Memory_Dyn + (H_INP * W_INP * CHANNELS),
+    //     W_INP * H_INP * CHANNELS * sizeof(char), 
+    //     IMGIO_OUTPUT_CHAR,
+    //     1
+    //     // 0
+    // );
+    // printf("read image status: %d\n", status);
+
+    for(int i = 0; i < 10; i++)
+        printf(" %d ", (model_L2_Memory_Dyn + (H_INP * W_INP * CHANNELS))[i]);
+    printf("\n");
 }
 
 static void cluster()
