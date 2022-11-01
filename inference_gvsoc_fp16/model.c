@@ -51,6 +51,7 @@ Box bboxes[top_k_boxes];
 #define NMS_THRESH 0.30
 // #define NMS_THRESH 0.65
 int final_valid_boxes;
+
 // cycles count variables
 unsigned int slicing_cycles;
 unsigned int decoding_cycles;
@@ -92,7 +93,6 @@ void copy_inputs() {
     __FS_DEINIT(fs);
 
 }
-
 
 static void cluster()
 {

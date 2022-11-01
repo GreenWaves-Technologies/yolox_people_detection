@@ -1,13 +1,12 @@
 #include "postprocessing.h"
-#include <assert.h>
 
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 
 void xywh2xyxy(f16 * input, unsigned int rows){
-    float width, height, x1, y1, x2, y2;
-    int count = 0;
 
+    int count = 0;
+    float width, height, x1, y1, x2, y2;
     for (unsigned int i = 0; i < rows; i++){
 
         width = input[count + 2] / 2;
@@ -17,6 +16,7 @@ void xywh2xyxy(f16 * input, unsigned int rows){
         y1 = input[count + 1] - height;
         x2 = input[count + 0] + width;
         y2 = input[count + 1] + height;
+
         input[count + 0] = x1;
         input[count + 1] = y1;
         input[count + 2] = x2;
@@ -28,21 +28,10 @@ void xywh2xyxy(f16 * input, unsigned int rows){
 
 void filter_boxes(f16 * Input, f16 * Output, f16 conf_thresh, unsigned int rows, unsigned int  * num_val_boxes){
 
-    
-    // printf(" \n %d \n", rows);
-    // for (int i=0; i < rows; i++){
-    //     Output[i] = 0.00;
-    //     printf("%d %f \n", i,  Output[i]);
-    // }
-
-    
-    // printf("\n pointer L2 address in the function: %p \n", Output);
     int count = 0; 
     int last_valid_idx = 0;
     for (unsigned int i = 0; i < rows; i++){
-        // printf("row: %d Input4: %f Input5: %f Conf: %f conf_thresh: %f \n", i,  Input[count + 4], Input[count + 5],conf, conf_thresh);
         if (Input[count + 4] * Input[count + 5] > conf_thresh){
-            // printf("MULT conf: %f OBJ conf: %f CLS conf: %f\n", conf, Input[count + 4], Input[count + 5]);
             Output[last_valid_idx + 0] = Input[count + 0];
             Output[last_valid_idx + 1] = Input[count + 1];
             Output[last_valid_idx + 2] = Input[count + 2];
@@ -58,12 +47,9 @@ void filter_boxes(f16 * Input, f16 * Output, f16 conf_thresh, unsigned int rows,
 }
 
 void to_bboxes(f16 * input, Box * output, int num_val_boxes){
-    // printf("inside to_bboxes \n \n");
-    int count = 0;
-    // printf("num_val_boxes: %d \n", num_val_boxes);
 
+    int count = 0;
     for (int i = 0; i < num_val_boxes; i++){
-        // printf("here \n\n");
         output[i].x1 = input[count + 0];
         output[i].y1 = input[count + 1];
         output[i].x2 = input[count + 2];
@@ -80,13 +66,10 @@ void to_bboxes(f16 * input, Box * output, int num_val_boxes){
 
 float iou(Box * box1, Box * box2){
 
-    // printf("box1 x1: %f y1: %f x2: %f y2: %f \n", box1->x1, box1->y1, box1->x2, box1->y2);
-    // printf("box2 x1: %f y1: %f x2: %f y2: %f \n", box2->x1, box2->y1, box2->x2, box2->y2);
-
-    float x_left = MAX(box1->x1, box2->x1);
-    float y_top = MAX(box1->y1, box2->y1);
-    float x_right = MIN(box1->x2, box2->x2);
-    float y_bottom = MIN(box1->y2, box2->y2);
+    float x_left    = MAX(box1->x1, box2->x1);
+    float y_top     = MAX(box1->y1, box2->y1);
+    float x_right   = MIN(box1->x2, box2->x2);
+    float y_bottom  = MIN(box1->y2, box2->y2);
 
     if (x_right < x_left || y_bottom < y_top){
         return 0.0;
@@ -119,11 +102,7 @@ void nms(
     int * val_final_boxes
     ){
 
-    // printf("inside nms \n \n");
-    // printf("num_val_boxes: %d \n", num_val_boxes);
-
     for (int i = 0; i < num_val_boxes; i++){
-        // printf("in nms loop %d \n", i);
         if (boxes[i].alive == 1){
 
             for (int j = 0; j < num_val_boxes; j++){
@@ -142,7 +121,6 @@ void nms(
         }
     }
 
-    // printf("val_final_boxes: %d \n", *val_final_boxes);
     int count = 0;
     for (int i = 0; i < num_val_boxes; i++){
         if (boxes[i].alive == 1){
@@ -157,7 +135,6 @@ void nms(
             (*val_final_boxes) += 1;
         }
     }
-    // printf("val_final_boxes: %d \n", *val_final_boxes);
 }
 
 
