@@ -30,7 +30,8 @@
 // ------------------------- PARAMETERS -------------------------
 
 //input_file_name
-char *input_file_name = "../../../000000001296.ppm";
+char *input_file_name   = "../../../000000001296.ppm";
+char *output_file_name  = "../../../000000001296_out.ppm";
 
 // parameters needed for slicing layer
 #define H_INP 256
@@ -137,50 +138,26 @@ void DrawRectangle(
 /* Copy inputs function */
 void copy_inputs() {
 
-    switch_fs_t fs;
-    __FS_INIT(fs);
-
-    /* Reading from file Input_1 */
-    void *File_Input_1;
-    int ret_Input_1 = 0;
-    #ifdef __EMUL__
-    // File_Input_1 = __OPEN_READ(fs, "../../../Input_1_Unsliced.bin");
-    #else
-    // File_Input_1 = __OPEN_READ(fs, "../../../Input_1_Unsliced.bin");
-    File_Input_1 = __OPEN_READ(fs, "../../../../Girl_Image_Unsliced.bin");
-    #endif
-
-    ret_Input_1 = __READ(
-        File_Input_1, 
-        model_L2_Memory_Dyn + (H_INP * W_INP * CHANNELS), 
-        (H_INP * W_INP * CHANNELS)*sizeof(signed char)
-    );
-
-    __CLOSE(File_Input_1);
-    __FS_DEINIT(fs);
-
-
     // -------------------------- READ IMAGE FROM PPM FILE --------------------------
     
-    // printf("\n\t\t*** READING INPUT FROM PPM FILE ***\n");
-    // printf("##########################################################\n");
-    // printf(" model_L2_Memory_Dyn points at: %p \n", model_L2_Memory_Dyn);
-    // int status = ReadImageFromFile(
-    //     input_file_name,
-    //     W_INP, 
-    //     H_INP, 
-    //     CHANNELS, 
-    //     model_L2_Memory_Dyn + (H_INP * W_INP * CHANNELS),
-    //     W_INP * H_INP * CHANNELS * sizeof(char), 
-    //     IMGIO_OUTPUT_CHAR,
-    //     1
-    //     // 0
-    // );
-    // printf("read image status: %d\n", status);
+    printf("\n\t\t*** READING INPUT FROM PPM FILE ***\n");
+    int status = ReadImageFromFile(
+        input_file_name,
+        W_INP, 
+        H_INP, 
+        CHANNELS, 
+        model_L2_Memory_Dyn + (H_INP * W_INP * CHANNELS),
+        W_INP * H_INP * CHANNELS * sizeof(char), 
+        IMGIO_OUTPUT_CHAR,
+        1
+    );
 
-    for(int i = 0; i < 10; i++)
-        printf(" %d ", (model_L2_Memory_Dyn + (H_INP * W_INP * CHANNELS))[i]);
-    printf("\n");
+    if (status != 0) {
+        printf("Error reading image from file %s (error: %d) \n", input_file_name, status);
+        exit(-1);
+    } 
+
+
 }
 
 static void cluster()
@@ -275,6 +252,65 @@ static void cluster()
 
 // ------------------------- END -------------------------
     printf("\t\t***Runner completed***\n");
+
+    // ----------------------- DRAW REACTANGLES ---------------------
+
+    // read image again but do not transpose it
+    // cast model_L2_Memory_Dyn to back to char
+    unsigned char * image = (unsigned char *) model_L2_Memory_Dyn_casted;
+    printf(" model_L2_Memory_Dyn points at: %p \n", image);
+    int status = ReadImageFromFile(
+        input_file_name,
+        W_INP, 
+        H_INP, 
+        CHANNELS, 
+        image,
+        W_INP * H_INP * CHANNELS * sizeof(char), 
+        IMGIO_OUTPUT_CHAR,
+        0 
+    );
+
+    printf("\n");
+    for (int i=0; i < final_valid_boxes; i++){
+
+        int x1 = (int) Output_1[i*7 + 0];
+        int y1 = (int) Output_1[i*7 + 1];
+        int x2 = (int) Output_1[i*7 + 2];
+        int y2 = (int) Output_1[i*7 + 3];
+    
+        float score = Output_1[i*7 + 4] * Output_1[i*7 + 5];
+        int cls = (int) Output_1[i*7 + 6];
+
+        int h = y2 - y1;
+        int w = x2 - x1;
+        int x = w / 2;
+        int y = h / 2;
+        
+        DrawRectangle(
+            image,
+            W_INP, 
+            H_INP, 
+            x1,
+            y1,
+            x2,
+            y2,
+            255
+        );
+    }
+
+    /* ----------------------- SAVE IMAGE --------------------- */
+    printf("\t\t***Save image***\n");
+    status = WriteImageToFile(
+        output_file_name,
+        W_INP, 
+        H_INP, 
+        CHANNELS, 
+        image,
+        RGB888_IO
+    );
+
+
+
 }
 
 int test_model(void)
