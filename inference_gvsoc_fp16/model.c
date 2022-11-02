@@ -81,7 +81,7 @@ L2_MEM F16 Output_1[10080];
 #define MIN(a, b)        (((a)<(b))?(a):(b))
 
 
-void DrawRectangle(
+void draw_rectangle(
     unsigned char *Img, 
     int W, 
     int H, 
@@ -89,7 +89,7 @@ void DrawRectangle(
     int y, 
     int w, 
     int h, 
-    unsigned char Value
+    unsigned char ColorValue
     ){
 
     int x0, x1, y0, y1;
@@ -102,19 +102,17 @@ void DrawRectangle(
     if (x0 >= 0 && x0 < W) {
         for (int i = y0; i <= y1; i++)
             for(int c = 0; c < CHANNELS; c++)
-                Img[CHANNELS*(i * W + x0) + c] = Value;
+                Img[CHANNELS*(i * W + x0) + c] = ColorValue;
     }
 
-    // x1 = x + w - 1;
     x1 = w - 1;
     if (x1 >= 0 && x1 < W) {
         for (int i = y0; i <= y1; i++)
             for(int c = 0; c < CHANNELS; c++)
-                Img[CHANNELS*(i * W + x1) + c] = Value;
+                Img[CHANNELS*(i * W + x1) + c] = ColorValue;
     }
 
     x0 = Max(Min(x, W - 1), 0);
-    // x1 = Max(Min(x + w - 1, W - 1), 0);
     x1 = w - 1;
     printf("x0: %d, x1: %d \n", x0, x1);
 
@@ -122,14 +120,14 @@ void DrawRectangle(
     if (y0 >= 0 && y0 < H) {
         for (int i = x0; i <= x1; i++)
             for(int c = 0; c < CHANNELS; c++)
-                Img[CHANNELS*(y0 * W + i) + c] = Value;
+                Img[CHANNELS*(y0 * W + i) + c] = ColorValue;
     }
 
     y1 = y + h - 1;
     if (y1 >= 0 && y1 < H) {
         for (int i = x0; i <= x1; i++)
             for(int c = 0; c < CHANNELS; c++)
-                Img[CHANNELS*(y1 * W + i) + c] = Value;
+                Img[CHANNELS*(y1 * W + i) + c] = ColorValue;
     }
 }
 
@@ -258,7 +256,6 @@ static void cluster()
     // read image again but do not transpose it
     // cast model_L2_Memory_Dyn to back to char
     unsigned char * image = (unsigned char *) model_L2_Memory_Dyn_casted;
-    printf(" model_L2_Memory_Dyn points at: %p \n", image);
     int status = ReadImageFromFile(
         input_file_name,
         W_INP, 
@@ -286,7 +283,7 @@ static void cluster()
         int x = w / 2;
         int y = h / 2;
         
-        DrawRectangle(
+        draw_rectangle(
             image,
             W_INP, 
             H_INP, 
@@ -308,9 +305,6 @@ static void cluster()
         image,
         RGB888_IO
     );
-
-
-
 }
 
 int test_model(void)
