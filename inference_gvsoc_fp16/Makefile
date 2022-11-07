@@ -26,6 +26,7 @@ APP_SRCS += $(MODEL_PREFIX).c $(MODEL_GEN_C) $(MODEL_EXPRESSIONS) $(MODEL_COMMON
 APP_SRCS += slicing.c
 APP_SRCS += decoding.c
 APP_SRCS += postprocessing.c
+APP_SRCS += draw.c
 
 
 APP_CFLAGS += -g -O3 -mno-memcpy -fno-tree-loop-distribute-patterns

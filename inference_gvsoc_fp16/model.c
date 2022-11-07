@@ -17,6 +17,7 @@
 #include "slicing.h"
 #include "decoding.h"
 #include "postprocessing.h"
+#include "draw.h"
 
 #ifdef __EMUL__
 #define pmsis_exit(n) exit(n)
@@ -32,11 +33,6 @@
 //input_file_name
 char *input_file_name   = "../../../000000001296.ppm";
 char *output_file_name  = "../../../000000001296_out.ppm";
-
-// parameters needed for slicing layer
-#define H_INP 256
-#define W_INP 320
-#define CHANNELS 3
 
 // parameters needed for decoding layer
 #define STRIDE_SIZE 3
@@ -73,64 +69,7 @@ AT_HYPERFLASH_EXT_ADDR_TYPE model_L3_Flash = 0;
 /* Inputs */
 /* Outputs */
 L2_MEM F16 Output_1[10080];
-
 // ------------------------------------------------------------------------
-
-//parameters for drawing boxes
-#define MAX(a, b)        (((a)>(b))?(a):(b))
-#define MIN(a, b)        (((a)<(b))?(a):(b))
-
-
-void draw_rectangle(
-    unsigned char *Img, 
-    int W, 
-    int H, 
-    int x, 
-    int y, 
-    int w, 
-    int h, 
-    unsigned char ColorValue
-    ){
-
-    int x0, x1, y0, y1;
-
-    y0 = Max(Min(y, H - 1), 0);
-    y1 = Max(Min(y + h - 1, H - 1), 0);
-    printf("y0: %d, y1: %d \n", y0, y1);
-
-    x0 = x;
-    if (x0 >= 0 && x0 < W) {
-        for (int i = y0; i <= y1; i++)
-            for(int c = 0; c < CHANNELS; c++)
-                Img[CHANNELS*(i * W + x0) + c] = ColorValue;
-    }
-
-    x1 = w - 1;
-    if (x1 >= 0 && x1 < W) {
-        for (int i = y0; i <= y1; i++)
-            for(int c = 0; c < CHANNELS; c++)
-                Img[CHANNELS*(i * W + x1) + c] = ColorValue;
-    }
-
-    x0 = Max(Min(x, W - 1), 0);
-    x1 = w - 1;
-    printf("x0: %d, x1: %d \n", x0, x1);
-
-    y0 = y;
-    if (y0 >= 0 && y0 < H) {
-        for (int i = x0; i <= x1; i++)
-            for(int c = 0; c < CHANNELS; c++)
-                Img[CHANNELS*(y0 * W + i) + c] = ColorValue;
-    }
-
-    y1 = y + h - 1;
-    if (y1 >= 0 && y1 < H) {
-        for (int i = x0; i <= x1; i++)
-            for(int c = 0; c < CHANNELS; c++)
-                Img[CHANNELS*(y1 * W + i) + c] = ColorValue;
-    }
-}
-
 
 
 /* Copy inputs function */
@@ -283,16 +222,7 @@ static void cluster()
         int x = w / 2;
         int y = h / 2;
         
-        draw_rectangle(
-            image,
-            W_INP, 
-            H_INP, 
-            x1,
-            y1,
-            x2,
-            y2,
-            255
-        );
+        draw_rectangle(image, W_INP, H_INP, x1, y1, x2, y2, 255);
     }
 
     /* ----------------------- SAVE IMAGE --------------------- */
