@@ -31,6 +31,9 @@
 // ------------------------- PARAMETERS -------------------------
 
 //input_file_name
+printf("input_file_name: %s", STR(INPUT_FILE_NAME));
+printf("outptut_file_name: %s", STR(OUTPUT_FILE_NAME));
+
 char *input_file_name   = "../../../000000001296.ppm";
 char *output_file_name  = "../../../000000001296_out.ppm";
 

@@ -1,6 +1,10 @@
 #ifndef __model_H__
 #define __model_H__
 
+
+#define QUOTE(name) #name
+#define STR(macro) QUOTE(macro)
+
 // parameters needed for slicing layer
 #define H_INP 256
 #define W_INP 320
