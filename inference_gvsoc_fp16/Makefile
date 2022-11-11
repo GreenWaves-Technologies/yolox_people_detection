@@ -21,6 +21,10 @@ include common/model_decl.mk
 # pulpChip = GAP
 # PULP_APP = $(MODEL_PREFIX)
 
+## input file names 
+input_file_name=../../../000000001296.ppm
+output_file_name=../../../000000001296_out.ppm
+
 APP = $(MODEL_PREFIX)
 APP_SRCS += $(MODEL_PREFIX).c $(MODEL_GEN_C) $(MODEL_EXPRESSIONS) $(MODEL_COMMON_SRCS) $(CNN_LIB)
 APP_SRCS += slicing.c
@@ -34,13 +38,6 @@ APP_CFLAGS += -I. -I$(MODEL_COMMON_INC) -I$(TILER_EMU_INC) -I$(TILER_INC) $(CNN_
 APP_CFLAGS += -DPERF -DAT_MODEL_PREFIX=$(MODEL_PREFIX) $(MODEL_SIZE_CFLAGS)
 APP_CFLAGS += -DSTACK_SIZE=$(CLUSTER_STACK_SIZE) -DSLAVE_STACK_SIZE=$(CLUSTER_SLAVE_STACK_SIZE)
 APP_CFLAGS += -DAT_IMAGE=$(IMAGE) -DFREQ_FC=$(FREQ_FC) -DFREQ_CL=$(FREQ_CL) -DFREQ_PE=$(FREQ_PE)
-
-# input_file_name=../../../000000001296.ppm
-# output_file_name=../../../000000001296_out.ppm
-
-input_file_name=000000001296.ppm
-output_file_name=000000001296_out.ppm
-
 APP_CFLAGS += -DINPUT_FILE_NAME=$(input_file_name) -DOUTPUT_FILE_NAME=$(output_file_name)
 
 READFS_FILES=$(abspath $(MODEL_TENSORS))

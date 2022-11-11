@@ -23,40 +23,20 @@
 #define pmsis_exit(n) exit(n)
 #endif
 
-#ifndef STACK_SIZE
-#define STACK_SIZE      1024
-#endif
-
 
 // ------------------------- PARAMETERS -------------------------
 
-//input_file_name
-printf("input_file_name: %s", STR(INPUT_FILE_NAME));
-printf("outptut_file_name: %s", STR(OUTPUT_FILE_NAME));
-
-char *input_file_name   = "../../../000000001296.ppm";
-char *output_file_name  = "../../../000000001296_out.ppm";
-
 // parameters needed for decoding layer
-#define STRIDE_SIZE 3
 tTuple feature_maps[STACK_SIZE] = {{32.0, 40.0}, {16.0, 20.0}, {8.0, 10.0}};
 float16 strides[STACK_SIZE] = {8.0, 16.0, 32.0};
 
-// parameters needed for xywh2xyxy layer
-#define RAWS 1680
-
 // parameters needed for postprocessing layer
-#define CONF_THRESH 0.30
-// #define CONF_THRESH 0.02
 unsigned int * num_val_boxes;
 
 // parameters needed for function to_boxes
-#define top_k_boxes 70 
 Box bboxes[top_k_boxes];
 
 // parameters needed for nms
-#define NMS_THRESH 0.30
-// #define NMS_THRESH 0.65
 int final_valid_boxes;
 
 // cycles count variables
@@ -82,7 +62,7 @@ void copy_inputs() {
     
     printf("\n\t\t*** READING INPUT FROM PPM FILE ***\n");
     int status = ReadImageFromFile(
-        input_file_name,
+        STR(INPUT_FILE_NAME),
         W_INP, 
         H_INP, 
         CHANNELS, 
@@ -93,7 +73,7 @@ void copy_inputs() {
     );
 
     if (status != 0) {
-        printf("Error reading image from file %s (error: %d) \n", input_file_name, status);
+        printf("Error reading image from file %s (error: %d) \n", STR(INPUT_FILE_NAME), status);
         exit(-1);
     } 
 
@@ -121,7 +101,7 @@ void draw_boxes(F16 * model_L2_Memory_Dyn_casted){
     // cast model_L2_Memory_Dyn to back to char
     unsigned char * image = (unsigned char *) model_L2_Memory_Dyn_casted;
     int status = ReadImageFromFile(
-        input_file_name,
+        STR(INPUT_FILE_NAME),
         W_INP, 
         H_INP, 
         CHANNELS, 
@@ -153,7 +133,7 @@ void draw_boxes(F16 * model_L2_Memory_Dyn_casted){
     /* ----------------------- SAVE IMAGE --------------------- */
     printf("\t\t***Save image***\n");
     status = WriteImageToFile(
-        output_file_name,
+        STR(OUTPUT_FILE_NAME),
         W_INP, 
         H_INP, 
         CHANNELS, 
