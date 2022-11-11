@@ -77,21 +77,6 @@ void copy_inputs() {
         exit(-1);
     } 
 
-
-
-    // READ OUTPUT
-    switch_fs_t fs;
-    __FS_INIT(fs);
-
-    printf("\t\t***Reading output file***\n");
-    void *File_Output_1;
-    int ret_Output_1 = 0;
-    File_Output_1 = __OPEN_READ(fs, "../../../inputs_for_validation/000000001296.jpg.bin");
-    ret_Output_1 = __READ(File_Output_1, Output_1, 10080*sizeof(F16));
-
-    __CLOSE(File_Output_1);
-    __FS_DEINIT(fs);
-    
 }
 
 
