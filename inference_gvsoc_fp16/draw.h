@@ -1,3 +1,5 @@
+#include "Gap.h"
+
 void draw_rectangle(
     unsigned char *Img, 
     int W, 
@@ -7,3 +9,9 @@ void draw_rectangle(
     int w, 
     int h, 
     unsigned char ColorValue);
+
+
+void draw_boxes(
+    f16 * model_L2_Memory_Dyn_casted,
+    f16 * Output_1,
+    int final_valid_boxes);

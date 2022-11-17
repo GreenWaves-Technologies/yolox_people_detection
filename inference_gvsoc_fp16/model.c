@@ -80,53 +80,6 @@ void copy_inputs() {
 }
 
 
-void draw_boxes(F16 * model_L2_Memory_Dyn_casted){
-
-    // read image again but do not transpose it
-    // cast model_L2_Memory_Dyn to back to char
-    unsigned char * image = (unsigned char *) model_L2_Memory_Dyn_casted;
-    int status = ReadImageFromFile(
-        STR(INPUT_FILE_NAME),
-        W_INP, 
-        H_INP, 
-        CHANNELS, 
-        image,
-        W_INP * H_INP * CHANNELS * sizeof(char), 
-        IMGIO_OUTPUT_CHAR,
-        0 
-    );
-
-    printf("\n");
-    for (int i=0; i < final_valid_boxes; i++){
-
-        int x1 = (int) Output_1[i*7 + 0];
-        int y1 = (int) Output_1[i*7 + 1];
-        int x2 = (int) Output_1[i*7 + 2];
-        int y2 = (int) Output_1[i*7 + 3];
-    
-        float score = Output_1[i*7 + 4] * Output_1[i*7 + 5];
-        int cls = (int) Output_1[i*7 + 6];
-
-        int h = y2 - y1;
-        int w = x2 - x1;
-        int x = w / 2;
-        int y = h / 2;
-        
-        draw_rectangle(image, W_INP, H_INP, x1, y1, x2, y2, 255);
-    }
-
-    /* ----------------------- SAVE IMAGE --------------------- */
-    printf("\t\t***Save image***\n");
-    status = WriteImageToFile(
-        STR(OUTPUT_FILE_NAME),
-        W_INP, 
-        H_INP, 
-        CHANNELS, 
-        image,
-        RGB888_IO
-    );
-}
-
 static void cluster()
 {
 
@@ -219,7 +172,12 @@ static void cluster()
 
 
 // ----------------------- DRAW REACTANGLES ---------------------
-    draw_boxes(model_L2_Memory_Dyn_casted);
+    printf("\t\t***Start draw reactangles ***\n");
+    draw_boxes(
+        model_L2_Memory_Dyn_casted,
+        &Output_1,
+        final_valid_boxes
+        );
 
 // ------------------------- END -------------------------
     printf("\t\t***Runner completed***\n");
