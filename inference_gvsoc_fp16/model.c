@@ -13,43 +13,30 @@
 #include "model.h"
 #include "modelKernels.h"
 #include "gaplib/fs_switch.h"
+#include "gaplib/ImgIO.h"
 #include "slicing.h"
 #include "decoding.h"
 #include "postprocessing.h"
+#include "draw.h"
 
 #ifdef __EMUL__
 #define pmsis_exit(n) exit(n)
 #endif
 
-#ifndef STACK_SIZE
-#define STACK_SIZE      1024
-#endif
 
-// parameters needed for slicing layer
-#define H_INP 256
-#define W_INP 320
-#define CHANNELS 3
+// ------------------------- PARAMETERS -------------------------
 
 // parameters needed for decoding layer
-#define STRIDE_SIZE 3
 tTuple feature_maps[STACK_SIZE] = {{32.0, 40.0}, {16.0, 20.0}, {8.0, 10.0}};
 float16 strides[STACK_SIZE] = {8.0, 16.0, 32.0};
 
-// parameters needed for xywh2xyxy layer
-#define RAWS 1680
-
 // parameters needed for postprocessing layer
-#define CONF_THRESH 0.30
-// #define CONF_THRESH 0.02
 unsigned int * num_val_boxes;
 
 // parameters needed for function to_boxes
-#define top_k_boxes 70 
 Box bboxes[top_k_boxes];
 
 // parameters needed for nms
-#define NMS_THRESH 0.30
-// #define NMS_THRESH 0.65
 int final_valid_boxes;
 
 // cycles count variables
@@ -60,39 +47,38 @@ unsigned int filter_boxes_cycles;
 unsigned int bbox_cycles;
 unsigned int nms_cycles;
 
-
-
 AT_HYPERFLASH_EXT_ADDR_TYPE model_L3_Flash = 0;
-
 
 /* Inputs */
 /* Outputs */
 L2_MEM F16 Output_1[10080];
+// ------------------------------------------------------------------------
+
 
 /* Copy inputs function */
 void copy_inputs() {
-    switch_fs_t fs;
-    __FS_INIT(fs);
 
-    /* Reading from file Input_1 */
-    void *File_Input_1;
-    int ret_Input_1 = 0;
-    #ifdef __EMUL__
-    File_Input_1 = __OPEN_READ(fs, "../../../Input_1_Unsliced.bin");
-    #else
-    File_Input_1 = __OPEN_READ(fs, "../../../Input_1_Unsliced.bin");
-    #endif
-
-    ret_Input_1 = __READ(
-        File_Input_1, 
-        model_L2_Memory_Dyn + (H_INP * W_INP * CHANNELS), 
-        (H_INP * W_INP * CHANNELS)*sizeof(signed char)
+    // -------------------------- READ IMAGE FROM PPM FILE --------------------------
+    
+    printf("\n\t\t*** READING INPUT FROM PPM FILE ***\n");
+    int status = ReadImageFromFile(
+        STR(INPUT_FILE_NAME),
+        W_INP, 
+        H_INP, 
+        CHANNELS, 
+        model_L2_Memory_Dyn + (H_INP * W_INP * CHANNELS),
+        W_INP * H_INP * CHANNELS * sizeof(char), 
+        IMGIO_OUTPUT_CHAR,
+        1
     );
 
-    __CLOSE(File_Input_1);
-    __FS_DEINIT(fs);
+    if (status != 0) {
+        printf("Error reading image from file %s (error: %d) \n", STR(INPUT_FILE_NAME), status);
+        exit(-1);
+    } 
 
 }
+
 
 static void cluster()
 {
@@ -184,8 +170,18 @@ static void cluster()
         );
     nms_cycles = gap_cl_readhwtimer() - nms_cycles;
 
+
+// ----------------------- DRAW REACTANGLES ---------------------
+    printf("\t\t***Start draw reactangles ***\n");
+    draw_boxes(
+        model_L2_Memory_Dyn_casted,
+        &Output_1,
+        final_valid_boxes
+        );
+
 // ------------------------- END -------------------------
     printf("\t\t***Runner completed***\n");
+
 }
 
 int test_model(void)
