@@ -105,21 +105,6 @@ static void cluster()
     mainCNN(Output_1);
     printf("Runner completed\n");
 
-// ------------------------- read nntool int8 output -------------------------
-    // printf("\t\t***Start reading nntool int8 output***\n");
-    // switch_fs_t fs;
-    // __FS_INIT(fs);
-
-    // void *File_Input_1;
-    // int ret_Input_1 = 0;
-
-    // File_Input_1 = __OPEN_READ(fs, "../../../000000559842.bin");
-    // // ret_Input_1 = __READ(File_Input_1, Output_1, RAWS * 6 * sizeof(float));
-    // ret_Input_1 = __READ(File_Input_1, Output_1, 9480 * sizeof(float));
-
-    // __CLOSE(File_Input_1);
-    // __FS_DEINIT(fs);
-
 // ------------------------- DECODING -------------------------
     printf("\t\t***Start decoding***\n");
     decoding_cycles = gap_cl_readhwtimer();
@@ -179,8 +164,6 @@ static void cluster()
         );
     nms_cycles = gap_cl_readhwtimer() - nms_cycles;
 
-    // printf("final_valid_boxes: %d\n", final_valid_boxes);
-
 // ----------------------- DRAW REACTANGLES ---------------------
     printf("\t\t***Start draw reactangles ***\n");
     draw_boxes(
@@ -191,22 +174,6 @@ static void cluster()
 
 // ------------------------- END -------------------------
     printf("\t\t***Runner completed***\n");
-
-// ------------------------- SAVE -------------------------
-    // printf("\t\t***Start saving output***\n");
-
-    // switch_fs_t fs;
-    // __FS_INIT(fs);
-
-    // void *File_Output_1;
-    // int ret_Output_1 = 0;
-
-    // File_Output_1 = __OPEN_WRITE(fs, "../../../output.bin");
-    // ret_Output_1 = __WRITE(File_Output_1, Output_1, final_valid_boxes * 7 * sizeof(float));
-
-    // __CLOSE(File_Output_1);
-    // __FS_DEINIT(fs);
-
 }
 
 int test_main(void)
