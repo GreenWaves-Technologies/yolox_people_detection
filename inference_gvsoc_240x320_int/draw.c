@@ -58,10 +58,7 @@ void draw_boxes(
     int final_valid_boxes
     ){
 
-    printf("reading pointer at %p", model_L2_Memory_Dyn_casted);
     unsigned char * image = (unsigned char *) model_L2_Memory_Dyn_casted;
-
-    printf("reading image at %p", image);
     int status = ReadImageFromFile(
         STR(INPUT_FILE_NAME),
         W_INP, 

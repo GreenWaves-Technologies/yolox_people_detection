@@ -52,7 +52,6 @@ void to_bboxes(float * input, Box * output, int num_val_boxes){
     int count = 0;
     // for (int i = 0; i < top_k_boxes; i++){
     for (int i = 0; i < num_val_boxes; i++){
-        printf("i = %d \n", i);
         output[i].x1 = input[count + 0];
         output[i].y1 = input[count + 1];
         output[i].x2 = input[count + 2];
