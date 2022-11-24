@@ -43,6 +43,16 @@ APP_CFLAGS += -DINPUT_FILE_NAME=$(input_file_name) -DOUTPUT_FILE_NAME=$(output_f
 
 READFS_FILES=$(abspath $(MODEL_TENSORS))
 
+
+# Application modes:
+#  - CI       Compare newtwork outputs with expected results on test samples
+mode?=CI
+ifeq (,$(filter $(mode), CI INFERENCE))
+    $(error HERE)
+endif
+APP_CFLAGS += -D$(mode) 
+
+
 # build depends on the model
 build:: model
 
