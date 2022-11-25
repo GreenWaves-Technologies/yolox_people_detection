@@ -2,7 +2,7 @@
 #include <dirent.h> 
 #include <string.h>
 #include <stdlib.h>
-#include "../inference_gvsoc/slicing.h"
+#include "../inference_gvsoc_240x320_int/slicing.h"
 
 
 struct Names{
@@ -15,11 +15,11 @@ int main(void) {
     
     struct Names test_data[60];
 
-    char  test_data_source[100] = "./data/test_chw_source/";
-    char  test_data_target[100] = "./data/test_chw_target/";
+    // char  test_data_source[100] = "./data/test_chw_source/";
+    // char  test_data_target[100] = "./data/test_chw_target/";
 
-    // char  test_data_source[100] = "./data/test_hwc_source/";
-    // char  test_data_target[100] = "./data/test_hwc_target/";
+    char  test_data_source[100] = "./data/test_hwc_source/";
+    char  test_data_target[100] = "./data/test_hwc_target/";
     
     // list dir and save file names 
     DIR *d;
