@@ -95,16 +95,17 @@ void slicing_hwc_channel(char * Input, unsigned char * Output, int h, int w, int
 
     unsigned int o_h = h / 2, o_w  =  w / 2; 
     unsigned int o_c = channels * 4; 
-
+    unsigned int o_idx, i_idx;
     for(int j = 0; j < o_h; j++){
         for(int i = 0; i < o_w; i++){
-            for(int c = 0; c < channels; c++){
-                
-                Output[j * o_w * o_c + i * o_c + c]     = Input[(j * 2 * w * channels) + (i * 2 * channels) + c];
-                Output[j * o_w * o_c + i * o_c + 3 + c] = Input[(j * 2 * w * channels) + (i * 2 * channels) + (channels * w) +  c];
-                Output[j * o_w * o_c + i * o_c + 6 + c] = Input[(j * 2 * w * channels) + (i * 2 * channels) + channels  + c];
-                Output[j * o_w * o_c + i * o_c + 9 + c] = Input[(j * 2 * w * channels) + (i * 2 * channels) + (channels * w + channels)  + c];
 
+            o_idx = j * o_w * o_c + i * o_c;
+            i_idx = (j * 2 * w * channels) + (i * 2 * channels);
+            for(int c = 0; c < channels; c++){
+                Output[o_idx + c]     = Input[i_idx + c];
+                Output[o_idx + 3 + c] = Input[i_idx + (channels * w) +  c];
+                Output[o_idx + 6 + c] = Input[i_idx + channels  + c];
+                Output[o_idx + 9 + c] = Input[i_idx + (channels * w + channels)  + c];
             }
         }
     }
