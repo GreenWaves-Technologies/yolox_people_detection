@@ -104,7 +104,8 @@ void nms(
     int num_val_boxes, 
     int * val_final_boxes
     ){
-
+    
+    int count = 0;
     for (int i = 0; i < num_val_boxes; i++){
         if (boxes[i].alive == 1){
 
@@ -121,12 +122,8 @@ void nms(
                     }
                 }
             }
-        }
-    }
-
-    // try to do fill in the this inside the firs for loop
-    int count = 0;
-    for (int i = 0; i < num_val_boxes; i++){
+        
+        // if boxes[i].alive == 1 then add to output
         if (boxes[i].alive == 1){
             Output[count + 0] = boxes[i].x1;
             Output[count + 1] = boxes[i].y1;
@@ -134,11 +131,28 @@ void nms(
             Output[count + 3] = boxes[i].y2;
             Output[count + 4] = boxes[i].obj_conf;
             Output[count + 5] = boxes[i].cls_conf;
-            Output[count + 6] = boxes[i].cls_id;
+            Output[count + 6] = (float) boxes[i].cls_id;
             count += 7;
-            (*val_final_boxes) += 1;
+            *val_final_boxes += 1;
         }
+       }
     }
+
+    // try to do fill in the this inside the first for loop
+    // int count = 0;
+    // for (int i = 0; i < num_val_boxes; i++){
+    //     if (boxes[i].alive == 1){
+    //         Output[count + 0] = boxes[i].x1;
+    //         Output[count + 1] = boxes[i].y1;
+    //         Output[count + 2] = boxes[i].x2;
+    //         Output[count + 3] = boxes[i].y2;
+    //         Output[count + 4] = boxes[i].obj_conf;
+    //         Output[count + 5] = boxes[i].cls_conf;
+    //         Output[count + 6] = boxes[i].cls_id;
+    //         count += 7;
+    //         (*val_final_boxes) += 1;
+    //     }
+    // }
 }
 
 
