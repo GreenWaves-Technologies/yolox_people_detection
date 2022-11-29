@@ -45,6 +45,13 @@ def main():
         transpose_to_chw = True,
     )
 
+
+    # prepare input
+    sample = next(iter(quant_dataset))
+
+    # check input dims
+    check_input_dims(graph, sample)
+
     # get statistics
     if args.stats:
         logger.info(f"Using statistics from file {args.stats}")
@@ -61,12 +68,6 @@ def main():
     if args.clip_stats:
         logger.info(f"Clipping statistics using stats: {args.clip_stats}")
         stats = clip_stats(stats, args.clip_stats)
-
-    # prepare input
-    sample = next(iter(quant_dataset))
-
-    # check input dims
-    check_input_dims(graph, sample)
 
     logger.info(f"Start quantization process !!!")
     graph.quantize(
@@ -91,20 +92,26 @@ def main():
 
     # get quantized outputs
     sample = sample.transpose(0, 2, 3, 1)
-    qout = graph.execute([sample], quantize=True, dequantize=False)
+
+    # check input dims
+    check_input_dims(graph, sample)
+
     qfout = graph.execute([sample], quantize=True, dequantize=True)
     fout = graph.execute([sample], quantize=False, dequantize=False)
 
     for i, fp32, fp16 in zip(range(len(graph)), fout, qfout):
         print(f"Graph[{i:3}] -> {graph[i].name:>40}:\t{qsnr(fp32[0], fp16[0])}")
-    
+
     # make inference in gvsoc
     logger.info("Generating GVSOC inference tamplete. This might take a couple of minutes !!!")
+
     graph.name = "main"
+    qout = graph.execute([sample], quantize=True, dequantize=False)
+
     graph[0].allocate = 1
     res = graph.execute_on_target(
         pmsis_os='freertos',
-        directory="./GVSOC_INFERENCE_TEMPLATE",
+        directory="../GVSOC_INFERENCE_TEMPLATE",
         pretty=True,
         input_tensors=[qout[0][0]],
         output_tensors=6,
@@ -119,10 +126,6 @@ def main():
     ) 
     logger.info("Finished generating GVSOC inference tamplete !!!")
     
-    # OUTPUT = res.stdout.split("\n")
-    # for (i, r) in enumerate(OUTPUT):
-    #     print(f"Output {i}: \t {r}")
-
     qsnrs = graph.qsnrs(qout, res.output_tensors)
     for i, el in enumerate(qsnrs):
         print(f"QSNR {i}: {el}")
