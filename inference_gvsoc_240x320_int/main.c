@@ -90,16 +90,16 @@ static void cluster()
     #endif
 
 // ------------------------- slicing -------------------------
-    // printf("\t\t***Start slicing***\n");
-    // slicing_cycles = gap_cl_readhwtimer();
-    // slicing_hwc_channel(
-    //     main_L2_Memory_Dyn + (H_INP * W_INP * CHANNELS), 
-    //     Input_1, 
-    //     H_INP, 
-    //     W_INP,
-    //     CHANNELS
-    //     );
-    // slicing_cycles = gap_cl_readhwtimer() - slicing_cycles;
+    printf("\t\t***Start slicing***\n");
+    slicing_cycles = gap_cl_readhwtimer();
+    slicing_hwc_channel(
+        main_L2_Memory_Dyn + (H_INP * W_INP * CHANNELS), 
+        Input_1, 
+        H_INP, 
+        W_INP,
+        CHANNELS
+        );
+    slicing_cycles = gap_cl_readhwtimer() - slicing_cycles;
 
 // ------------------------- INFERENCE -------------------------
     mainCNN(Output_1);
@@ -231,25 +231,6 @@ int test_main(void)
      * Put here Your input settings
      */
     copy_inputs();
-
-    #ifdef PERF
-    printf("Start timer\n");
-    gap_fc_starttimer();
-    gap_fc_resethwtimer();
-    #endif
-
-// ------------------------- slicing -------------------------
-    printf("\t\t***Start slicing***\n");
-    slicing_cycles = gap_fc_readhwtimer();
-    slicing_hwc_channel(
-        main_L2_Memory_Dyn + (H_INP * W_INP * CHANNELS), 
-        Input_1, 
-        H_INP, 
-        W_INP,
-        CHANNELS
-        );
-    slicing_cycles = gap_fc_readhwtimer() - slicing_cycles;
-
 
     printf("Call cluster\n");
 #ifndef __EMUL__
