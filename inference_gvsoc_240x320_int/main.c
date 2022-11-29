@@ -89,7 +89,7 @@ void write_outputs() {
     void *File_Output_1;
     int ret_Output_1 = 0;
 
-    File_Output_1 = __OPEN_WRITE(fs, "../../../output.bin");
+    File_Output_1 = __OPEN_WRITE(fs, STR(OUTPUT_BIN_FILE_NAME));
     ret_Output_1 = __WRITE(File_Output_1, Output_1, final_valid_boxes * 7 * sizeof(float));
 
     __CLOSE(File_Output_1);

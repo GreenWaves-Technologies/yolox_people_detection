@@ -24,6 +24,7 @@ include common/model_decl.mk
 ## input file names 
 input_file_name=../../../input.ppm
 output_file_name=../../../output.ppm
+output_bin_file_name=../../../output.bin
 
 
 APP = $(MODEL_PREFIX)
@@ -39,7 +40,9 @@ APP_CFLAGS += -I. -I$(MODEL_COMMON_INC) -I$(TILER_EMU_INC) -I$(TILER_INC) $(CNN_
 APP_CFLAGS += -DPERF -DAT_MODEL_PREFIX=$(MODEL_PREFIX) $(MODEL_SIZE_CFLAGS)
 APP_CFLAGS += -DSTACK_SIZE=$(CLUSTER_STACK_SIZE) -DSLAVE_STACK_SIZE=$(CLUSTER_SLAVE_STACK_SIZE)
 APP_CFLAGS += -DAT_IMAGE=$(IMAGE) -DFREQ_FC=$(FREQ_FC) -DFREQ_CL=$(FREQ_CL) -DFREQ_PE=$(FREQ_PE)
-APP_CFLAGS += -DINPUT_FILE_NAME=$(input_file_name) -DOUTPUT_FILE_NAME=$(output_file_name)
+APP_CFLAGS += -DINPUT_FILE_NAME=$(input_file_name)
+APP_CFLAGS += -DOUTPUT_FILE_NAME=$(output_file_name) 
+APP_CFLAGS += -DOUTPUT_BIN_FILE_NAME=$(output_bin_file_name)
 
 READFS_FILES=$(abspath $(MODEL_TENSORS))
 
@@ -48,7 +51,7 @@ READFS_FILES=$(abspath $(MODEL_TENSORS))
 #  - CI       Compare newtwork outputs with expected results on test samples
 mode?=CI
 ifeq (,$(filter $(mode), CI INFERENCE))
-    $(error HERE)
+    $(error Invalid mode $(mode))
 endif
 APP_CFLAGS += -D$(mode) 
 
