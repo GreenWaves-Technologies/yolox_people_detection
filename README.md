@@ -10,6 +10,8 @@ The input is a 240x320 image and the output is the bounding box/es of detected p
  * [Setup](#Setup)
  * [Input & output data format](#Input-&-output-data-format)
  * [GVSOC Inference](#gvsoc)
+ * [Additional features](#Additional-features)
+    * Qunatization
 
 
 
@@ -62,3 +64,11 @@ make all run platform=gvsoc
 ```
 
 To run GVSOC inference on a different image, replace the image in 'inference_gvsoc_240x320_int/input.ppm' with the desired image. The image should be in `.ppm` as described in the [table](#input--output-data-format) above. Then then rerun the command [above](#gvsoc-inference). 
+
+
+
+
+# Additional features
+## Quantization
+
+
