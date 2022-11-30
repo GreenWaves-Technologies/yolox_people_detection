@@ -114,10 +114,14 @@ def slicing_hwc_c_style_imp(array, h, w, channels):
     for j in range(0, o_h):
         for i in range(0, o_w):
             for c in range(0, channels): 
-                output[j * o_w * o_c + i * o_c + c]     = array[(j * 2 * w * channels) + (i * 2 * channels) + c]
-                output[j * o_w * o_c + i * o_c + 3 + c] = array[(j * 2 * w * channels) + (i * 2 * channels) + (channels * w) +  c]
-                output[j * o_w * o_c + i * o_c + 6 + c] = array[(j * 2 * w * channels) + (i * 2 * channels) + channels  + c]
-                output[j * o_w * o_c + i * o_c + 9 + c] = array[(j * 2 * w * channels) + (i * 2 * channels) + (channels * w + channels)  + c]
+                output[j * o_w * o_c + i * o_c + 0 * channels + c] = array[(j * 2 * w * channels) + (i * 2 * channels) + c]
+                output[j * o_w * o_c + i * o_c + 1 * channels + c] = array[(j * 2 * w * channels) + (i * 2 * channels) + (channels * w) +  c]
+                output[j * o_w * o_c + i * o_c + 2 * channels + c] = array[(j * 2 * w * channels) + (i * 2 * channels) + channels  + c]
+                output[j * o_w * o_c + i * o_c + 3 * channels + c] = array[(j * 2 * w * channels) + (i * 2 * channels) + (channels * w + channels)  + c]
+                # output[j * o_w * o_c + i * o_c + c]     = array[(j * 2 * w * channels) + (i * 2 * channels) + c]
+                # output[j * o_w * o_c + i * o_c + 3 + c] = array[(j * 2 * w * channels) + (i * 2 * channels) + (channels * w) +  c]
+                # output[j * o_w * o_c + i * o_c + 6 + c] = array[(j * 2 * w * channels) + (i * 2 * channels) + channels  + c]
+                # output[j * o_w * o_c + i * o_c + 9 + c] = array[(j * 2 * w * channels) + (i * 2 * channels) + (channels * w + channels)  + c]
     return output 
 
 def check_idex(input_array, input_seq, h, w, channels): 
@@ -131,15 +135,15 @@ def check_idex(input_array, input_seq, h, w, channels):
         for i in range(0, o_w):
             for c in range(0, channels): 
 
-                output[j, i, c]     = input_array[j * 2, i * 2, c]
-                output[j, i, 3 + c] = input_array[j * 2 + 1, i * 2, c]
-                output[j, i, 6 + c] = input_array[j * 2, i * 2 + 1, c]
-                output[j, i, 9 + c] = input_array[1 + j * 2, 1 + i * 2, c]
+                output[j, i, 0 * channels + c] = input_array[j * 2, i * 2, c]
+                output[j, i, 1 * channels + c] = input_array[j * 2 + 1, i * 2, c]
+                output[j, i, 2 * channels + c] = input_array[j * 2, i * 2 + 1, c]
+                output[j, i, 3 * channels + c] = input_array[1 + j * 2, 1 + i * 2, c]
             
-                output_seq[j * o_w * o_c + i * o_c + c]     = input_seq[(j * 2 * w * channels) + (i * 2 * channels) + c]
-                output_seq[j * o_w * o_c + i * o_c + 3 + c] = input_seq[(j * 2 * w * channels) + (i * 2 * channels) + (channels * w) +  c]
-                output_seq[j * o_w * o_c + i * o_c + 6 + c] = input_seq[(j * 2 * w * channels) + (i * 2 * channels) + channels  + c]
-                output_seq[j * o_w * o_c + i * o_c + 9 + c] = input_seq[(j * 2 * w * channels) + (i * 2 * channels) + (channels * w + channels)  + c]
+                output_seq[j * o_w * o_c + i * o_c + 0 * channels + c] = input_seq[(j * 2 * w * channels) + (i * 2 * channels) + c]
+                output_seq[j * o_w * o_c + i * o_c + 1 * channels + c] = input_seq[(j * 2 * w * channels) + (i * 2 * channels) + (channels * w) +  c]
+                output_seq[j * o_w * o_c + i * o_c + 2 * channels + c] = input_seq[(j * 2 * w * channels) + (i * 2 * channels) + channels  + c]
+                output_seq[j * o_w * o_c + i * o_c + 3 * channels + c] = input_seq[(j * 2 * w * channels) + (i * 2 * channels) + (channels * w + channels)  + c]
 
     input_seq = input_seq.reshape((h, w, channels))
     output_seq = output_seq.reshape((o_h, o_w, o_c))
