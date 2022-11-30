@@ -57,7 +57,6 @@ L2_MEM float Output_1[9480];
 void copy_inputs() {
 
     printf("\n\t\t*** READING INPUT FROM PPM FILE ***\n");
-    printf("Reading file named %s \n", STR(INPUT_FILE_NAME));
     int status = ReadImageFromFile(
         STR(INPUT_FILE_NAME),
         W_INP, 
@@ -78,102 +77,41 @@ void copy_inputs() {
 
 /* Copy inputs function */
 void write_outputs() {
+
+
+
+    /* ------ SAVE ------*/
+    printf("\t\t***Start saving output***\n");
+
+    switch_fs_t fs;
+    __FS_INIT(fs);
+
+    void *File_Output_1;
+    int ret_Output_1 = 0;
+
+    File_Output_1 = __OPEN_WRITE(fs, STR(OUTPUT_BIN_FILE_NAME));
+    ret_Output_1 = __WRITE(File_Output_1, Output_1, final_valid_boxes * 7 * sizeof(float));
+
+    __CLOSE(File_Output_1);
+    __FS_DEINIT(fs);
+
+
+
+
+
+
 }
 
 
 static void cluster()
 {
     #ifdef PERF
-    printf("Start timer\n");
+    printf("\t\t***Start CLUSTER timer***\n");
     gap_cl_starttimer();
     gap_cl_resethwtimer();
     #endif
 
-// ------------------------- slicing -------------------------
-    printf("\t\t***Start slicing***\n");
-    slicing_cycles = gap_cl_readhwtimer();
-    slicing_hwc_channel(
-        main_L2_Memory_Dyn + (H_INP * W_INP * CHANNELS), 
-        Input_1, 
-        H_INP, 
-        W_INP,
-        CHANNELS
-        );
-    slicing_cycles = gap_cl_readhwtimer() - slicing_cycles;
-
-// ------------------------- INFERENCE -------------------------
     mainCNN(Output_1);
-    printf("Runner completed\n");
-
-// ------------------------- DECODING -------------------------
-    printf("\t\t***Start decoding***\n");
-    decoding_cycles = gap_cl_readhwtimer();
-    decoding(
-        Output_1,
-        feature_maps, 
-        strides, 
-        STRIDE_SIZE
-    );
-    decoding_cycles = gap_cl_readhwtimer() - decoding_cycles;
-
-// ------------------------- xywh2xyxy -------------------------
-    printf("\t\t***Start xywh2xyxy***\n");
-
-    xywh2xyxy_cycles = gap_cl_readhwtimer();
-    xywh2xyxy(Output_1, (int) (RAWS));
-    xywh2xyxy_cycles = gap_cl_readhwtimer() - xywh2xyxy_cycles;
-
-// ------------------------- filter_boxes -------------------------
-    printf("\t\t***Start filter boxes ***\n");
-
-    //cast model_L2_Memory_Dyn to float16
-    float * main_L2_Memory_Dyn_casted = (float *) main_L2_Memory_Dyn;
-    *num_val_boxes = 0;
-    filter_boxes_cycles = gap_cl_readhwtimer();
-    filter_boxes(
-        Output_1, 
-        (main_L2_Memory_Dyn_casted + (RAWS * 6)), 
-        CONF_THRESH, 
-        RAWS, 
-        num_val_boxes
-        );
-    filter_boxes_cycles = gap_cl_readhwtimer() - filter_boxes_cycles;
-
-// ------------------------- Conver boxes -------------------------
-    printf("\t\t***Start conver boxes ***\n");
-    printf("num_val_boxes: %d", *num_val_boxes);
-    bbox_cycles = gap_cl_readhwtimer();
-    to_bboxes(
-        (main_L2_Memory_Dyn_casted + (RAWS * 6)), 
-        bboxes, 
-        *num_val_boxes
-        );
-    bbox_cycles = gap_cl_readhwtimer() - bbox_cycles;
-    
-// ------------------------- nms -------------------------
-    printf("\t\t***Start nms ***\n");
-
-    final_valid_boxes = 0;
-    nms_cycles = gap_cl_readhwtimer();
-    nms(
-        bboxes, 
-        Output_1,
-        NMS_THRESH, 
-        *num_val_boxes, 
-        &final_valid_boxes
-        );
-    nms_cycles = gap_cl_readhwtimer() - nms_cycles;
-
-// ----------------------- DRAW REACTANGLES ---------------------
-    printf("\t\t***Start draw reactangles ***\n");
-    draw_boxes(
-        main_L2_Memory_Dyn_casted,
-        Output_1,
-        final_valid_boxes
-        );
-
-// ------------------------- END -------------------------
-    printf("\t\t***Runner completed***\n");
 }
 
 int test_main(void)
@@ -229,10 +167,30 @@ int test_main(void)
 
     /*
      * Put here Your input settings
-     */
+    */
     copy_inputs();
 
-    printf("Call cluster\n");
+    #ifdef PERF
+    printf("\t\t***Start FC timer***\n");
+    gap_fc_starttimer();
+    gap_fc_resethwtimer();
+    #endif
+
+    /* ------ SLICING ------*/
+    printf("\t\t***Start slicing***\n");
+    slicing_cycles = gap_fc_readhwtimer();
+    slicing_hwc_channel(
+        main_L2_Memory_Dyn + (H_INP * W_INP * CHANNELS), 
+        Input_1, 
+        H_INP, 
+        W_INP,
+        CHANNELS
+        );
+    slicing_cycles = gap_fc_readhwtimer() - slicing_cycles;
+
+
+    /* ------ INFERENCE ------*/
+    printf("\t\t***Call CLUSTER***\n");
 #ifndef __EMUL__
     struct pi_cluster_task task;
     pi_cluster_task(&task, (void (*)(void *))cluster, NULL);
@@ -243,9 +201,79 @@ int test_main(void)
     cluster();
 #endif
 
-    write_outputs();
 
+    /* ------ DECODING ------*/
+    printf("\t\t***Start decoding***\n");
+    decoding_cycles = gap_fc_readhwtimer();
+    decoding(
+        Output_1,
+        feature_maps, 
+        strides, 
+        STRIDE_SIZE
+    );
+    decoding_cycles = gap_fc_readhwtimer() - decoding_cycles;
+
+
+    /* ------ POST PROCESSING ------*/
+    /* ------ xywh2xyxy ------*/
+    printf("\t\t***Start xywh2xyxy***\n");
+    xywh2xyxy_cycles = gap_fc_readhwtimer();
+    xywh2xyxy(Output_1, (int) (RAWS));
+    xywh2xyxy_cycles = gap_fc_readhwtimer() - xywh2xyxy_cycles;
+
+    /* ------ filter boxes ------*/
+    printf("\t\t***Start filter boxes ***\n");
+    //cast model_L2_Memory_Dyn to float16
+    float * main_L2_Memory_Dyn_casted = (float *) main_L2_Memory_Dyn;
+    *num_val_boxes = 0;
+    filter_boxes_cycles = gap_fc_readhwtimer();
+    filter_boxes(
+        Output_1, 
+        (main_L2_Memory_Dyn_casted + (RAWS * 6)), 
+        CONF_THRESH, 
+        RAWS, 
+        num_val_boxes
+        );
+    filter_boxes_cycles = gap_fc_readhwtimer() - filter_boxes_cycles;
+
+    /* ------ conver boxes ------*/
+    printf("\t\t***Start conver boxes ***\n");
+    bbox_cycles = gap_fc_readhwtimer();
+    to_bboxes(
+        (main_L2_Memory_Dyn_casted + (RAWS * 6)), 
+        bboxes, 
+        *num_val_boxes
+        );
+    bbox_cycles = gap_fc_readhwtimer() - bbox_cycles;
     
+    /* ------ nms ------*/
+    printf("\t\t***Start nms ***\n");
+    final_valid_boxes = 0;
+    nms_cycles = gap_fc_readhwtimer();
+    nms(
+        bboxes, 
+        Output_1,
+        NMS_THRESH, 
+        *num_val_boxes, 
+        &final_valid_boxes
+        );
+    nms_cycles = gap_fc_readhwtimer() - nms_cycles;
+
+    #ifdef CI
+        /* ------ DRAW REATANGLES ------*/
+        printf("\t\t***Start draw reactangles ***\n");
+        draw_boxes(
+            main_L2_Memory_Dyn_casted,
+            Output_1,
+            final_valid_boxes
+            );
+    #endif
+
+    /* ------ END ------*/
+    printf("\t\t***Runner completed***\n");
+
+
+    write_outputs();
 
     mainCNN_Destruct();
 
