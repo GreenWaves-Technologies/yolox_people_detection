@@ -69,6 +69,37 @@ To run GVSOC inference on a different image, replace the image in 'inference_gvs
 
 
 # Additional features
+
+## To onnx conversion
+
+If one wished to convert model weight to onnx format one can run the following command:
+
+```bash
+python quantization/to_onnx.py                                 \
+        --ckpt <path to .pth file>                             \
+        --input_width 320                                      \
+        --input_height 240                                     \
+        --input-channels <number of channels of input image>   \
+        --output-name <name of the output file>                \   
+
+```
+If one wished to convert model with modified architecture to onnx format one need to change the architecture of yolox model accortingly. And only then run the command [above](#to-onnx-conversion).
+
+
 ## Quantization
+
+If one wishes to quantize the model to 8 bit one can run the following command:
+
+```bash
+
+python quantization/quantize.py                                 \
+        --path <path to .onnx model>                            \
+        --coco_path <path to coco dataset>                      \
+        --coco_annotations_path <path to annotations>           \
+        --quant_dataset_size <size of the quantization dataset> \
+        --input_size <input size of the model>                  \
+
+```
+
 
 
