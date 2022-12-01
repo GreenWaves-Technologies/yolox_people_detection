@@ -102,10 +102,18 @@ void slicing_hwc_channel(char * Input, unsigned char * Output, int h, int w, int
             o_idx = j * o_w * o_c + i * o_c;
             i_idx = (j * 2 * w * channels) + (i * 2 * channels);
             for(int c = 0; c < channels; c++){
-                Output[o_idx + c]     = Input[i_idx + c];
-                Output[o_idx + 3 + c] = Input[i_idx + (channels * w) +  c];
-                Output[o_idx + 6 + c] = Input[i_idx + channels  + c];
-                Output[o_idx + 9 + c] = Input[i_idx + (channels * w + channels)  + c];
+                
+                // for BGR input
+                // Output[o_idx + c]     = Input[i_idx + c];
+                // Output[o_idx + 3 + c] = Input[i_idx + (channels * w) +  c];
+                // Output[o_idx + 6 + c] = Input[i_idx + channels  + c];
+                // Output[o_idx + 9 + c] = Input[i_idx + (channels * w + channels)  + c];
+
+                // for RGB input
+                Output[o_idx + c]     = Input[i_idx + (channels - 1 - c)];
+                Output[o_idx + 3 + c] = Input[i_idx + (channels * w) + (channels - 1 - c)];
+                Output[o_idx + 6 + c] = Input[i_idx + channels + (channels - 1 - c)];
+                Output[o_idx + 9 + c] = Input[i_idx + (channels * w + channels) + (channels - 1 - c)];
             }
         }
     }
