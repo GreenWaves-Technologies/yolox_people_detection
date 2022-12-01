@@ -12,7 +12,7 @@ def make_parser():
     parser = argparse.ArgumentParser("Parser")
     parser.add_argument("--path", type=str, default="./weights/model.onnx", help="path to onnx model")
     parser.add_argument("--coco_path", type=str, default="/home/abduragim/data/coco/val2017", help="path to coco dataset images") 
-    parser.add_argument("--coco_annotations_path", type=str, default="/home/abduragim/data/coco/val2017", help="path to coco dataset annotations") 
+    parser.add_argument("--coco_annotations_path", type=str, default="/home/abduragim/data/coco/annotations/instances_val2017.json", help="path to coco dataset annotations") 
     parser.add_argument("--quant_dataset_size", type=int, default=1000, help="size of dataset for quantization")
     parser.add_argument("--input_size", type=tuple, default=(240, 320), help="input size")
     parser.add_argument("--stats", type=str, default=None, help="path to precalculated statistics")
