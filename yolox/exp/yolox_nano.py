@@ -21,7 +21,7 @@ class Exp(metaclass=ABCMeta):
         # ----- model config ------
         self.class_names = ('person',)
         self.num_classes = len(self.class_names)
-        self.input_channels = 3
+        self.input_channels = 1
         self.act = "relu6"
         # ---------------- dataloader config ---------------- #
         # checkpoint saving directory 
@@ -40,10 +40,11 @@ class Exp(metaclass=ABCMeta):
         self.val_dir = "val2017"
         self.train_ann = "instances_train2017.json"
         self.val_ann = "instances_val2017.json"
-        self.image_type = 'RGB'
+        # self.image_type = 'RGB'
+        self.image_type = 'BAYER'
         self.data_num_workers = 1
 
-    def get_model(self, sublinear=False):
+    def get_model(self, sublinear=False, to_onnx=False):
 
         def init_yolo(M):
             for m in M.modules():
@@ -56,14 +57,26 @@ class Exp(metaclass=ABCMeta):
             in_channels = [256, 512, 1024]
             # NANO model use depthwise = True, which is main difference.
             backbone = YOLOPAFPN(
-                self.depth, self.width, in_channels=in_channels,
-                act=self.act, depthwise=True,
+                self.depth, 
+                self.width, 
+                in_channels=in_channels,
+                act=self.act, 
+                depthwise=True, 
+                input_channels=self.input_channels,
+                to_onnx=to_onnx,
             )
             head = YOLOXHead(
-                self.num_classes, self.width, in_channels=in_channels, strides=self.strides,
-                act=self.act, depthwise=True
+                self.num_classes, 
+                self.width, 
+                in_channels=in_channels, 
+                strides=self.strides,
+                act=self.act, 
+                depthwise=True
             )
-            self.model = YOLOX(backbone, head, postprocess_in_forward=self.postprocess_in_forward)
+            self.model = YOLOX(backbone, 
+                                head, 
+                                postprocess_in_forward=self.postprocess_in_forward
+                            )
 
         self.model.apply(init_yolo)
         self.model.head.initialize_biases(1e-2)
