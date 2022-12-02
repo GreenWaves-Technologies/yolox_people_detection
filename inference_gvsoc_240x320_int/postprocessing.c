@@ -1,9 +1,6 @@
 #include "postprocessing.h"
 #include "main.h"
 
-// #define MAX(a, b) ((a) > (b) ? (a) : (b))
-// #define MIN(a, b) ((a) < (b) ? (a) : (b))
-
 void xywh2xyxy(float * input, unsigned int rows){
 
     int count = 0;

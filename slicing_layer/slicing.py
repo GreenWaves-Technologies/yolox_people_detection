@@ -77,34 +77,6 @@ def slicing_chw_c_style(array, h, w, chnl):
     return tmp
 
 
-def slicing_hwc_c_style(array, h, w, channels):
-
-    tmp_array = array.copy()
-    cur = 0
-    tmp1 = 0 
-    tmp2 = w * channels 
-    comp = (w * h * channels) // (h // 2) 
-
-    larger, smaller = (h, w) if h > w else (w, h)
-
-    for j in range(0, larger):
-        for i in range(0, smaller):
-            for c in range(0, channels):
-                if i % 2 == 0:                
-                    tmp_array[cur] = array[tmp1]
-                    tmp1 += 1
-                else:
-                    tmp_array[cur] = array[tmp2]
-                    tmp2 += 1 
-
-                cur += 1
-                if  cur % comp == 0: 
-                    tmp1 += w * channels
-                    tmp2 += w * channels
-                
-    return tmp_array
-
-
 def slicing_hwc_c_style_imp(array, h, w, channels):
 
     o_h, o_w = h // 2, w // 2
@@ -114,14 +86,13 @@ def slicing_hwc_c_style_imp(array, h, w, channels):
     for j in range(0, o_h):
         for i in range(0, o_w):
             for c in range(0, channels): 
+
+                # more general form for any number of channels
                 output[j * o_w * o_c + i * o_c + 0 * channels + c] = array[(j * 2 * w * channels) + (i * 2 * channels) + c]
                 output[j * o_w * o_c + i * o_c + 1 * channels + c] = array[(j * 2 * w * channels) + (i * 2 * channels) + (channels * w) +  c]
                 output[j * o_w * o_c + i * o_c + 2 * channels + c] = array[(j * 2 * w * channels) + (i * 2 * channels) + channels  + c]
                 output[j * o_w * o_c + i * o_c + 3 * channels + c] = array[(j * 2 * w * channels) + (i * 2 * channels) + (channels * w + channels)  + c]
-                # output[j * o_w * o_c + i * o_c + c]     = array[(j * 2 * w * channels) + (i * 2 * channels) + c]
-                # output[j * o_w * o_c + i * o_c + 3 + c] = array[(j * 2 * w * channels) + (i * 2 * channels) + (channels * w) +  c]
-                # output[j * o_w * o_c + i * o_c + 6 + c] = array[(j * 2 * w * channels) + (i * 2 * channels) + channels  + c]
-                # output[j * o_w * o_c + i * o_c + 9 + c] = array[(j * 2 * w * channels) + (i * 2 * channels) + (channels * w + channels)  + c]
+
     return output 
 
 def check_idex(input_array, input_seq, h, w, channels): 
