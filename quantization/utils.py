@@ -20,7 +20,9 @@ class CostomCOCODaset():
         annotations, 
         input_size,
         max_size=500, 
-        transpose_to_chw=True):
+        transpose_to_chw=True,
+        input_channels=3,
+        ):
 
         self._idx = 0 
         self.annotations = annotations 
@@ -29,6 +31,7 @@ class CostomCOCODaset():
         self.data_dir = image_folder
         self.input_size = input_size
         self.transpose_to_chw = transpose_to_chw
+        self.input_channels = input_channels
 
     def __iter__(self):
         self._idx = 0
@@ -40,10 +43,23 @@ class CostomCOCODaset():
             raise StopIteration()
 
         filename = self.annotations[self._idx]["file_name"]
+        if self.input_channels != 3:
+            filename = filename.replace("jpg", "png")
         img_file = os.path.join(self.data_dir, filename)
 
-        image = cv2.imread(img_file, cv2.IMREAD_COLOR)
-        image = self.preproc(image, self.input_size)
+
+        image = cv2.imread(
+            img_file, 
+            cv2.IMREAD_COLOR if self.input_channels == 3 else cv2.IMREAD_UNCHANGED)
+
+        if len(image.shape) == 2:
+            image = np.expand_dims(image, axis=2)
+
+        image = self.preproc(
+            image, 
+            self.input_size, 
+            input_channels=self.input_channels
+        )
         image = self.slicing(image)
 
         if not self.transpose_to_chw:

@@ -10,13 +10,54 @@ from nntool.utils.stats_funcs import qsnr
 
 def make_parser():
     parser = argparse.ArgumentParser("Parser")
-    parser.add_argument("--path", type=str, default="./weights/model.onnx", help="path to onnx model")
-    parser.add_argument("--coco_path", type=str, default="/home/abduragim/data/coco/val2017", help="path to coco dataset images") 
-    parser.add_argument("--coco_annotations_path", type=str, default="/home/abduragim/data/coco/annotations/instances_val2017.json", help="path to coco dataset annotations") 
-    parser.add_argument("--quant_dataset_size", type=int, default=1000, help="size of dataset for quantization")
-    parser.add_argument("--input_size", type=tuple, default=(240, 320), help="input size")
-    parser.add_argument("--stats", type=str, default=None, help="path to precalculated statistics")
-    parser.add_argument("--clip_stats", type=int, default=None, help="value with which to clip the statistics")
+    parser.add_argument(
+        "--onnx_path", 
+        type=str, 
+        default="./weights/model.onnx", 
+        help="path to onnx model"
+    )
+    parser.add_argument(
+        "--coco_path", 
+        type=str, 
+        default="/data/coco/val2017", 
+        help="path to coco dataset images"
+    ) 
+    parser.add_argument(
+        "--coco_annotations_path", 
+        type=str, 
+        default="/data/coco/annotations/instances_val2017.json", 
+        help="path to coco dataset annotations"
+    ) 
+    parser.add_argument(
+        "--quant_dataset_size", 
+        type=int, 
+        default=1000, 
+        help="size of dataset for quantization"
+    )
+    parser.add_argument(
+        "--input_size", 
+        type=tuple, 
+        default=(240,320), 
+        help="input size"
+    )
+    parser.add_argument(
+        "--input_channels",
+        type=int,
+        default=3,
+        help="input channels"
+    )
+    parser.add_argument(
+        "--stats", 
+        type=str, 
+        default=None, 
+        help="path to precalculated statistics"
+    )
+    parser.add_argument(
+        "--clip_stats", 
+        type=int, 
+        default=None, 
+        help="value with which to clip the statistics"
+    )
 
     return parser
 
@@ -31,7 +72,7 @@ def main():
     args = make_parser().parse_args()
 
     #create graph
-    graph = build_graph(args.path)
+    graph = build_graph(args.onnx_path)
 
     # get class person annotations
     annotations = get_annotations(args.coco_annotations_path)
@@ -43,6 +84,7 @@ def main():
         max_size         = args.quant_dataset_size,
         input_size       = args.input_size,
         transpose_to_chw = True,
+        input_channels   = args.input_channels,
     )
 
 
@@ -111,7 +153,7 @@ def main():
     graph[0].allocate = 1
     res = graph.execute_on_target(
         pmsis_os='freertos',
-        directory="../GVSOC_INFERENCE_TEMPLATE",
+        directory="./GVSOC_INFERENCE_TEMPLATE",
         pretty=True,
         input_tensors=[qout[0][0]],
         output_tensors=6,
