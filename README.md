@@ -11,7 +11,7 @@ The input is a 240x320 image and the output is the bounding box/es of detected p
  * [Input & output data format](#Input-&-output-data-format)
  * [GVSOC Inference](#gvsoc)
  * [Additional features](#Additional-features)
-    * Qunatization
+   * [Quantization](#Quantization)
 
 
 
@@ -69,22 +69,6 @@ To run GVSOC inference on a different image, replace the image in 'inference_gvs
 
 
 # Additional features
-
-## To onnx conversion
-
-If one wished to convert model weight to onnx format one can run the following command:
-
-```bash
-python quantization/to_onnx.py                                 \
-        --ckpt <path to .pth file>                             \
-        --input_width 320                                      \
-        --input_height 240                                     \
-        --input-channels <number of channels of input image>   \
-        --output-name <name of the output file>                \   
-
-```
-If one wished to convert model with modified architecture to onnx format one need to change the architecture of yolox model accortingly. And only then run the command [above](#to-onnx-conversion).
-
 
 ## Quantization
 
