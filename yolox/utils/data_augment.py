@@ -9,8 +9,6 @@ The data augmentation procedures were interpreted from @weiliu89's SSD paper
 http://arxiv.org/abs/1512.02325
 """
 
-import math
-import random
 
 import cv2
 import numpy as np

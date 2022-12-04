@@ -5,8 +5,6 @@ import importlib
 
 from torch import nn
 from loguru import logger
-
-from yolox.utils.data_augment import preproc
 from yolox.models.network_blocks import SiLU
 from yolox.utils.model_utils import replace_module
 
