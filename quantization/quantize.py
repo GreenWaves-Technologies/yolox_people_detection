@@ -180,31 +180,3 @@ def main():
 if __name__ == "__main__":
 
     main()
-
-
-
-
-    ### save useful code lines for later use
-
-    # dum_inp = np.random.randint(low=0, high=255, size=(3, 256, 320))
-    # dum_inp = np.random.randint(low=0, high=255, size=(256, 320, 3))
-    # with open(os.path.join("./inference_gvsoc_hwc/", f"Input_1_Unsliced.bin"), "wb") as in_f:
-    #     dum_inp.astype(np.uint8, order='C', casting='unsafe', copy=True).tofile(in_f)
-
-    # # slice the input
-    # dum_inp_chw = chw_slice(dum_inp.copy())
-    # # dum_inp_hwc = hwc_slice(np.moveaxis(dum_inp.copy(), 0, -1))
-    # dum_inp_hwc = hwc_slice(dum_inp)
-    
-    # # print(dum_inp_chw[0, :2, :2])
-    # print(dum_inp_hwc[:2, :2, 0])
-    # print(dum_inp.shape)
-    # # print(dum_inp_chw.shape)
-    # print(dum_inp_hwc.shape)
-
-    # with open(os.path.join("./inference_gvsoc_hwc/", f"Input_1_Python_sliced.bin"), "wb") as in_f:
-    #     # dum_inp.astype(np.uint8, order='C', casting='unsafe', copy=True).tofile(in_f)
-    #     dum_inp_hwc.astype(np.uint8, order='C', casting='unsafe', copy=True).tofile(in_f)
-
-    # # with open(os.path.join("./", f"Input_1_sliced.bin"), "wb") as in_f:
-    # #     dum_inp.astype(np.uint8, order='C', casting='unsafe', copy=True).tofile(in_f)
