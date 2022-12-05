@@ -22,7 +22,7 @@ include common/model_decl.mk
 # PULP_APP = $(MODEL_PREFIX)
 
 ## input file names 
-input_file_name=../../../input.ppm
+input_file_name=../../../input_rgb.ppm
 output_file_name=../../../output.ppm
 output_bin_file_name=../../../output.bin
 

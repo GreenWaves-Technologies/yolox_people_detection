@@ -1,7 +1,4 @@
-from re import S
-from tkinter import E
 import numpy as np
-import os
 from utils import read_bin, save_bin
 
 def slicing_channel_fist(array):
@@ -80,33 +77,50 @@ def slicing_chw_c_style(array, h, w, chnl):
     return tmp
 
 
-def slicing_hwc_c_style(array, h, w, channels):
+def slicing_hwc_c_style_imp(array, h, w, channels):
 
-    tmp_array = array.copy()
-    cur = 0
-    tmp1 = 0 
-    tmp2 = w * channels 
-    comp = (w * h * channels) // (h // 2) 
+    o_h, o_w = h // 2, w // 2
+    o_c = channels * 4
+    output = np.zeros((o_h * o_w * o_c ), dtype=np.uint8)
 
-    larger, smaller = (h, w) if h > w else (w, h)
+    for j in range(0, o_h):
+        for i in range(0, o_w):
+            for c in range(0, channels): 
 
-    for j in range(0, larger):
-        for i in range(0, smaller):
-            for c in range(0, channels):
-                if i % 2 == 0:                
-                    tmp_array[cur] = array[tmp1]
-                    tmp1 += 1
-                else:
-                    tmp_array[cur] = array[tmp2]
-                    tmp2 += 1 
-                cur += 1
+                # more general form for any number of channels
+                output[j * o_w * o_c + i * o_c + 0 * channels + c] = array[(j * 2 * w * channels) + (i * 2 * channels) + c]
+                output[j * o_w * o_c + i * o_c + 1 * channels + c] = array[(j * 2 * w * channels) + (i * 2 * channels) + (channels * w) +  c]
+                output[j * o_w * o_c + i * o_c + 2 * channels + c] = array[(j * 2 * w * channels) + (i * 2 * channels) + channels  + c]
+                output[j * o_w * o_c + i * o_c + 3 * channels + c] = array[(j * 2 * w * channels) + (i * 2 * channels) + (channels * w + channels)  + c]
 
-                if  cur % comp == 0: 
-                    tmp1 += w * channels
-                    tmp2 += w * channels
+    return output 
 
-    return tmp_array
+def check_idex(input_array, input_seq, h, w, channels): 
 
+    o_h, o_w = h // 2, w // 2
+    o_c = channels * 4
+    output = np.zeros((o_h, o_w, o_c), dtype=np.uint8)
+    output_seq = np.zeros((input_seq.shape), dtype=np.uint8)
+
+    for j in range(0, o_h):
+        for i in range(0, o_w):
+            for c in range(0, channels): 
+
+                output[j, i, 0 * channels + c] = input_array[j * 2, i * 2, c]
+                output[j, i, 1 * channels + c] = input_array[j * 2 + 1, i * 2, c]
+                output[j, i, 2 * channels + c] = input_array[j * 2, i * 2 + 1, c]
+                output[j, i, 3 * channels + c] = input_array[1 + j * 2, 1 + i * 2, c]
+            
+                output_seq[j * o_w * o_c + i * o_c + 0 * channels + c] = input_seq[(j * 2 * w * channels) + (i * 2 * channels) + c]
+                output_seq[j * o_w * o_c + i * o_c + 1 * channels + c] = input_seq[(j * 2 * w * channels) + (i * 2 * channels) + (channels * w) +  c]
+                output_seq[j * o_w * o_c + i * o_c + 2 * channels + c] = input_seq[(j * 2 * w * channels) + (i * 2 * channels) + channels  + c]
+                output_seq[j * o_w * o_c + i * o_c + 3 * channels + c] = input_seq[(j * 2 * w * channels) + (i * 2 * channels) + (channels * w + channels)  + c]
+
+    input_seq = input_seq.reshape((h, w, channels))
+    output_seq = output_seq.reshape((o_h, o_w, o_c))
+
+    cor_output = slicing_channel_last(input_array)
+    print(np.sum(output - output_seq))
 
 def slicing_hw1_style(array, h, w):
 
@@ -137,26 +151,8 @@ if __name__ == "__main__":
 
     np.random.seed(1)
 
-    ##### main part #####
-    h = 4
-    w = 2
-    c = 3
-
-    # array = np.arange(h * w * c).reshape(h, w, c)
-    # save_bin(array, f"array_{w}_{h}_{c}.bin")
-    # array_python = read_bin(f"array_{w}_{h}_{c}.bin")
-    # print(array_python)
-
-
-    # array_scliced_python = slicing_channel_last(array)
-    # save_bin(array_scliced_python, f"array_scliced_{w}_{h}_{c}.bin")
-    # array_sliced_bin = read_bin(f"array_scliced_{w}_{h}_{c}.bin")
-    # print(array_sliced_bin)
-
-    # for h in range(2, 400, 2 ):
-    #     for w in range(4, 400, 2):
-    h = 2
-    w = 4
+    h = 240  
+    w = 320 
     c = 3
     array = np.arange(h * w * c, dtype=np.uint64).reshape(h, w, c)
     # array = np.random.randint(low=0, high=255, size=(h * w * c), dtype=np.uint8).reshape(h, w, c )
@@ -180,11 +176,13 @@ if __name__ == "__main__":
     save_bin(array_scliced_python, "array_scliced_python.bin")
     array_sliced_bin = read_bin("array_scliced_python.bin")
 
+
     print(array_sliced_bin)
     print(array_sliced_bin.shape)
 
     # call the fucntion 
-    sliced_c_stype = slicing_hwc_c_style(array_python, h, w, channels=c) 
+    sliced_c_stype = slicing_hwc_c_style_imp(array_python, h, w, channels=c) 
+
     mistach = np.sum(sliced_c_stype - array_sliced_bin)
     print(f"mistach = {mistach} w = {w} h = {h}")
     assert mistach == 0, f"mismatch: {mistach} h={h} w={w} c={c}"

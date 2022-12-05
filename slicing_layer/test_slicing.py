@@ -1,6 +1,6 @@
 import os
 import numpy as np
-from slicing import slicing_chw_c_style, slicing_hwc_c_style
+from slicing import slicing_chw_c_style, slicing_hwc_c_style, slicing_hwc_c_style_imp
 from slicing import slicing_channel_fist, slicing_channel_last
 from utils import save_bin, read_bin
 
@@ -63,7 +63,8 @@ def pass_tests(source_path):
         if order == 'chw':
             array_sliced_c_style = slicing_chw_c_style(array, h, w, c)
         else:
-            array_sliced_c_style = slicing_hwc_c_style(array, h, w, c)
+            # array_sliced_c_style = slicing_hwc_c_style(array, h, w, c)
+            array_sliced_c_style = slicing_hwc_c_style_imp(array, h, w, c)
 
         equal = np.allclose(array_target, array_sliced_c_style)
         print(f"test - {file}:   \t +") if equal else print(f"test - {file}:   \t -")
