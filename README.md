@@ -1,6 +1,6 @@
 # YOLOX detection GAP inference
 
-This repository contains the code for the inference of [YOLOX]: https://arxiv.org/pdf/2107.08430.pdf Nano on GVSOC.
+This repository contains the code for the inference of [YOLOX](https://arxiv.org/pdf/2107.08430.pdf) Nano on GVSOC.
 Also, it can be used to quantize both `RGB`<sup>1</sup> and `BAYER`<sup>2</sup> version of yolox model.
 
 
