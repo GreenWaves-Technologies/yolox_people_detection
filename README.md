@@ -17,6 +17,7 @@ The input image resolution is QVGA and the output is the bounding box/es of dete
  * [Input & output data format](#input-&-output-data-format)
    * [RGB](#rgb)
    * [BAYER](#bayer)
+   * [Output](#output)
  * [Performance](#performance)
  * [GVSOC Inference](#gvsoc-Inference)
    * [RGB model](#rgb-model)
@@ -70,6 +71,8 @@ pip install -r requirements.txt
 | image width               | 320      |
 | number of image channels  | 1        |
 | channel order             | RAW BAYER|
+
+## Output
 
 | Model Ouput Description in `CI` mode |              |          
 |---------------------------|-----------------------|
