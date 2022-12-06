@@ -1,31 +1,47 @@
 # YOLOX detection GAP inference
 
-This repository contains the code for the inference of [YOLOX](https://arxiv.org/pdf/2107.08430.pdf)Nano on GVSOC.
-Also one can using this repository to quantize both `RGB`<sup>1</sup> and `BAYER`<sup>2</sup> version of yolox model.
-The input is a 240x320 image and the output is the bounding box/es of detected people in the image. The model has been trained on the part of [COCO dataset](https://cocodataset.org/#home) that contains only people. The model has a mAP of 0.3 on the val set of CoCo dataset. 
+This repository contains the code for the inference of [YOLOX](https://arxiv.org/pdf/2107.08430.pdf) Nano on GVSOC.
+Also, it can be used to quantize both `RGB`<sup>1</sup> and `BAYER`<sup>2</sup> version of yolox model.
 
-[1] `RGB` version of yolox model is trained on the RGB images of CoCo dataset.  
-[2] `BAYER` version of yolox model is trained on the BAYER images of CoCo dataset. Can be used to detected people on raw images from a camera with some accuracy loss.
+
+The input image resolution is QVGA and the output is the bounding box/es of detected people on the image. The model has been trained on the part of [COCO dataset](https://cocodataset.org/#home) that contains only people. The `RGB` model has a mAP of 0.3 on the val set of COCO dataset. 
+
+[1] `RGB` version of yolox model is trained on the RGB images of COCO dataset.  
+
+
+[2] `BAYER` version of yolox model is trained on the BAYER type of COCO dataset (see description about BAYER type of COCO dataset in [Quantization](###Quantization) part). Can be used to detected people on raw images from a camera with some accuracy loss.
 
 # Content 
  <!-- * [Requirements](#requirements) -->
  * [Setup](#Setup)
  * [Input & output data format](#Input-&-output-data-format)
- * [GVSOC Inference](#gvsoc)
+   * [RGB](##RGB)
+   * [BAYER](##BAYER)
+ * [Performance](#Performance)
+ * [GVSOC Inference](#GVSOC-Inference)
+   * [RGB model](##RGB-model)
+   * [BAYER model](##BAYER-model)
  * [Additional features](#Additional-features)
-   * [Quantization](#Quantization)
+   * [Quantization](##Quantization)
 
 # Setup
 
 
-In order to able to run th inference on GVSOC, one needs to *make sure* that GAP_SDK is installed. Once this requirement is satisfied, one needs to run the following command: 
+In order to able to run th **inference on GVSOC**, one needs to *make sure* that GAP_SDK is installed. Once this requirement is satisfied, one needs to run the following command: 
 
 ```bash
 source <GAP_SDK_HOME>/configs/gap9_v2.sh
 ```
+
+In order to run **quantization part** of this repository, one needs to install some python dependencies. One sould keep in mind that some dependencies, such as `torch` and `torchvision` can be quite large. There we recommend to install following dependencies *only if* one wants to run the quantization part of this repository. 
+
+```bash
+pip install -r requirements.txt
+```
+
 # Input & output data format
 
-## RGB model
+## RGB 
 <!-- See the `audio` folder with examples of input data. -->
 
 | Input Image Description   |          |
@@ -43,7 +59,8 @@ source <GAP_SDK_HOME>/configs/gap9_v2.sh
 | data type                 | float32               |
 | output lenght             | 7 * `DO`<sup>3</sup>    |
 
-## BAYER model
+
+## BAYER 
 
 | Input Image Description   |          |
 |---------------------------|----------|
@@ -71,6 +88,19 @@ The output of the model is a binary file with the name `output.bin` in the `out`
 where `x1` and `y1` are the coordinates of the top left corner of the bounding box, `x2` and `y2` are the coordinates of the bottom right corner of the bounding box, `objectness score` is the score of the bounding box and `class score` is the score of the class of the detected object. The last column is always 1 indicating class `id`.
 
 
+
+# Performance 
+
+
+Following rusult are obtained using GVSOC inference and are validated on the RGB and BEYER version of COCO val2017 dataset respectively. 
+
+| Model | Input resolution | mAP | AP@0.5 | AR@0.5| Gflops / GMac | Parameters (M) | Size (MB) |
+|-------|------------------|-----|--------|-------|---------------|----------------|-----------|
+| RGB   | 240x320          | 0.271 | 0.54 | 0.346 | 0.46 / 0.24   | 0.9            | 3,5       |
+| BAYER | 240x320          | 0.229 | 0.46 | 0.309 | 0.42 / 0.22   | 0.9            | 3,5       |
+
+
+
 # GVSOC Inference
 
 ## RGB model
@@ -81,7 +111,7 @@ cd inference_gvsoc
 make all run platform=gvsoc
 ```
 
-To run GVSOC inference on a different image, replace the image in 'inference_gvsoc_240x320_int/input.ppm' with the desired image. The image should be in `.ppm` as described in the [table](#input--output-data-format) above. Then then rerun the command [above](#gvsoc-inference). 
+To run GVSOC inference on a different image, replace the image in 'inference_gvsoc_240x320_int/input.ppm' with the desired image. The image should be in `.ppm` format as described in the [table](#input-output-data-format) above. Then then rerun the command [above](#gvsoc-inference). 
 
 ## BAYER model
 
@@ -93,7 +123,7 @@ TODO: add description(When model will be merged)
 
 ## Quantization
 
-Originaly **RGB** models were quantized using 1000 random samples from [`COCO 2017` validation](http://images.cocodataset.org/zips/val2017.zip) set. The **BAYER** model however was quantized using `COCO 2017` which was converted to **synthetic BAYER** using the [ApproxVision repository](https://github.com/cucapra/approx-vision). What the repository does in a nutshell is it take a RGB image and convers it to BAYER image. The conversion is done using certain camera intrinsic parameters and reverse all ISP steps. The conversion is done in a way that the output image is as close as possible to the original image.
+Originaly **RGB** model was quantized using 1000 random samples from [`COCO 2017` validation](http://images.cocodataset.org/zips/val2017.zip) set. The **BAYER** model however was quantized using `COCO 2017` which was converted to **synthetic BAYER** using the [ApproxVision repository](https://github.com/cucapra/approx-vision). What the repository does in a nutshell is it take a RGB image and convers it to BAYER image. The conversion is done using certain camera intrinsic parameters to reverse all ISP steps and in a way that the output image is as close as possible to the original image.
 
 If one wishes to quantize the `RGB` model to 8 bit one can run the following command:
 
