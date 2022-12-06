@@ -13,16 +13,16 @@ The input image resolution is QVGA and the output is the bounding box/es of dete
 
 # Content 
  <!-- * [Requirements](#requirements) -->
- * [Setup](#Setup)
- * [Input & output data format](#Input-&-output-data-format)
-   * [RGB](#RGB)
-   * [BAYER](#BAYER)
- * [Performance](#Performance)
- * [GVSOC Inference](#GVSOC-Inference)
-   * [RGB model](#RGB-model)
-   * [BAYER model](#BAYER-model)
- * [Additional features](#Additional-features)
-   * [Quantization](#Quantization)
+ * [Setup](#setup)
+ * [Input & output data format](#input-&-output-data-format)
+   * [RGB](#rgb)
+   * [BAYER](#bayer)
+ * [Performance](#performance)
+ * [GVSOC Inference](#gvsoc-Inference)
+   * [RGB model](#rgb-model)
+   * [BAYER model](#model-model)
+ * [Additional features](#additional-features)
+   * [Quantization](#quantization)
 
 # Setup
 
