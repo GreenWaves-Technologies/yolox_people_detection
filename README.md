@@ -18,9 +18,13 @@ The input image resolution is QVGA and the output is the bounding box/es of dete
    * [RGB](#rgb)
    * [BAYER](#bayer)
 <<<<<<< HEAD
+<<<<<<< HEAD
    * [Output](#output)
 =======
 >>>>>>> upt
+=======
+   * [Output](#output)
+>>>>>>> working hyperlinks
  * [Performance](#performance)
  * [GVSOC Inference](#gvsoc-Inference)
    * [RGB model](#rgb-model)
