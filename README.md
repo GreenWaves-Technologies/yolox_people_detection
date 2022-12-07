@@ -24,7 +24,11 @@ The input image resolution is QVGA and the output is the bounding box/es of dete
    * [RGB model](#rgb-model)
    * [BAYER model](#model-model)
  * [Additional features](#additional-features)
-   * [Quantization](#quantization)
+    * [Training](#training)
+    * [Pytorch Inference](#pytorch-inference)
+    * [ONNX Conversion](#onnx-conversion)
+    * [Quantization](#quantization)
+    * [Qunatization Validation](#quantization-validation)
 
 # Setup
 
@@ -147,11 +151,26 @@ To run GVSOC inference on a different image, replace the image in 'inference_gvs
 
 # Additional features
 
+Some additional features are implemented in the project while others are not. The reason for not including them in this project is to break the project into smaller independent parts and break the dependency on external large libraries such as `PyTorch`. If a feature is not included here, you will find a link to the repository where it is implemented.
+
+## Training
+
+Refer to the [Yolox repository](https://gitlab.com/xperience-ai/edge-devices/yolox/-/tree/yolox-master) for traning instructions. 
+
+## Pytorch Inference
+
+Refer to the [People_pet_detection](https://gitlab.greenwaves-tech.com/gwt_app_developer/people_pet_detection/-/tree/ar/yolox_eval)
+
+## ONNX conversion 
+
+Refer to the [People_pet_detection](https://gitlab.greenwaves-tech.com/gwt_app_developer/people_pet_detection/-/tree/ar/yolox_eval)
+
+
 ## Quantization
 
 Originaly **RGB** model was quantized using 1000 random samples from [`COCO 2017` validation](http://images.cocodataset.org/zips/val2017.zip) set. The **BAYER** model however was quantized using `COCO 2017` which was converted to **synthetic BAYER** using the [ApproxVision repository](https://github.com/cucapra/approx-vision). What the repository does in a nutshell is it take a RGB image and convers it to BAYER image. The conversion is done using certain camera intrinsic parameters to reverse all ISP steps and in a way that the output image is as close as possible to the original image.
 
-If one wishes to quantize the `RGB` model to 8 bit one can run the following command:
+If you want to quantize the `RGB` model to 8 bit one can run the following command:
 
 ```bash
 
@@ -164,7 +183,7 @@ python quantization/quantize.py                                 \
 
 ```
 
-if one wishes to quantize the `BAYER` model to 8 bit one can run the following command:
+if you want to quantize the `BAYER` model to 8 bit one can run the following command:
 
 ```bash
 
@@ -179,5 +198,12 @@ python quantization/quantize.py                                 \
 ```
 
 
+## Quantization Validation 
 
+If you want to validate the quantized model on the `COCO 2017` validation set you please refer to the [People_pet_detection](https://gitlab.greenwaves-tech.com/gwt_app_developer/people_pet_detection/-/tree/ar/yolox_eval) repository. There two script that can be used to validate the quantized model. 
+
+1. `eval_nntool.py` - This will validate nntool quantized model. 
+2. `eval_gvsoc.py` - This will validate GVSOC quantized model.[^1]
+
+[^1]: However, to validate the GVSOC model you will need to cread dumps using GVSOC model in this repository. 
 
