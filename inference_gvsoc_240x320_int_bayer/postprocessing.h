@@ -1,10 +1,11 @@
 #include "Gap.h"
 
+
 typedef struct{
     float x1, y1, x2, y2;
     float obj_conf, cls_conf;
-    int cls_id;
-    int alive;
+    char cls_id;
+    bool alive;
 } Box;
 
 void xywh2xyxy(float * array, unsigned int rows);

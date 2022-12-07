@@ -1,15 +1,9 @@
 #include "Gap.h"
 
-// typedef struct{
-//     float x1, y1, x2, y2;
-//     float obj_conf, cls_conf;
-//     int cls_id;
-//     int alive;
-// } Box;
 
 typedef struct{
-    int x1, y1, x2, y2;
-    f16 obj_conf, cls_conf;
+    float x1, y1, x2, y2;
+    float obj_conf, cls_conf;
     char cls_id;
     bool alive;
 } Box;

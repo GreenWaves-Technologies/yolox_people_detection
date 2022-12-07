@@ -1,9 +1,6 @@
 #include "postprocessing.h"
 #include "main.h"
 
-// #define MAX(a, b) ((a) > (b) ? (a) : (b))
-// #define MIN(a, b) ((a) < (b) ? (a) : (b))
-
 void xywh2xyxy(float * input, unsigned int rows){
 
     int count = 0;
@@ -50,18 +47,16 @@ void filter_boxes(float * Input, float * Output, float conf_thresh, unsigned int
 void to_bboxes(float * input, Box * output, int num_val_boxes){
 
     int count = 0;
-    // for (int i = 0; i < top_k_boxes; i++){
-    for (int i = 0; i < num_val_boxes; i++){
+    for (int i = 0; i < top_k_boxes; i++){
+    // for (int i = 0; i < num_val_boxes; i++){
         output[i].x1 = input[count + 0];
         output[i].y1 = input[count + 1];
         output[i].x2 = input[count + 2];
         output[i].y2 = input[count + 3];
         output[i].obj_conf = input[count + 4];
-        // if class confindence < then do not add to struct 
-        // already done in fileter boxes
         output[i].cls_conf = input[count + 5];
-        output[i].cls_id = (int) input[count + 6];
-        output[i].alive = 1;
+        output[i].cls_id = (char) input[count + 6];
+        output[i].alive = true;
         count += 7;
     }
 }
@@ -108,38 +103,45 @@ void nms(
     int * val_final_boxes
     ){
 
-    for (int i = 0; i < num_val_boxes; i++){
-        if (boxes[i].alive == 1){
+    int count = 0;
+    int val_boxes;
 
-            for (int j = 0; j < num_val_boxes; j++){
-                if (i != j && boxes[j].alive == 1){
+    if (num_val_boxes > top_k_boxes){
+        val_boxes = top_k_boxes;
+    }
+    else{
+        val_boxes = num_val_boxes;
+    }
+
+    for (int i = 0; i < val_boxes; i++){
+        if (boxes[i].alive == true){
+
+            for (int j = 0; j < val_boxes; j++){
+                if (i != j && boxes[j].alive == true){
 
                     if (iou(&boxes[i], &boxes[j]) >= nms_thresh){
                         if (boxes[i].obj_conf > boxes[j].obj_conf){
-                            boxes[j].alive = 0;
+                            boxes[j].alive = false;
                         }
                         else{
-                            boxes[i].alive = 0;
+                            boxes[i].alive = false;
                         }
                     }
                 }
             }
-        }
-    }
 
-    // try to do fill in the this inside the firs for loop
-    int count = 0;
-    for (int i = 0; i < num_val_boxes; i++){
-        if (boxes[i].alive == 1){
-            Output[count + 0] = boxes[i].x1;
-            Output[count + 1] = boxes[i].y1;
-            Output[count + 2] = boxes[i].x2;
-            Output[count + 3] = boxes[i].y2;
-            Output[count + 4] = boxes[i].obj_conf;
-            Output[count + 5] = boxes[i].cls_conf;
-            Output[count + 6] = boxes[i].cls_id;
-            count += 7;
-            (*val_final_boxes) += 1;
+            // if boxes is alive, add it to the output
+            if (boxes[i].alive == 1){
+                Output[count + 0] =  boxes[i].x1;
+                Output[count + 1] =  boxes[i].y1;
+                Output[count + 2] =  boxes[i].x2;
+                Output[count + 3] =  boxes[i].y2;
+                Output[count + 4] =  boxes[i].obj_conf;
+                Output[count + 5] =  boxes[i].cls_conf;
+                Output[count + 6] = (float) boxes[i].cls_id;
+                count += 7;
+                *val_final_boxes += 1;
+            }
         }
     }
 }

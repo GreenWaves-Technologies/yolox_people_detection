@@ -49,12 +49,12 @@ void to_bboxes(float * input, Box * output, int num_val_boxes){
     int count = 0;
     for (int i = 0; i < top_k_boxes; i++){
     // for (int i = 0; i < num_val_boxes; i++){
-        output[i].x1 = (int) input[count + 0];
-        output[i].y1 = (int) input[count + 1];
-        output[i].x2 = (int) input[count + 2];
-        output[i].y2 = (int) input[count + 3];
-        output[i].obj_conf = (f16) input[count + 4];
-        output[i].cls_conf = (f16) input[count + 5];
+        output[i].x1 = input[count + 0];
+        output[i].y1 = input[count + 1];
+        output[i].x2 = input[count + 2];
+        output[i].y2 = input[count + 3];
+        output[i].obj_conf = input[count + 4];
+        output[i].cls_conf = input[count + 5];
         output[i].cls_id = (char) input[count + 6];
         output[i].alive = true;
         count += 7;
@@ -103,7 +103,6 @@ void nms(
     int * val_final_boxes
     ){
 
-            
     int count = 0;
     int val_boxes;
 
@@ -130,37 +129,21 @@ void nms(
                     }
                 }
             }
-        // printf("correctly: %d \n", i); 
-        // if boxes[i].alive == 1 then add to output
-        if (boxes[i].alive == 1){
-            Output[count + 0] = (float) boxes[i].x1;
-            Output[count + 1] = (float) boxes[i].y1;
-            Output[count + 2] = (float) boxes[i].x2;
-            Output[count + 3] = (float) boxes[i].y2;
-            Output[count + 4] = (float) boxes[i].obj_conf;
-            Output[count + 5] = (float) boxes[i].cls_conf;
-            Output[count + 6] = (float) boxes[i].cls_id;
-            count += 7;
-            *val_final_boxes += 1;
-        }
-       }
-    }
 
-    // try to do fill in the this inside the first for loop
-    // int count = 0;
-    // for (int i = 0; i < num_val_boxes; i++){
-    //     if (boxes[i].alive == 1){
-    //         Output[count + 0] = boxes[i].x1;
-    //         Output[count + 1] = boxes[i].y1;
-    //         Output[count + 2] = boxes[i].x2;
-    //         Output[count + 3] = boxes[i].y2;
-    //         Output[count + 4] = boxes[i].obj_conf;
-    //         Output[count + 5] = boxes[i].cls_conf;
-    //         Output[count + 6] = boxes[i].cls_id;
-    //         count += 7;
-    //         (*val_final_boxes) += 1;
-    //     }
-    // }
+            // if boxes is alive, add it to the output
+            if (boxes[i].alive == 1){
+                Output[count + 0] =  boxes[i].x1;
+                Output[count + 1] =  boxes[i].y1;
+                Output[count + 2] =  boxes[i].x2;
+                Output[count + 3] =  boxes[i].y2;
+                Output[count + 4] =  boxes[i].obj_conf;
+                Output[count + 5] =  boxes[i].cls_conf;
+                Output[count + 6] = (float) boxes[i].cls_id;
+                count += 7;
+                *val_final_boxes += 1;
+            }
+        }
+    }
 }
 
 
