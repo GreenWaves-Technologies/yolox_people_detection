@@ -27,6 +27,7 @@ The input image resolution is QVGA and the output is the bounding box/es of dete
 >>>>>>> working hyperlinks
  * [Performance](#performance)
  * [GVSOC Inference](#gvsoc-Inference)
+   * [Inference Type Description](#inference-type-description)
    * [RGB model](#rgb-model)
    * [BAYER model](#model-model)
  * [Additional features](#additional-features)
@@ -34,17 +35,29 @@ The input image resolution is QVGA and the output is the bounding box/es of dete
 
 # Setup
 
+To start the porjec you will need: 
 
-In order to able to run th **inference on GVSOC**, one needs to *make sure* that GAP_SDK is installed. Once this requirement is satisfied, one needs to run the following command: 
+1. Python 3.10.4
+2. Developer's GAP_SDK 
+
+
+Execute the following commands to setup the project at the firt time: 
 
 ```bash
-source <GAP_SDK_HOME>/configs/gap9_v2.sh
+git clone git@gitlab.greenwaves-tech.com:Xperience/yolox_gap_inference.git 
+cd yolox_gap_inference
+virtualenv -p python3.10.4 venv
+source venv/bin/activate
+pip install -r requirements.txt
+source <GAP_SDK_HOME>/configs/gap9_v2.sh (from drop down menu select GAP9_V2)
 ```
 
-In order to run **quantization part** of this repository, one needs to install some python dependencies. One sould keep in mind that some dependencies, such as `torch` and `torchvision` can be quite large. There we recommend to install following dependencies *only if* one wants to run the quantization part of this repository. 
+Next time you can just run the following commands to start the project: 
 
 ```bash
-pip install -r requirements.txt
+cd yolox_gap_inference
+source venv/bin/activate
+source <GAP_SDK_HOME>/configs/gap9_v2.sh (from drop down menu select GAP9_V2)
 ```
 
 # Input & output data format
@@ -60,12 +73,6 @@ pip install -r requirements.txt
 | image width               | 320      |
 | number of image channels  | 3        |
 | channel order             | RGB      |
-
-| Model Ouput Description in `CI` mode |              |          
-|---------------------------|-----------------------|
-| extension                 | .bin                  |
-| data type                 | float32               |
-| output lenght             | 7 * `DO`<sup>3</sup>    |
 
 
 ## BAYER 
@@ -113,20 +120,36 @@ Following rusult are obtained using GVSOC inference and are validated on the RGB
 
 # GVSOC Inference
 
+
+## Inference Type Description
+
+There are 3 types of inference that can be run on GVSOC. Each of them is described below.
+
+- [+ DEMO +] In this model one can make inference on a single image.  The model will detect people on the image and draw bounding boxes around them. 
+
+- [+ INFERENCE +] In thise model will only save detected bounding boxes in the output file.
+
+
 ## RGB model
 To run GVSOC inference on default image run the following command:
 
 ```bash
-cd inference_gvsoc
-make all run platform=gvsoc
+cd inference_gvsoc_240x320_int
+make all run platform=gvsoc mode=<choose the mode>
 ```
 
 To run GVSOC inference on a different image, replace the image in 'inference_gvsoc_240x320_int/input.ppm' with the desired image. The image should be in `.ppm` format as described in the [table](#input-output-data-format) above. Then then rerun the command [above](#gvsoc-inference). 
 
 ## BAYER model
 
-TODO: add description(When model will be merged)
+```bash
 
+cd inference_gvsoc_240x320_int_bayer
+make all run platform=gvsoc mode=<choose the mode>
+
+```
+
+To run GVSOC inference on a different image, replace the image in 'inference_gvsoc_240x320_int/input.pgm' with the desired image. The image should be in `.pgm` format as described in the [table](#input-output-data-format) above. Then then rerun the command [above](#gvsoc-inference). 
 
 
 # Additional features
