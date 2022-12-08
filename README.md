@@ -113,7 +113,7 @@ where `x1` and `y1` are the coordinates of the top left corner of the bounding b
 # Performance 
 
 
-Following rusult are obtained using GVSOC inference and are validated on the RGB and BEYER version of COCO val2017 dataset respectively. 
+Following results are obtained using GVSOC inference and are validated on the RGB and BEYER version of COCO val2017 dataset respectively. 
 
 | Model | Input resolution | mAP | AP@0.5 | AR@0.5| Gflops / GMac | Parameters (M) | Size (MB) |
 |-------|------------------|-----|--------|-------|---------------|----------------|-----------|
@@ -157,8 +157,6 @@ To run GVSOC inference on a different image, replace the image in 'inference_gvs
 
 
 # Additional features
-
-Some additional features are implemented in the project while others are not. The reason for not including them in this project is to break the project into smaller independent parts and break the dependency on external large libraries such as `PyTorch`. If a feature is not included here, you will find a link to the repository where it is implemented.
 
 ## Training
 
@@ -212,5 +210,5 @@ If you want to validate the quantized model on the `COCO 2017` validation set yo
 1. `eval_nntool.py` - This will validate nntool quantized model. 
 2. `eval_gvsoc.py` - This will validate GVSOC quantized model.[^1]
 
-[^1]: However, to validate the GVSOC model you will need to cread dumps using GVSOC model in this repository. 
+[^1]: However, to validate the GVSOC model you will need to create dumps using GVSOC model in this repository. 
 
