@@ -48,7 +48,6 @@ void to_bboxes(float * input, Box * output, int num_val_boxes){
 
     int count = 0;
     for (int i = 0; i < top_k_boxes; i++){
-    // for (int i = 0; i < num_val_boxes; i++){
         output[i].x1 = input[count + 0];
         output[i].y1 = input[count + 1];
         output[i].x2 = input[count + 2];
@@ -94,7 +93,6 @@ float iou(Box * box1, Box * box2){
 }
 
 
-// this function can be optimized
 void nms(
     Box * boxes, 
     float * Output, 
