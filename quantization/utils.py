@@ -1,17 +1,14 @@
-import argparse
-import pickle
 import os
 import cv2
-import numpy as np 
 import copy
 import onnx
-import onnxruntime as ort
 import collections
+import numpy as np 
+import onnxruntime as ort
 
 from loguru import logger
-from pycocotools.coco import COCO 
-from nntool.importer.importer import create_graph
 from nntool.api import NNGraph
+from pycocotools.coco import COCO 
 
 class CostomCOCODaset():
     def __init__(
@@ -147,7 +144,6 @@ def hwc_slice(array):
 
 def build_graph(onnx_path):
 
-    # graph = create_graph(onnx_path, opts={})
     graph = NNGraph.load_graph(onnx_path)
 
 
