@@ -322,10 +322,5 @@ int test_main(void)
 int main(int argc, char *argv[])
 {
     printf("\n\n\t *** NNTOOL main Example ***\n\n");
-    #ifdef __EMUL__
-    test_main();
-    #else
-    return pmsis_kickoff((void *) test_main);
-    #endif
-    return 0;
+    return test_main();
 }
