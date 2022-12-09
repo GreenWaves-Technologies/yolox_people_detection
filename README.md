@@ -177,6 +177,12 @@ Follwing are the instructions on how to create dumps using GVSOC model.
 
 In our case we use COCO2017 validation set. If you need to use a different dataset you will need to inherit `CostomCOCODataset` class located in `quantization/utils.py` similar to how it is done in `GvsocInputGeneratorCOCO` class located in `quantization/utils.py`. Then run the following command:
 
+Follwing are the instructions on how to create dumps using GVSOC model.
+
+1. Firstly you will need to create a folder with preprocessed images from the validation set. The folder should be located in one of the `inference_gvsoc_240x320_int` or `inference_gvsoc_240x320_int_bayer` folders, depending on the model you want to validate. In our case it is COCO2017 validations set. The format of the images should be `.ppm` for RGB and `.pgm` for BAYER respectively.
+
+In our case we use COCO2017 validation set. If you need to use a different dataset you will need to inherit `CostomCOCODataset` class located in `quantization/utils.py` similar to how it is done in `GvsocInputGeneratorCOCO` class located in `quantization/utils.py`. Then run the following command:
+
 ```bash
 python quantization/gvsoc_gen_inputs.py --image_folder <path to folder with images>                 \
                                         --annotations <path to annotations>                         \
