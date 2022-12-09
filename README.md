@@ -157,11 +157,11 @@ Refer to the [Yolox repository](https://gitlab.com/xperience-ai/edge-devices/yol
 
 ## Pytorch Inference
 
-Refer to the [People_pet_detection](https://gitlab.greenwaves-tech.com/gwt_app_developer/people_pet_detection/-/tree/ar/yolox_eval)
+Refer to the [Demo](https://gitlab.com/xperience-ai/edge-devices/yolox/-/blob/yolox-master/tools/demo.py)
 
 ## ONNX conversion 
 
-Refer to the [People_pet_detection](https://gitlab.greenwaves-tech.com/gwt_app_developer/people_pet_detection/-/tree/ar/yolox_eval)
+Refer to the [ONNX](https://gitlab.com/xperience-ai/edge-devices/yolox/-/blob/yolox-master/tools/export_onnx.py)
 
 
 ## Quantization
@@ -205,3 +205,26 @@ If you want to validate the quantized model on the `COCO 2017` validation set yo
 
 [^1]: However, to validate the GVSOC model you will need to create dumps using GVSOC model in this repository. 
 
+Follwing are the instructions on how to create dumps using GVSOC model.
+
+1. Firstly you will need to create a folder with preprocessed images from the validation set. The folder should be located in one of the `inference_gvsoc_240x320_int` or `inference_gvsoc_240x320_int_bayer` folders, depending on the model you want to validate. In our case it is COCO2017 validations set. The format of the images should be `.ppm` for RGB and `.pgm` for BAYER respectively.
+
+In our case we use COCO2017 validation set. If you need to use a different dataset you will need to inherit `CostomCOCODataset` class located in `quantization/utils.py` similar to how it is done in `GvsocInputGeneratorCOCO` class located in `quantization/utils.py`. Then run the following command:
+
+```bash
+python quantization/gvsoc_gen_inputs.py --image_folder <path to folder with images>                 \
+                                        --annotations <path to annotations>                         \
+                                        --gvsoc_inputs <path to a folder to save inputs>            \
+                                        --input_size <input size of the model>                      \
+                                        --input_channels <number of input channels>                 \
+                                        --model_type <model type for gvsoc validation>              \
+```
+
+2. Then you will need to create a folder for stroing the dumps inside one of the `inference_gvsoc_240x320_int` or `inference_gvsoc_240x320_int_bayer` folders, depending on the model you want to validate.
+
+3. Finally you will need to run the following command:
+
+```bash
+cd <folder of the model you want to validate >
+./val_ru.sh <input images folder name> <name of the folder for dumps>
+```
