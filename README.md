@@ -17,51 +17,27 @@ The input image resolution is QVGA and the output is the bounding box/es of dete
  * [Input & output data format](#input-&-output-data-format)
    * [RGB](#rgb)
    * [BAYER](#bayer)
-<<<<<<< HEAD
-<<<<<<< HEAD
    * [Output](#output)
-=======
->>>>>>> upt
-=======
-   * [Output](#output)
->>>>>>> working hyperlinks
  * [Performance](#performance)
  * [GVSOC Inference](#gvsoc-Inference)
-   * [Inference Type Description](#inference-type-description)
    * [RGB model](#rgb-model)
    * [BAYER model](#model-model)
  * [Additional features](#additional-features)
-    * [Training](#training)
-    * [Pytorch Inference](#pytorch-inference)
-    * [ONNX Conversion](#onnx-conversion)
-    * [Quantization](#quantization)
-    * [Qunatization Validation](#quantization-validation)
+   * [Quantization](#quantization)
 
 # Setup
 
-To start the porjec you will need: 
 
-1. Python 3.10.4
-2. Developer's GAP_SDK 
-
-
-Execute the following commands to setup the project at the firt time: 
+In order to able to run th **inference on GVSOC**, one needs to *make sure* that GAP_SDK is installed. Once this requirement is satisfied, one needs to run the following command: 
 
 ```bash
-git clone git@gitlab.greenwaves-tech.com:Xperience/yolox_gap_inference.git 
-cd yolox_gap_inference
-virtualenv -p python3.10.4 venv
-source venv/bin/activate
-pip install -r requirements.txt
-source <GAP_SDK_HOME>/configs/gap9_v2.sh (from drop down menu select GAP9_V2)
+source <GAP_SDK_HOME>/configs/gap9_v2.sh
 ```
 
-Next time you can just run the following commands to start the project: 
+In order to run **quantization part** of this repository, one needs to install some python dependencies. One sould keep in mind that some dependencies, such as `torch` and `torchvision` can be quite large. There we recommend to install following dependencies *only if* one wants to run the quantization part of this repository. 
 
 ```bash
-cd yolox_gap_inference
-source venv/bin/activate
-source <GAP_SDK_HOME>/configs/gap9_v2.sh (from drop down menu select GAP9_V2)
+pip install -r requirements.txt
 ```
 
 # Input & output data format
@@ -77,6 +53,12 @@ source <GAP_SDK_HOME>/configs/gap9_v2.sh (from drop down menu select GAP9_V2)
 | image width               | 320      |
 | number of image channels  | 3        |
 | channel order             | RGB      |
+
+| Model Ouput Description in `CI` mode |              |          
+|---------------------------|-----------------------|
+| extension                 | .bin                  |
+| data type                 | float32               |
+| output lenght             | 7 * `DO`<sup>3</sup>    |
 
 
 ## BAYER 
@@ -113,7 +95,7 @@ where `x1` and `y1` are the coordinates of the top left corner of the bounding b
 # Performance 
 
 
-Following results are obtained using GVSOC inference and are validated on the RGB and BEYER version of COCO val2017 dataset respectively. 
+Following rusult are obtained using GVSOC inference and are validated on the RGB and BEYER version of COCO val2017 dataset respectively. 
 
 | Model | Input resolution | mAP | AP@0.5 | AR@0.5| Gflops / GMac | Parameters (M) | Size (MB) |
 |-------|------------------|-----|--------|-------|---------------|----------------|-----------|
@@ -124,58 +106,29 @@ Following results are obtained using GVSOC inference and are validated on the RG
 
 # GVSOC Inference
 
-
-## Inference Type Description
-
-There are 3 types of inference that can be run on GVSOC. Each of them is described below.
-
-- [+ DEMO +] In this model one can make inference on a single image.  The model will detect people on the image and draw bounding boxes around them. 
-
-- [+ INFERENCE +] In thise model will only save detected bounding boxes in the output file.
-
-
 ## RGB model
 To run GVSOC inference on default image run the following command:
 
 ```bash
-cd inference_gvsoc_240x320_int
-make all run platform=gvsoc mode=<choose the mode>
+cd inference_gvsoc
+make all run platform=gvsoc
 ```
 
 To run GVSOC inference on a different image, replace the image in 'inference_gvsoc_240x320_int/input.ppm' with the desired image. The image should be in `.ppm` format as described in the [table](#input-output-data-format) above. Then then rerun the command [above](#gvsoc-inference). 
 
 ## BAYER model
 
-```bash
+TODO: add description(When model will be merged)
 
-cd inference_gvsoc_240x320_int_bayer
-make all run platform=gvsoc mode=<choose the mode>
-
-```
-
-To run GVSOC inference on a different image, replace the image in 'inference_gvsoc_240x320_int/input.pgm' with the desired image. The image should be in `.pgm` format as described in the [table](#input-output-data-format) above. Then then rerun the command [above](#gvsoc-inference). 
 
 
 # Additional features
-
-## Training
-
-Refer to the [Yolox repository](https://gitlab.com/xperience-ai/edge-devices/yolox/-/tree/yolox-master) for traning instructions. 
-
-## Pytorch Inference
-
-Refer to the [People_pet_detection](https://gitlab.greenwaves-tech.com/gwt_app_developer/people_pet_detection/-/tree/ar/yolox_eval)
-
-## ONNX conversion 
-
-Refer to the [People_pet_detection](https://gitlab.greenwaves-tech.com/gwt_app_developer/people_pet_detection/-/tree/ar/yolox_eval)
-
 
 ## Quantization
 
 Originaly **RGB** model was quantized using 1000 random samples from [`COCO 2017` validation](http://images.cocodataset.org/zips/val2017.zip) set. The **BAYER** model however was quantized using `COCO 2017` which was converted to **synthetic BAYER** using the [ApproxVision repository](https://github.com/cucapra/approx-vision). What the repository does in a nutshell is it take a RGB image and convers it to BAYER image. The conversion is done using certain camera intrinsic parameters to reverse all ISP steps and in a way that the output image is as close as possible to the original image.
 
-If you want to quantize the `RGB` model to 8 bit one can run the following command:
+If one wishes to quantize the `RGB` model to 8 bit one can run the following command:
 
 ```bash
 
@@ -188,7 +141,7 @@ python quantization/quantize.py                                 \
 
 ```
 
-if you want to quantize the `BAYER` model to 8 bit one can run the following command:
+if one wishes to quantize the `BAYER` model to 8 bit one can run the following command:
 
 ```bash
 
@@ -203,12 +156,5 @@ python quantization/quantize.py                                 \
 ```
 
 
-## Quantization Validation 
 
-If you want to validate the quantized model on the `COCO 2017` validation set you please refer to the [People_pet_detection](https://gitlab.greenwaves-tech.com/gwt_app_developer/people_pet_detection/-/tree/ar/yolox_eval) repository. There two script that can be used to validate the quantized model. 
-
-1. `eval_nntool.py` - This will validate nntool quantized model. 
-2. `eval_gvsoc.py` - This will validate GVSOC quantized model.[^1]
-
-[^1]: However, to validate the GVSOC model you will need to create dumps using GVSOC model in this repository. 
 
