@@ -124,6 +124,19 @@ TODO: add description(When model will be merged)
 
 # Additional features
 
+## Training
+
+Refer to the [Yolox repository](https://gitlab.com/xperience-ai/edge-devices/yolox/-/tree/yolox-master) for traning instructions. 
+
+## Pytorch Inference
+
+Refer to the [Demo](https://gitlab.com/xperience-ai/edge-devices/yolox/-/blob/yolox-master/tools/demo.py)
+
+## ONNX conversion 
+
+Refer to the [ONNX](https://gitlab.com/xperience-ai/edge-devices/yolox/-/blob/yolox-master/tools/export_onnx.py)
+
+
 ## Quantization
 
 Originaly **RGB** model was quantized using 1000 random samples from [`COCO 2017` validation](http://images.cocodataset.org/zips/val2017.zip) set. The **BAYER** model however was quantized using `COCO 2017` which was converted to **synthetic BAYER** using the [ApproxVision repository](https://github.com/cucapra/approx-vision). What the repository does in a nutshell is it take a RGB image and convers it to BAYER image. The conversion is done using certain camera intrinsic parameters to reverse all ISP steps and in a way that the output image is as close as possible to the original image.
@@ -158,3 +171,26 @@ python quantization/quantize.py                                 \
 
 
 
+Follwing are the instructions on how to create dumps using GVSOC model.
+
+1. Firstly you will need to create a folder with preprocessed images from the validation set. The folder should be located in one of the `inference_gvsoc_240x320_int` or `inference_gvsoc_240x320_int_bayer` folders, depending on the model you want to validate. In our case it is COCO2017 validations set. The format of the images should be `.ppm` for RGB and `.pgm` for BAYER respectively.
+
+In our case we use COCO2017 validation set. If you need to use a different dataset you will need to inherit `CostomCOCODataset` class located in `quantization/utils.py` similar to how it is done in `GvsocInputGeneratorCOCO` class located in `quantization/utils.py`. Then run the following command:
+
+```bash
+python quantization/gvsoc_gen_inputs.py --image_folder <path to folder with images>                 \
+                                        --annotations <path to annotations>                         \
+                                        --gvsoc_inputs <path to a folder to save inputs>            \
+                                        --input_size <input size of the model>                      \
+                                        --input_channels <number of input channels>                 \
+                                        --model_type <model type for gvsoc validation>              \
+```
+
+2. Then you will need to create a folder for stroing the dumps inside one of the `inference_gvsoc_240x320_int` or `inference_gvsoc_240x320_int_bayer` folders, depending on the model you want to validate.
+
+3. Finally you will need to run the following command:
+
+```bash
+cd <folder of the model you want to validate >
+./val_ru.sh <input images folder name> <name of the folder for dumps>
+```
