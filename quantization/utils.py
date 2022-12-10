@@ -121,6 +121,22 @@ class GvsocInputGeneratorCOCO(CostomCOCODaset):
         input_channels=3,
         ):
 
+        assert model_type.lower() in ["bayer", "rgb"], \
+            "model_type must be 'bayer' or 'rgb'"
+        self.model_type = model_type.lower()
+
+        if model_type.lower() == "bayer" and input_channels != 1:
+            logger.warning("Input_channels must be 1 for bayer model. Changing to 1")
+            input_channels = 1
+
+        elif model_type.lower() == "rgb" and input_channels != 3:
+            logger.warning("Input_channels must be 3 for rgb model. Changing to 3")
+            input_channels = 3
+
+        self.gvsoc_inputs_folder = gvsoc_inputs_folder
+        if not os.path.exists(self.gvsoc_inputs_folder):
+            os.makedirs(self.gvsoc_inputs_folder)
+
         annotations = get_annotations(annotations)
         super().__init__(
             image_folder, 
@@ -129,27 +145,18 @@ class GvsocInputGeneratorCOCO(CostomCOCODaset):
             max_size = len(annotations), 
             input_channels = input_channels,
         )
-        self.gvsoc_inputs_folder = gvsoc_inputs_folder
-
-        if not os.path.exists(self.gvsoc_inputs_folder):
-            os.makedirs(self.gvsoc_inputs_folder)
-
-        assert model_type.lower() in ["bayer", "rgb"], \
-            "model_type must be 'bayer' or 'rgb'"
-        self.model_type = model_type.lower()
 
     def __next__(self):
 
-        if self._idx > self.max_idx:
+        if self._idx >= self.max_idx:
             raise StopIteration()
 
         filename = self.annotations[self._idx]["file_name"]
-        print(filename)
+
         if self.input_channels != 3:
             filename = filename.replace("jpg", "png")
-        img_file = os.path.join(self.data_dir, filename)
-        print(img_file)
 
+        img_file = os.path.join(self.data_dir, filename)
         image = cv2.imread(
             img_file, 
             cv2.IMREAD_COLOR if self.input_channels == 3 else cv2.IMREAD_UNCHANGED)
@@ -164,7 +171,6 @@ class GvsocInputGeneratorCOCO(CostomCOCODaset):
         )
         image = image.transpose(1, 2, 0)
 
-        print(image.shape)
         self._idx += 1
         return image, filename.split(".")[0]
     
@@ -173,12 +179,9 @@ class GvsocInputGeneratorCOCO(CostomCOCODaset):
         for image, filename in tqdm(self):
             save_path = os.path.join(
                 self.gvsoc_inputs_folder,
-                filename + ".ppm" if self.model_type == "rgb" else ".pgm"
+                filename + (".ppm" if self.model_type == "rgb" else ".pgm")
             ) 
-            print(save_path)
             cv2.imwrite(save_path, image)
-
-
 
 def chw_slice(array):
     patch_top_left = array[..., ::2, ::2]
