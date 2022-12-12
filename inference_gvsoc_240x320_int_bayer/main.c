@@ -62,6 +62,27 @@ L2_MEM float Output_1[9480];
 
 /* Copy inputs function */
 void copy_inputs() {
+    int status;
+#ifdef CI
+    /* ------------------- reading data for test ----------------------*/
+    if (CONF_THRESH > 0.01){
+        printf("CONF_THRESH = %f is larger than shoud be for CI test,\
+                please set it to 0.01 and run again", CONF_THRESH);
+    }
+
+    printf("\n\t\t*** READING TEST INPUT ***\n");
+    status = ReadImageFromFile(
+        "../../../test_data/input.pgm",
+        W_INP, 
+        H_INP, 
+        CHANNELS, 
+        main_L2_Memory_Dyn + (H_INP * W_INP * CHANNELS),
+        W_INP * H_INP * CHANNELS * sizeof(char), 
+        IMGIO_OUTPUT_CHAR,
+        0
+    );
+
+#endif 
 
     PRINTF("\n\t\t*** READING INPUT FROM PPM FILE ***\n");
     PRINTF("Number of input channels: %d\n", CHANNELS);
@@ -84,10 +105,53 @@ void copy_inputs() {
 
 }
 
+void ci_output_test(float * model_output, char * GT_file_name, float * GT_buffer){
+
+    switch_fs_t fs;
+    __FS_INIT(fs); 
+
+    void *File_GT;
+    int ret_GT = 0;
+
+    File_GT = __OPEN_READ(fs, GT_file_name);
+
+    // here 3 is the number of boxes and 7 is the number of parameters for each box
+    // the numbers are hard coded here since we know this number ahead 
+    ret_GT = __READ(File_GT, GT_buffer, 3 * 7 * sizeof(float));
+
+    __CLOSE(File_GT);
+    __FS_DEINIT(fs);
+
+    //check the difference between the model output and the ground truth
+    float diff = 0;
+    for (int i = 0; i < 3 * 7; i++){
+        diff += Abs(model_output[i] - GT_buffer[i]);
+    }
+
+    if (diff > 0.01){
+        printf("CI test failed, the difference between the model output and the ground truth is %f\n", diff);
+        exit(-1);
+    }
+    else{
+        printf("CI test passed, the difference between the model output and the ground truth is %f\n", diff);
+    }
+
+
+}
+
+
+
+
 /* Copy inputs function */
 void write_outputs() {
 
+#ifdef CI
 
+    printf("\t\t***Start CI output test***\n");
+    char GT_file[] = "../../../test_data/gt_boxes.bin";
+    ci_output_test(Output_1, GT_file, (float *) main_L2_Memory_Dyn);
+
+#else
     /* ------ SAVE ------*/
     PRINTF("\t\t***Start saving output***\n");
 
@@ -395,9 +459,7 @@ int test_main(void)
     /* ------ END ------*/
     PRINTF("\t\t***Runner completed***\n");
 
-    #ifdef CI 
-        write_outputs();
-    #endif
+    write_outputs();
 
     mainCNN_Destruct();
 

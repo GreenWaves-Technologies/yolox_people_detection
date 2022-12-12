@@ -56,7 +56,7 @@ READFS_FILES=$(abspath $(MODEL_TENSORS))
 #  - DEMO     Run in Demo mode with camera
 
 mode?=CI
-ifeq (,$(filter $(mode), CI INFERENCE DEMO))
+ifeq (,$(filter $(mode), CI DEMO))
     $(error Invalid mode $(mode))
 endif
 APP_CFLAGS += -D$(mode) 
