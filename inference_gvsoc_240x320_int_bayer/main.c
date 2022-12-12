@@ -281,13 +281,14 @@ int test_main(void)
     mainCNN_Destruct();
 
 // #ifdef PERF
-#ifndef PERF
+#ifdef PERF
     {
       unsigned int TotalCycles = 0, TotalOper = 0;
       printf("\n");
       for (unsigned int i=0; i<(sizeof(AT_GraphPerf)/sizeof(unsigned int)); i++) {
         TotalCycles += AT_GraphPerf[i]; TotalOper += AT_GraphOperInfosNames[i];
       }
+      TotalCycles += slicing_cycles + decoding_cycles + xywh2xyxy_cycles + filter_boxes_cycles + bbox_cycles + nms_cycles;
       for (unsigned int i=0; i<(sizeof(AT_GraphPerf)/sizeof(unsigned int)); i++) {
         printf("%45s: Cycles: %12u, Cyc%%: %5.1f%%, Operations: %12u, Op%%: %5.1f%%, Operations/Cycle: %f\n", AT_GraphNodeNames[i], AT_GraphPerf[i], 100*((float) (AT_GraphPerf[i]) / TotalCycles), AT_GraphOperInfosNames[i], 100*((float) (AT_GraphOperInfosNames[i]) / TotalOper), ((float) AT_GraphOperInfosNames[i])/ AT_GraphPerf[i]);
       }

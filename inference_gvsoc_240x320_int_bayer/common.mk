@@ -19,7 +19,7 @@ MODEL_EXPRESSIONS = Expression_Kernels.c
 
 # Memory sizes for cluster L1, SoC L2 and Flash
 TARGET_L1_SIZE = 128000
-TARGET_L2_SIZE = 1000000
+TARGET_L2_SIZE = 1200000
 TARGET_L3_SIZE = 8000000
 
 # Options for the memory settings: will require
@@ -27,7 +27,7 @@ TARGET_L3_SIZE = 8000000
 # set l3_ram_device $(MODEL_L3_RAM)
 # in the nntool_script
 # FLASH and RAM type
-FLASH_TYPE = DEFAULT
+FLASH_TYPE = MRAM
 RAM_TYPE   = DEFAULT
 
 ifeq '$(FLASH_TYPE)' 'HYPER'
@@ -69,8 +69,8 @@ else
 endif
 
 # Cluster stack size for master core and other cores
-CLUSTER_STACK_SIZE=4096
-CLUSTER_SLAVE_STACK_SIZE=1024
+CLUSTER_STACK_SIZE=2048
+CLUSTER_SLAVE_STACK_SIZE=512
 
 # define STD_FLOAT if float16 in use
 

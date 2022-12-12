@@ -22,7 +22,11 @@ include common/model_decl.mk
 # PULP_APP = $(MODEL_PREFIX)
 
 ## input file names 
-input_file_name=../../../input.pgm
+#input_file_name=../../../input.pgm
+#input_file_name=../../../samples/7_qvga.pgm
+#input_file_name=../../../samples/17_qvga.pgm
+
+input_file_name=../../../samples/17_qvga_resized.pgm
 output_file_name=../../../output.pgm
 output_bin_file_name=../../../output.bin
 
@@ -49,6 +53,8 @@ READFS_FILES=$(abspath $(MODEL_TENSORS))
 
 # Application modes:
 #  - CI       Compare newtwork outputs with expected results on test samples
+#  - DEMO     Run in Demo mode with camera
+
 mode?=CI
 ifeq (,$(filter $(mode), CI INFERENCE DEMO))
     $(error Invalid mode $(mode))
