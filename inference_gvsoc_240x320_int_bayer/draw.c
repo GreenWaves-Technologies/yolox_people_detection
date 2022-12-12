@@ -86,7 +86,7 @@ void draw_boxes(
     }
 
     /* ----------------------- SAVE IMAGE --------------------- */
-    printf("Number of channels: %d", CHANNELS);
+    PRINTF("Number of channels: %d", CHANNELS);
     status = WriteImageToFile(
         STR(OUTPUT_FILE_NAME),
         W_INP, 

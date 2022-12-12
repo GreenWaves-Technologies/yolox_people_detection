@@ -41,7 +41,7 @@ APP_SRCS += draw.c
 
 APP_CFLAGS += -g -O3 -mno-memcpy -fno-tree-loop-distribute-patterns
 APP_CFLAGS += -I. -I$(MODEL_COMMON_INC) -I$(TILER_EMU_INC) -I$(TILER_INC) $(CNN_LIB_INCLUDE) -I$(MODEL_BUILD)
-APP_CFLAGS += -DPERF -DAT_MODEL_PREFIX=$(MODEL_PREFIX) $(MODEL_SIZE_CFLAGS)
+APP_CFLAGS += -DAT_MODEL_PREFIX=$(MODEL_PREFIX) $(MODEL_SIZE_CFLAGS)
 APP_CFLAGS += -DSTACK_SIZE=$(CLUSTER_STACK_SIZE) -DSLAVE_STACK_SIZE=$(CLUSTER_SLAVE_STACK_SIZE)
 APP_CFLAGS += -DAT_IMAGE=$(IMAGE) -DFREQ_FC=$(FREQ_FC) -DFREQ_CL=$(FREQ_CL) -DFREQ_PE=$(FREQ_PE)
 APP_CFLAGS += -DINPUT_FILE_NAME=$(input_file_name)
@@ -61,6 +61,12 @@ ifeq (,$(filter $(mode), CI INFERENCE DEMO))
 endif
 APP_CFLAGS += -D$(mode) 
 
+#uncomment this line to hide printfs
+#APP_CFLAGS += -DSILENT=1
+
+
+#uncomment this line to show NN perfs (only in inference and CI mode)
+#APP_CLFAGS += -DPERF
 
 # build depends on the model
 build:: model
