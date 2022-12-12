@@ -1,7 +1,6 @@
 #include "draw.h"
 #include "main.h"
 #include "gaplib/ImgIO.h"
-// #include "Gap.h"
 
 void draw_rectangle(
     unsigned char *Img, 
@@ -86,7 +85,6 @@ void draw_boxes(
     }
 
     /* ----------------------- SAVE IMAGE --------------------- */
-    PRINTF("Number of channels: %d", CHANNELS);
     status = WriteImageToFile(
         STR(OUTPUT_FILE_NAME),
         W_INP, 

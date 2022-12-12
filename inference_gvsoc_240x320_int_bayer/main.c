@@ -60,6 +60,7 @@ AT_DEFAULTFLASH_EXT_ADDR_TYPE main_L3_Flash = 0;
 /* Outputs */
 L2_MEM float Output_1[9480];
 
+
 /* Copy inputs function */
 void copy_inputs() {
     int status;
@@ -115,16 +116,16 @@ void ci_output_test(float * model_output, char * GT_file_name, float * GT_buffer
 
     File_GT = __OPEN_READ(fs, GT_file_name);
 
-    // here 3 is the number of boxes and 7 is the number of parameters for each box
+    // here 11 is the number of boxes and 7 is the number of parameters for each box
     // the numbers are hard coded here since we know this number ahead 
-    ret_GT = __READ(File_GT, GT_buffer, 3 * 7 * sizeof(float));
+    ret_GT = __READ(File_GT, GT_buffer, 11 * 7 * sizeof(float));
 
     __CLOSE(File_GT);
     __FS_DEINIT(fs);
 
     //check the difference between the model output and the ground truth
     float diff = 0;
-    for (int i = 0; i < 3 * 7; i++){
+    for (int i = 0; i < 11 * 7; i++){
         diff += Abs(model_output[i] - GT_buffer[i]);
     }
 
@@ -161,11 +162,14 @@ void write_outputs() {
     void *File_Output_1;
     int ret_Output_1 = 0;
 
+    printf("final_valid_boxes = %d \n", final_valid_boxes);
     File_Output_1 = __OPEN_WRITE(fs, STR(OUTPUT_BIN_FILE_NAME));
     ret_Output_1 = __WRITE(File_Output_1, Output_1, final_valid_boxes * 7 * sizeof(float));
 
     __CLOSE(File_Output_1);
     __FS_DEINIT(fs);
+
+#endif
 
 }
 
