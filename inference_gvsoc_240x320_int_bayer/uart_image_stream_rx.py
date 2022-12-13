@@ -46,7 +46,7 @@ def main():
             if DEBAYER:
                 #cv2.imwrite("saved_images/"+str(count)+".pgm",open_cv_image)
                 bgr = cv2.cvtColor(open_cv_image, cv2.COLOR_BAYER_GB2BGR)
-                resized = cv2.resize(bgr, (INPUT_W,INPUT_H), interpolation = cv2.INTER_AREA)
+                resized = cv2.resize(bgr, (INPUT_W*2,INPUT_H*2), interpolation = cv2.INTER_AREA)
             else:
                 resized = cv2.resize(open_cv_image, (INPUT_W,INPUT_H), interpolation = cv2.INTER_AREA)
             cv2.imshow('Image from GAP',resized)

@@ -27,7 +27,7 @@
 #define RAWS 1580
 
 // parameters needed for postprocessing layer
-#define CONF_THRESH 0.50
+#define CONF_THRESH 0.45
 
 // parameters needed for function to_boxes
 #define top_k_boxes 400 

@@ -273,6 +273,8 @@ int test_main(void)
     /* ------ SLICING ------*/
     PRINTF("\t\t***Start slicing***\n");
     slicing_cycles = gap_fc_readhwtimer();
+    
+    #ifdef DEMO
     slicing_hwc_channel(
         cam_image, 
         Input_1, 
@@ -280,6 +282,16 @@ int test_main(void)
         W_INP,
         CHANNELS
         );
+    #else
+    slicing_hwc_channel(
+        main_L2_Memory_Dyn + (H_INP * W_INP * CHANNELS), 
+        Input_1, 
+        H_INP, 
+        W_INP,
+        CHANNELS
+        );
+    #endif
+
     slicing_cycles = gap_fc_readhwtimer() - slicing_cycles;
 
 
