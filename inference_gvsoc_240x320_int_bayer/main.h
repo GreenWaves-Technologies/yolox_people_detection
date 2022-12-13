@@ -15,6 +15,11 @@
 #define W_INP 320
 #define CHANNELS 1
 
+#define H_CAM 240
+#define W_CAM 320
+#define BYTES_CAM 2
+
+
 // parameters needed for decoding layer
 #define STRIDE_SIZE 3
 

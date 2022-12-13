@@ -62,11 +62,12 @@ endif
 APP_CFLAGS += -D$(mode) 
 
 #uncomment this line to hide printfs
-#APP_CFLAGS += -DSILENT=1
+ifeq '$(mode)' 'DEMO'
+  APP_CFLAGS += -DSILENT=1
+else ifeq '$(mode)' 'INFERNCE'
+    APP_CLFAGS += -DPERF
+endif
 
-
-#uncomment this line to show NN perfs (only in inference and CI mode)
-#APP_CLFAGS += -DPERF
 
 # build depends on the model
 build:: model

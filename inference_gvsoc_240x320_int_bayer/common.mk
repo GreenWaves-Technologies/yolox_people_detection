@@ -19,7 +19,7 @@ MODEL_EXPRESSIONS = Expression_Kernels.c
 
 # Memory sizes for cluster L1, SoC L2 and Flash
 TARGET_L1_SIZE = 128000
-TARGET_L2_SIZE = 1200000
+TARGET_L2_SIZE = 1000000
 TARGET_L3_SIZE = 8000000
 
 # Options for the memory settings: will require
@@ -57,7 +57,8 @@ endif
 ifeq '$(TARGET_CHIP_FAMILY)' 'GAP9'
     FREQ_CL?=370
     FREQ_FC?=370
-    FREQ_PE?=370
+    #360 is for mipi camera which needs to be multiple of 20 mhz
+    FREQ_PE?=360 
 else
     ifeq '$(TARGET_CHIP)' 'GAP8_V3'
     FREQ_CL?=175
