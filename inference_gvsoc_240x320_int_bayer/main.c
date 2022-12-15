@@ -32,8 +32,8 @@
 
 // parameters needed for decoding layer
 // !!! do not forget to change the stride sizes accordint to the input size !!!  
-tTuple feature_maps[STACK_SIZE] = {{30.0, 40.0}, {15.0, 20.0}, {8.0, 10.0}};
-float strides[STACK_SIZE] = {8.0, 16.0, 32.0};
+tTuple feature_maps[STRIDE_SIZE] = {{30.0, 40.0}, {15.0, 20.0}, {8.0, 10.0}};
+float strides[STRIDE_SIZE] = {8.0, 16.0, 32.0};
 
 // parameters needed for postprocessing layer
 unsigned int * num_val_boxes;
@@ -64,12 +64,15 @@ L2_MEM float Output_1[9480];
 /* Copy inputs function */
 void copy_inputs() {
     int status;
+
 #ifdef CI
     /* ------------------- reading data for test ----------------------*/
     if (CONF_THRESH > 0.01){
         printf("CONF_THRESH = %f is larger than shoud be for CI test,\
                 please set it to 0.01 and run again", CONF_THRESH);
+        exit(-1);
     }
+
 
     printf("\n\t\t*** READING TEST INPUT ***\n");
     status = ReadImageFromFile(
@@ -83,11 +86,11 @@ void copy_inputs() {
         0
     );
 
-#endif 
+#else
 
     PRINTF("\n\t\t*** READING INPUT FROM PPM FILE ***\n");
     PRINTF("Number of input channels: %d\n", CHANNELS);
-    int status = ReadImageFromFile(
+    status = ReadImageFromFile(
         STR(INPUT_FILE_NAME),
         W_INP, 
         H_INP, 
@@ -98,11 +101,13 @@ void copy_inputs() {
         0 // transpose from HWC to CHW 
     );
 
+#endif
 
     if (status != 0) {
         printf("Error reading image from file %s (error: %d) \n", STR(INPUT_FILE_NAME), status);
         exit(-1);
     } 
+
 
 }
 

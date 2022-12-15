@@ -25,8 +25,8 @@
 
 // parameters needed for decoding layer
 // !!! do not forget to change the stride sizes accordint to the input size !!!  
-tTuple feature_maps[STACK_SIZE] = {{30.0, 40.0}, {15.0, 20.0}, {8.0, 10.0}};
-float strides[STACK_SIZE] = {8.0, 16.0, 32.0};
+tTuple feature_maps[STRIDE_SIZE] = {{30.0, 40.0}, {15.0, 20.0}, {8.0, 10.0}};
+float strides[STRIDE_SIZE] = {8.0, 16.0, 32.0};
 
 // parameters needed for postprocessing layer
 unsigned int * num_val_boxes;
@@ -330,7 +330,6 @@ int test_main(void)
 
     /* ------ END ------*/
     printf("\t\t***Runner completed***\n");
-
 
     write_outputs();
 
