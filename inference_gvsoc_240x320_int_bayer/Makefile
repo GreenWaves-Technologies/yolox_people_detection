@@ -54,9 +54,10 @@ READFS_FILES=$(abspath $(MODEL_TENSORS))
 # Application modes:
 #  - CI       Compare newtwork outputs with expected results on test samples
 #  - DEMO     Run in Demo mode with camera
+#  - INFERNCE Run in Inference on static image 
 
 mode?=CI
-ifeq (,$(filter $(mode), CI DEMO))
+ifeq (,$(filter $(mode), CI DEMO, INFERENCE))
     $(error Invalid mode $(mode))
 endif
 APP_CFLAGS += -D$(mode) 
@@ -64,7 +65,7 @@ APP_CFLAGS += -D$(mode)
 #uncomment this line to hide printfs
 ifeq '$(mode)' 'DEMO'
   APP_CFLAGS += -DSILENT=1
-else ifeq '$(mode)' 'INFERNCE'
+else ifeq '$(mode)' 'INFERENCE'
     APP_CLFAGS += -DPERF
 endif
 

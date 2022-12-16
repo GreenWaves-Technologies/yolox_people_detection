@@ -153,17 +153,19 @@ def main():
     graph[0].allocate = 1
     res = graph.execute_on_target(
         pmsis_os='freertos',
-        directory="./GVSOC_INFERENCE_TEMPLATE",
+        directory="./GVSOC_INFERENCE_TEMPLATE_NEW_DEFFLASH",
         pretty=True,
         input_tensors=[qout[0][0]],
         output_tensors=6,
         dont_run=False,
         do_clean=False,
-        cmake=False,
+        cmake=True,
         settings={
             'l1_size': 128000,
             'l2_size': 1000000,
             'tensor_directory': './weights_tensors',
+            # "l3_ram_device": "AT_MEM_L3_DEFAULTRAM",
+            # "l3_flash_device": "AT_MEM_L3_MRAMFLASH", #"AT_MEM_L3_DEFAULTFLASH",
         }
     ) 
     logger.info("Finished generating GVSOC inference tamplete !!!")
