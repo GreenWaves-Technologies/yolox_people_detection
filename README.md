@@ -34,7 +34,7 @@ In order to able to run th **inference on GVSOC**, one needs to *make sure* that
 source <GAP_SDK_HOME>/configs/gap9_v2.sh
 ```
 
-In order to run **quantization part** of this repository, one needs to install some python dependencies. One sould keep in mind that some dependencies, such as `torch` and `torchvision` can be quite large. There we recommend to install following dependencies *only if* one wants to run the quantization part of this repository. 
+In order to run **quantization part** of this repository, one needs to install some python dependencies.
 
 ```bash
 pip install -r requirements.txt
@@ -111,18 +111,37 @@ To run GVSOC inference on default image run the following command:
 
 ```bash
 cd inference_gvsoc
-make all run platform=gvsoc
+make all run platform=gvsoc mode=DEMO
 ```
 
 To run GVSOC inference on a different image, replace the image in 'inference_gvsoc_240x320_int/input.ppm' with the desired image. The image should be in `.ppm` format as described in the [table](#input-output-data-format) above. Then then rerun the command [above](#gvsoc-inference). 
 
 ## BAYER model
+To run GVSOC inference on default image run the following command:
 
-TODO: add description(When model will be merged)
+```bash
+cd inference_gvsoc
+make all run platform=gvsoc mode=DEMO
+```
+
+To run GVSOC inference on a different image, replace the image in 'inference_gvsoc_240x320_int_bayer/input.pgm' with the desired image. The image should be in `.pgm` format as described in the [table](#input-output-data-format) above. Then then rerun the command [above](#gvsoc-inference). 
 
 
 
 # Additional features
+
+## Training
+
+Refer to the [Yolox repository](https://gitlab.com/xperience-ai/edge-devices/yolox/-/tree/yolox-master) for traning instructions. 
+
+## Pytorch Inference
+
+Refer to the [Demo](https://gitlab.com/xperience-ai/edge-devices/yolox/-/blob/yolox-master/tools/demo.py)
+
+## ONNX conversion 
+
+Refer to the [ONNX](https://gitlab.com/xperience-ai/edge-devices/yolox/-/blob/yolox-master/tools/export_onnx.py)
+
 
 ## Quantization
 
@@ -141,7 +160,7 @@ python quantization/quantize.py                                 \
 
 ```
 
-if one wishes to quantize the `BAYER` model to 8 bit one can run the following command:
+If one wishes to quantize the `BAYER` model to 8 bit one can run the following command:
 
 ```bash
 
@@ -155,6 +174,26 @@ python quantization/quantize.py                                 \
 
 ```
 
+Follwing are the instructions on how to create dumps using GVSOC model.
 
+1. Firstly you will need to create a folder with preprocessed images from the validation set. The folder should be located in one of the `inference_gvsoc_240x320_int` or `inference_gvsoc_240x320_int_bayer` folders, depending on the model you want to validate. In our case it is COCO2017 validations set. The format of the images should be `.ppm` for RGB and `.pgm` for BAYER respectively.
 
+In our case we use COCO2017 validation set. If you need to use a different dataset you will need to inherit `CostomCOCODataset` class located in `quantization/utils.py` similar to how it is done in `GvsocInputGeneratorCOCO` class located in `quantization/utils.py`. Then run the following command:
 
+```bash
+python quantization/gvsoc_gen_inputs.py --image_folder <path to folder with images>                 \
+                                        --annotations <path to annotations>                         \
+                                        --gvsoc_inputs <path to a folder to save inputs>            \
+                                        --input_size <input size of the model>                      \
+                                        --input_channels <number of input channels>                 \
+                                        --model_type <model type for gvsoc validation>              \
+```
+
+2. Then you will need to create a folder for stroing the dumps inside one of the `inference_gvsoc_240x320_int` or `inference_gvsoc_240x320_int_bayer` folders, depending on the model you want to validate.
+
+3. Finally you will need to run the following command:
+
+```bash
+cd <folder of the model you want to validate >
+./val_ru.sh <input images folder name> <name of the folder for dumps>
+```
