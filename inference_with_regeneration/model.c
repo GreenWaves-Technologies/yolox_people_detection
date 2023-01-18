@@ -24,12 +24,13 @@ void mainModel(unsigned int L1Memory, unsigned int L2Memory, unsigned int L3Memo
     AT_SetGraphCtrl(AT_GRAPH_MONITOR_CYCLES, AT_OPT_ON);
     AT_SetGraphCtrl(AT_GRAPH_PRODUCE_NODE_NAMES, AT_OPT_ON);
     AT_SetGraphCtrl(AT_GRAPH_PRODUCE_OPERINFOS, AT_OPT_ON);
+    AT_SetGraphCtrl(AT_GRAPH_CONST_EXEC_FROM_FLASH, AT_OPT_ON);
 
     SetMemoryDeviceInfos(4,
         AT_MEM_L1, L1Memory, "main_L1_Memory", 0, 0,
         AT_MEM_L2, L2Memory, "main_L2_Memory", 0, 1,
         AT_MEM_L3_DEFAULTRAM, L3Memory, "main_L3_Memory", 0, 0,
-        AT_MEM_L3_MRAMFLASH, L3Flash, "main_L3_Flash", "main_L3_Flash_Const.dat", 0
+        AT_MEM_L3_DEFAULTFLASH, L3Flash, "main_L3_Flash", "main_L3_Flash_Const.dat", 0
     );
 
     LoadCNN_SQ8_Library();

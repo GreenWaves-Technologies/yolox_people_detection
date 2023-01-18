@@ -144,7 +144,7 @@ target_compile_options(${TARGET_NAME} PUBLIC   ${TARGET_CFLAGS}
 # Commands added for specific application
 ###############################################################################
 
-# message(STATUS "Generating model")
+message(STATUS "Generating model")
 add_custom_command(
   OUTPUT ${AT_MODEL_PATH} ${MODEL_EXPRESSIONS} ${AT_TENSORS_DIR}
   COMMENT "Generating the autotiler model"

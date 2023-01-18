@@ -80,8 +80,10 @@ G.generate(
         "graph_monitor_cycles": True,
         "graph_produce_node_names": True,
         "graph_produce_operinfos": True,
+        "graph_const_exec_from_flash": True,
 
         "l3_ram_device": "AT_MEM_L3_DEFAULTRAM",
-        "l3_flash_device": "AT_MEM_L3_MRAMFLASH", #"AT_MEM_L3_DEFAULTFLASH",
+        # "l3_flash_device": "AT_MEM_L3_MRAMFLASH", #"AT_MEM_L3_DEFAULTFLASH",
+        "l3_flash_device": "AT_MEM_L3_DEFAULTFLASH",
     }
 )

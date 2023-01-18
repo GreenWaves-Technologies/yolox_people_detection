@@ -251,10 +251,10 @@ int test_main(void)
 
 
     // print first 30 elements of the input
-    for (int i = 0; i < 30; i++){
-        printf("%d ", (main_L2_Memory_Dyn + (H_INP * W_INP * CHANNELS))[i]);
-    }
-    printf("\n");
+    // for (int i = 0; i < 30; i++){
+    //     printf("%d ", (main_L2_Memory_Dyn + (H_INP * W_INP * CHANNELS))[i]);
+    // }
+    // printf("\n");
 
     /* ------ INFERENCE ------*/
     printf("\t\t***Call CLUSTER***\n");
@@ -268,10 +268,10 @@ int test_main(void)
     cluster();
 #endif
 
-    for(int i=0; i<30; i++){
-        printf("%f ", Output_1[i]);
-    }
-    printf("\n");
+    // for(int i=0; i<30; i++){
+    //     printf("%f ", Output_1[i]);
+    // }
+    // printf("\n");
 
     /* ------ DECODING ------*/
     printf("\t\t***Start decoding***\n");
