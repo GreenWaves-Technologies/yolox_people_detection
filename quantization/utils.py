@@ -20,12 +20,24 @@ class CostomCOCODaset():
         max_size=500, 
         transpose_to_chw=True,
         input_channels=3,
+        img_type = "rgb",
         ):
 
         self._idx = 0 
+
+        assert self._idx < max_size <= len(annotations), \
+            f"Choose max_size between {self._idx} and {len(annotations)}"
         self.annotations = annotations 
-        assert self._idx < max_size <= len(self.annotations), \
-            f"Choose max_size between {self._idx} and {len(self.annotations)}"
+
+        img_type = img_type.lower()        
+        assert img_type in ["rgb", "bayer"], \
+            f"The images you passed is not supported, please choose from ('rgb', 'bayer')"
+        self.img_type = img_type
+
+        if img_type == "bayer" and input_channels == 3:
+            logger.info("If you are resizing the image via DEMOSAICING, make sure \
+                that input_size is 2 as large as desired input for the model !!!")
+ 
         self.max_idx = max_size 
         self.data_dir = image_folder
         self.input_size = input_size
@@ -38,27 +50,46 @@ class CostomCOCODaset():
 
     def __next__(self):
 
-        if self._idx > self.max_idx:
+        if self._idx >= self.max_idx:
             raise StopIteration()
 
+        print(self._idx)
+
         filename = self.annotations[self._idx]["file_name"]
-        if self.input_channels != 3:
+
+        if self.img_type == "bayer":
             filename = filename.replace("jpg", "png")
         img_file = os.path.join(self.data_dir, filename)
 
-
+        # read image as BGR
         image = cv2.imread(
             img_file, 
-            cv2.IMREAD_COLOR if self.input_channels == 3 else cv2.IMREAD_UNCHANGED)
+            cv2.IMREAD_UNCHANGED
+        )
+
+        print(image.shape)
+
+        cv2.imwrite("./read_img.png", image)
 
         if len(image.shape) == 2:
             image = np.expand_dims(image, axis=2)
 
-        image = self.preproc(
-            image, 
-            self.input_size, 
-            input_channels=self.input_channels
-        )
+
+        if self.img_type == "bayer" and self.input_channels == 3: 
+            image = self.preproc_bayer(
+                img = image,
+                input_size = self.input_size,
+                input_channels = self.input_channels,
+            )
+        else:
+            image = self.preproc(
+                image, 
+                self.input_size, 
+                input_channels = self.input_channels
+            )
+
+        cv2.imwrite("./proccsed_image.png", image.transpose(1, 2, 0)) 
+
         image = self.slicing(image)
 
         if not self.transpose_to_chw:
@@ -69,6 +100,29 @@ class CostomCOCODaset():
     
     def __len__(self):
         return self.max_idx
+
+    @staticmethod
+    def preproc_bayer(img, input_size, input_channels, swap=(2, 0, 1)):
+        #BGR image
+        h, w, c = img.shape 
+        print("input shape: ", input_size)
+
+        # get correct size 
+        if h > input_size[0]: 
+            img = img[:input_size[0], :, :]
+        if w > input_size[1]: 
+            img = img[:, :input_size[1], :] 
+
+        # reszie by demosaicing
+        img = img.astype(np.uint16)
+        output = np.zeros((img.shape[0] // 2, img.shape[1] // 2, input_channels), dtype=np.int16) 
+        print( img[1::2,  ::2, 0].shape)
+        output[:, :, 0] =  img[1::2,  ::2, 0]
+        output[:, :, 1] = (img[ ::2,  ::2, 1] + img[1::2, 1::2, 1]) / 2 
+        output[:, :, 2] =  img[ ::2, 1::2, 2]
+        output = output.astype(np.uint8)
+        output = output.transpose(swap)
+        return output 
 
     @staticmethod
     def preproc(img, input_size, swap=(2, 0, 1), input_channels=3):
@@ -270,9 +324,10 @@ def get_annotations(coco_annotations_path):
     logger.info("Loading annotations for class person...")
     cocoGt = COCO(coco_annotations_path)
     class_ids = cocoGt.getCatIds("person")
+
     img_ids = []
     for cls in class_ids:
         img_ids.extend(cocoGt.getImgIds(catIds=cls))
-    annotations = cocoGt.loadImgs(img_ids) 
 
+    annotations = cocoGt.loadImgs(img_ids) 
     return annotations

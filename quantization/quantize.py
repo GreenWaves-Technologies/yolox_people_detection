@@ -13,19 +13,32 @@ def make_parser():
     parser.add_argument(
         "--onnx_path", 
         type=str, 
-        default="./weights/model.onnx", 
+        default="./weights/yolox-QVGA-bayer-BGR.onnx", 
+        # default="./weights/model.onnx", 
+        # default="./weights/model_bayer.onnx", 
         help="path to onnx model"
     )
     parser.add_argument(
         "--coco_path", 
         type=str, 
-        default="/data/coco/val2017", 
+        default="/home/abduragim/data/coco/val2017_VGA_v2", 
+        # default="/home/abduragim/data/coco/val2017", 
+        # default="/home/abduragim/data/coco/val2017_1c_syn", 
         help="path to coco dataset images"
+    ) 
+    parser.add_argument(
+        "--img_type", 
+        type=str, 
+        choices=["rgb", "bayer"],
+        default="bayer",
+        # default="rgb",
+        help="type of images to quantize with"
     ) 
     parser.add_argument(
         "--coco_annotations_path", 
         type=str, 
-        default="/data/coco/annotations/instances_val2017.json", 
+        default="/home/abduragim/data/coco/annotations/instances_val2017_VGA.json", 
+        # default="/home/abduragim/data/coco/annotations/instances_val2017.json", 
         help="path to coco dataset annotations"
     ) 
     parser.add_argument(
@@ -38,13 +51,15 @@ def make_parser():
         "--input_size", 
         type=int, 
         nargs='+',
-        default=(240,320), 
+        default=(480, 640), 
+        # default=(240, 320), 
         help="input size"
     )
     parser.add_argument(
         "--input_channels",
         type=int,
         default=3,
+        # default=1,
         help="input channels"
     )
     parser.add_argument(
@@ -86,6 +101,7 @@ def main():
         input_size       = tuple(args.input_size),
         transpose_to_chw = True,
         input_channels   = args.input_channels,
+        img_type         = args.img_type,
     )
 
 
@@ -140,7 +156,7 @@ def main():
     check_input_dims(graph, sample)
 
     qfout = graph.execute([sample], quantize=True, dequantize=True)
-    fout = graph.execute([sample], quantize=False, dequantize=False)
+    fout  = graph.execute([sample], quantize=False, dequantize=False)
 
     for i, fp32, fp16 in zip(range(len(graph)), fout, qfout):
         print(f"Graph[{i:3}] -> {graph[i].name:>40}:\t{qsnr(fp32[0], fp16[0])}")
@@ -154,7 +170,7 @@ def main():
     graph[0].allocate = 1
     res = graph.execute_on_target(
         pmsis_os='freertos',
-        directory="./GVSOC_INFERENCE_TEMPLATE_NEW_DEFFLASH",
+        directory="./GVSOC_INFERENCE_TEMPLATE_n",
         pretty=True,
         input_tensors=[qout[0][0]],
         output_tensors=6,
@@ -167,9 +183,12 @@ def main():
             'l1_size': 128000,
             'l2_size': 1000000,
             'tensor_directory': './weights_tensors',
-            "l3_ram_device": "AT_MEM_L3_DEFAULTRAM",
+
+            # 'graph_const_exec_from_flash': True,
+
+            'l3_ram_device': 'AT_MEM_L3_DEFAULTRAM',
             # "l3_flash_device": "AT_MEM_L3_MRAMFLASH",
-            "l3_flash_device":  "AT_MEM_L3_DEFAULTFLASH",
+            'l3_flash_device':  'AT_MEM_L3_DEFAULTFLASH',
         }
     ) 
     logger.info("Finished generating GVSOC inference tamplete !!!")
