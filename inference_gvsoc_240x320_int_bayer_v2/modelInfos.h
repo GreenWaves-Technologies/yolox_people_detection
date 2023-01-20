@@ -1,0 +1,1934 @@
+#ifndef MAIN_GRAPHINFO_H
+#define MAIN_GRAPHINFO_H
+// Quantized scales can be used round_norm(val * QSCALE, QNORM) giving the real value in Q8
+// Input_1
+#define main_Input_1_OUT_SCALE	0.9725490212440491
+#define main_Input_1_OUT_QSCALE	124
+#define main_Input_1_OUT_QNORM	7
+#define main_Input_1_OUT_ZERO_POINT	0
+// S2_Op_Conv_0_weights
+#define main_S2_Op_Conv_0_weights_OUT_SCALE	5.029844032833353e-05
+#define main_S2_Op_Conv_0_weights_OUT_QSCALE	105
+#define main_S2_Op_Conv_0_weights_OUT_QNORM	21
+#define main_S2_Op_Conv_0_weights_OUT_ZERO_POINT	128
+// S3_Op_constant__1247
+#define main_S3_Op_constant__1247_OUT_SCALE	4.8917700041783974e-05
+#define main_S3_Op_constant__1247_OUT_QSCALE	103
+#define main_S3_Op_constant__1247_OUT_QNORM	21
+#define main_S3_Op_constant__1247_OUT_ZERO_POINT	0
+// S4_Conv2d_16x12x3x3_Relu6
+#define main_S4_Conv2d_16x12x3x3_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S4_Conv2d_16x12x3x3_Relu6_OUT_QSCALE	96
+#define main_S4_Conv2d_16x12x3x3_Relu6_OUT_QNORM	12
+#define main_S4_Conv2d_16x12x3x3_Relu6_OUT_ZERO_POINT	0
+// S5_Op_Conv_4_weights
+#define main_S5_Op_Conv_4_weights_OUT_SCALE	0.003723940346390009
+#define main_S5_Op_Conv_4_weights_OUT_QSCALE	122
+#define main_S5_Op_Conv_4_weights_OUT_QNORM	15
+#define main_S5_Op_Conv_4_weights_OUT_ZERO_POINT	128
+// S6_Op_constant__1250
+#define main_S6_Op_constant__1250_OUT_SCALE	8.762212579741198e-05
+#define main_S6_Op_constant__1250_OUT_QSCALE	92
+#define main_S6_Op_constant__1250_OUT_QNORM	20
+#define main_S6_Op_constant__1250_OUT_ZERO_POINT	0
+// S7_Conv2d_16x1x3x3_Relu6
+#define main_S7_Conv2d_16x1x3x3_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S7_Conv2d_16x1x3x3_Relu6_OUT_QSCALE	96
+#define main_S7_Conv2d_16x1x3x3_Relu6_OUT_QNORM	12
+#define main_S7_Conv2d_16x1x3x3_Relu6_OUT_ZERO_POINT	0
+// S8_Op_Conv_8_weights
+#define main_S8_Op_Conv_8_weights_OUT_SCALE	0.010938217863440514
+#define main_S8_Op_Conv_8_weights_OUT_QSCALE	90
+#define main_S8_Op_Conv_8_weights_OUT_QNORM	13
+#define main_S8_Op_Conv_8_weights_OUT_ZERO_POINT	128
+// S9_Op_constant__1253
+#define main_S9_Op_constant__1253_OUT_SCALE	0.00025736983208095326
+#define main_S9_Op_constant__1253_OUT_QSCALE	67
+#define main_S9_Op_constant__1253_OUT_QNORM	18
+#define main_S9_Op_constant__1253_OUT_ZERO_POINT	0
+// S10_Conv2d_32x16x1x1_Relu6
+#define main_S10_Conv2d_32x16x1x1_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S10_Conv2d_32x16x1x1_Relu6_OUT_QSCALE	96
+#define main_S10_Conv2d_32x16x1x1_Relu6_OUT_QNORM	12
+#define main_S10_Conv2d_32x16x1x1_Relu6_OUT_ZERO_POINT	0
+// S11_Op_Conv_12_weights
+#define main_S11_Op_Conv_12_weights_OUT_SCALE	0.003478345461189747
+#define main_S11_Op_Conv_12_weights_OUT_QSCALE	114
+#define main_S11_Op_Conv_12_weights_OUT_QNORM	15
+#define main_S11_Op_Conv_12_weights_OUT_ZERO_POINT	128
+// S12_Op_constant__1256
+#define main_S12_Op_constant__1256_OUT_SCALE	8.184342261622933e-05
+#define main_S12_Op_constant__1256_OUT_QSCALE	86
+#define main_S12_Op_constant__1256_OUT_QNORM	20
+#define main_S12_Op_constant__1256_OUT_ZERO_POINT	0
+// S13_Conv2d_16x32x1x1_Relu6
+#define main_S13_Conv2d_16x32x1x1_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S13_Conv2d_16x32x1x1_Relu6_OUT_QSCALE	96
+#define main_S13_Conv2d_16x32x1x1_Relu6_OUT_QNORM	12
+#define main_S13_Conv2d_16x32x1x1_Relu6_OUT_ZERO_POINT	0
+// S14_Op_Conv_16_weights
+#define main_S14_Op_Conv_16_weights_OUT_SCALE	0.005293612834066153
+#define main_S14_Op_Conv_16_weights_OUT_QSCALE	87
+#define main_S14_Op_Conv_16_weights_OUT_QNORM	14
+#define main_S14_Op_Conv_16_weights_OUT_ZERO_POINT	128
+// S15_Op_constant__1259
+#define main_S15_Op_constant__1259_OUT_SCALE	0.00012455559609567417
+#define main_S15_Op_constant__1259_OUT_QSCALE	65
+#define main_S15_Op_constant__1259_OUT_QNORM	19
+#define main_S15_Op_constant__1259_OUT_ZERO_POINT	0
+// S16_Conv2d_16x32x1x1_Relu6
+#define main_S16_Conv2d_16x32x1x1_Relu6_OUT_SCALE	0.03978586569428444
+#define main_S16_Conv2d_16x32x1x1_Relu6_OUT_QSCALE	81
+#define main_S16_Conv2d_16x32x1x1_Relu6_OUT_QNORM	11
+#define main_S16_Conv2d_16x32x1x1_Relu6_OUT_ZERO_POINT	0
+// S17_Op_Conv_20_weights
+#define main_S17_Op_Conv_20_weights_OUT_SCALE	0.0045709251426160336
+#define main_S17_Op_Conv_20_weights_OUT_QSCALE	75
+#define main_S17_Op_Conv_20_weights_OUT_QNORM	14
+#define main_S17_Op_Conv_20_weights_OUT_ZERO_POINT	128
+// S18_Op_constant__1262
+#define main_S18_Op_constant__1262_OUT_SCALE	0.00010755117982625961
+#define main_S18_Op_constant__1262_OUT_QSCALE	113
+#define main_S18_Op_constant__1262_OUT_QNORM	20
+#define main_S18_Op_constant__1262_OUT_ZERO_POINT	0
+// S19_Conv2d_16x16x1x1_Relu6
+#define main_S19_Conv2d_16x16x1x1_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S19_Conv2d_16x16x1x1_Relu6_OUT_QSCALE	96
+#define main_S19_Conv2d_16x16x1x1_Relu6_OUT_QNORM	12
+#define main_S19_Conv2d_16x16x1x1_Relu6_OUT_ZERO_POINT	0
+// S20_Op_Conv_24_weights
+#define main_S20_Op_Conv_24_weights_OUT_SCALE	0.02349233813583851
+#define main_S20_Op_Conv_24_weights_OUT_QSCALE	96
+#define main_S20_Op_Conv_24_weights_OUT_QNORM	12
+#define main_S20_Op_Conv_24_weights_OUT_ZERO_POINT	128
+// S21_Op_constant__1265
+#define main_S21_Op_constant__1265_OUT_SCALE	0.0005527608973138473
+#define main_S21_Op_constant__1265_OUT_QSCALE	72
+#define main_S21_Op_constant__1265_OUT_QNORM	17
+#define main_S21_Op_constant__1265_OUT_ZERO_POINT	0
+// S22_Conv2d_16x1x3x3_Relu6
+#define main_S22_Conv2d_16x1x3x3_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S22_Conv2d_16x1x3x3_Relu6_OUT_QSCALE	96
+#define main_S22_Conv2d_16x1x3x3_Relu6_OUT_QNORM	12
+#define main_S22_Conv2d_16x1x3x3_Relu6_OUT_ZERO_POINT	0
+// S23_Op_Conv_28_weights
+#define main_S23_Op_Conv_28_weights_OUT_SCALE	0.010077295824885368
+#define main_S23_Op_Conv_28_weights_OUT_QSCALE	83
+#define main_S23_Op_Conv_28_weights_OUT_QNORM	13
+#define main_S23_Op_Conv_28_weights_OUT_ZERO_POINT	128
+// S24_Op_constant__1268
+#define main_S24_Op_constant__1268_OUT_SCALE	0.00023711284293847926
+#define main_S24_Op_constant__1268_OUT_QSCALE	124
+#define main_S24_Op_constant__1268_OUT_QNORM	19
+#define main_S24_Op_constant__1268_OUT_ZERO_POINT	0
+// S25_Conv2d_16x16x1x1_Relu6
+#define main_S25_Conv2d_16x16x1x1_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S25_Conv2d_16x16x1x1_Relu6_OUT_QSCALE	96
+#define main_S25_Conv2d_16x16x1x1_Relu6_OUT_QNORM	12
+#define main_S25_Conv2d_16x16x1x1_Relu6_OUT_ZERO_POINT	0
+// S26_MatAdd_60x80x16
+#define main_S26_MatAdd_60x80x16_OUT_SCALE	0.03978586569428444
+#define main_S26_MatAdd_60x80x16_OUT_QSCALE	81
+#define main_S26_MatAdd_60x80x16_OUT_QNORM	11
+#define main_S26_MatAdd_60x80x16_OUT_ZERO_POINT	0
+// S27_Concat
+#define main_S27_Concat_OUT_SCALE	0.03978586569428444
+#define main_S27_Concat_OUT_QSCALE	81
+#define main_S27_Concat_OUT_QNORM	11
+#define main_S27_Concat_OUT_ZERO_POINT	0
+// S28_Op_Conv_34_weights
+#define main_S28_Op_Conv_34_weights_OUT_SCALE	0.003575708717107773
+#define main_S28_Op_Conv_34_weights_OUT_QSCALE	117
+#define main_S28_Op_Conv_34_weights_OUT_QNORM	15
+#define main_S28_Op_Conv_34_weights_OUT_ZERO_POINT	128
+// S29_Op_constant__1271
+#define main_S29_Op_constant__1271_OUT_SCALE	0.00014226266648620367
+#define main_S29_Op_constant__1271_OUT_QSCALE	75
+#define main_S29_Op_constant__1271_OUT_QNORM	19
+#define main_S29_Op_constant__1271_OUT_ZERO_POINT	0
+// S30_Conv2d_32x32x1x1_Relu6
+#define main_S30_Conv2d_32x32x1x1_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S30_Conv2d_32x32x1x1_Relu6_OUT_QSCALE	96
+#define main_S30_Conv2d_32x32x1x1_Relu6_OUT_QNORM	12
+#define main_S30_Conv2d_32x32x1x1_Relu6_OUT_ZERO_POINT	0
+// S31_Op_Conv_38_weights
+#define main_S31_Op_Conv_38_weights_OUT_SCALE	0.0020336315501481295
+#define main_S31_Op_Conv_38_weights_OUT_QSCALE	67
+#define main_S31_Op_Conv_38_weights_OUT_QNORM	15
+#define main_S31_Op_Conv_38_weights_OUT_ZERO_POINT	128
+// S32_Op_constant__1274
+#define main_S32_Op_constant__1274_OUT_SCALE	4.785015412113246e-05
+#define main_S32_Op_constant__1274_OUT_QSCALE	100
+#define main_S32_Op_constant__1274_OUT_QNORM	21
+#define main_S32_Op_constant__1274_OUT_ZERO_POINT	0
+// S33_Conv2d_32x1x3x3_Relu6
+#define main_S33_Conv2d_32x1x3x3_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S33_Conv2d_32x1x3x3_Relu6_OUT_QSCALE	96
+#define main_S33_Conv2d_32x1x3x3_Relu6_OUT_QNORM	12
+#define main_S33_Conv2d_32x1x3x3_Relu6_OUT_ZERO_POINT	0
+// S34_Op_Conv_42_weights
+#define main_S34_Op_Conv_42_weights_OUT_SCALE	0.00965732429176569
+#define main_S34_Op_Conv_42_weights_OUT_QSCALE	79
+#define main_S34_Op_Conv_42_weights_OUT_QNORM	13
+#define main_S34_Op_Conv_42_weights_OUT_ZERO_POINT	128
+// S35_Op_constant__1277
+#define main_S35_Op_constant__1277_OUT_SCALE	0.00022723115980625153
+#define main_S35_Op_constant__1277_OUT_QSCALE	119
+#define main_S35_Op_constant__1277_OUT_QNORM	19
+#define main_S35_Op_constant__1277_OUT_ZERO_POINT	0
+// S36_Conv2d_64x32x1x1_Relu6
+#define main_S36_Conv2d_64x32x1x1_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S36_Conv2d_64x32x1x1_Relu6_OUT_QSCALE	96
+#define main_S36_Conv2d_64x32x1x1_Relu6_OUT_QNORM	12
+#define main_S36_Conv2d_64x32x1x1_Relu6_OUT_ZERO_POINT	0
+// S37_Op_Conv_46_weights
+#define main_S37_Op_Conv_46_weights_OUT_SCALE	0.005012609530240297
+#define main_S37_Op_Conv_46_weights_OUT_QSCALE	82
+#define main_S37_Op_Conv_46_weights_OUT_QNORM	14
+#define main_S37_Op_Conv_46_weights_OUT_ZERO_POINT	128
+// S38_Op_constant__1280
+#define main_S38_Op_constant__1280_OUT_SCALE	0.00011794375365271287
+#define main_S38_Op_constant__1280_OUT_QSCALE	124
+#define main_S38_Op_constant__1280_OUT_QNORM	20
+#define main_S38_Op_constant__1280_OUT_ZERO_POINT	0
+// S39_Conv2d_32x64x1x1_Relu6
+#define main_S39_Conv2d_32x64x1x1_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S39_Conv2d_32x64x1x1_Relu6_OUT_QSCALE	96
+#define main_S39_Conv2d_32x64x1x1_Relu6_OUT_QNORM	12
+#define main_S39_Conv2d_32x64x1x1_Relu6_OUT_ZERO_POINT	0
+// S40_Op_Conv_50_weights
+#define main_S40_Op_Conv_50_weights_OUT_SCALE	0.0064771887846291065
+#define main_S40_Op_Conv_50_weights_OUT_QSCALE	106
+#define main_S40_Op_Conv_50_weights_OUT_QNORM	14
+#define main_S40_Op_Conv_50_weights_OUT_ZERO_POINT	128
+// S41_Op_constant__1283
+#define main_S41_Op_constant__1283_OUT_SCALE	0.0001524044419912731
+#define main_S41_Op_constant__1283_OUT_QSCALE	80
+#define main_S41_Op_constant__1283_OUT_QNORM	19
+#define main_S41_Op_constant__1283_OUT_ZERO_POINT	0
+// S42_Conv2d_32x64x1x1_Relu6
+#define main_S42_Conv2d_32x64x1x1_Relu6_OUT_SCALE	0.05683133751153946
+#define main_S42_Conv2d_32x64x1x1_Relu6_OUT_QSCALE	116
+#define main_S42_Conv2d_32x64x1x1_Relu6_OUT_QNORM	11
+#define main_S42_Conv2d_32x64x1x1_Relu6_OUT_ZERO_POINT	0
+// S43_Op_Conv_54_weights
+#define main_S43_Op_Conv_54_weights_OUT_SCALE	0.003279776545241475
+#define main_S43_Op_Conv_54_weights_OUT_QSCALE	107
+#define main_S43_Op_Conv_54_weights_OUT_QNORM	15
+#define main_S43_Op_Conv_54_weights_OUT_ZERO_POINT	128
+// S44_Op_constant__1286
+#define main_S44_Op_constant__1286_OUT_SCALE	7.717121282921117e-05
+#define main_S44_Op_constant__1286_OUT_QSCALE	81
+#define main_S44_Op_constant__1286_OUT_QNORM	20
+#define main_S44_Op_constant__1286_OUT_ZERO_POINT	0
+// S45_Conv2d_32x32x1x1_Relu6
+#define main_S45_Conv2d_32x32x1x1_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S45_Conv2d_32x32x1x1_Relu6_OUT_QSCALE	96
+#define main_S45_Conv2d_32x32x1x1_Relu6_OUT_QNORM	12
+#define main_S45_Conv2d_32x32x1x1_Relu6_OUT_ZERO_POINT	0
+// S46_Op_Conv_58_weights
+#define main_S46_Op_Conv_58_weights_OUT_SCALE	0.018236054107546806
+#define main_S46_Op_Conv_58_weights_OUT_QSCALE	75
+#define main_S46_Op_Conv_58_weights_OUT_QNORM	12
+#define main_S46_Op_Conv_58_weights_OUT_ZERO_POINT	128
+// S47_Op_constant__1289
+#define main_S47_Op_constant__1289_OUT_SCALE	0.00042908362605992485
+#define main_S47_Op_constant__1289_OUT_QSCALE	112
+#define main_S47_Op_constant__1289_OUT_QNORM	18
+#define main_S47_Op_constant__1289_OUT_ZERO_POINT	0
+// S48_Conv2d_32x1x3x3_Relu6
+#define main_S48_Conv2d_32x1x3x3_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S48_Conv2d_32x1x3x3_Relu6_OUT_QSCALE	96
+#define main_S48_Conv2d_32x1x3x3_Relu6_OUT_QNORM	12
+#define main_S48_Conv2d_32x1x3x3_Relu6_OUT_ZERO_POINT	0
+// S49_Op_Conv_62_weights
+#define main_S49_Op_Conv_62_weights_OUT_SCALE	0.0028770575299859047
+#define main_S49_Op_Conv_62_weights_OUT_QSCALE	94
+#define main_S49_Op_Conv_62_weights_OUT_QNORM	15
+#define main_S49_Op_Conv_62_weights_OUT_ZERO_POINT	128
+// S50_Op_constant__1292
+#define main_S50_Op_constant__1292_OUT_SCALE	6.769547129378599e-05
+#define main_S50_Op_constant__1292_OUT_QSCALE	71
+#define main_S50_Op_constant__1292_OUT_QNORM	20
+#define main_S50_Op_constant__1292_OUT_ZERO_POINT	0
+// S51_Conv2d_32x32x1x1_Relu6
+#define main_S51_Conv2d_32x32x1x1_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S51_Conv2d_32x32x1x1_Relu6_OUT_QSCALE	96
+#define main_S51_Conv2d_32x32x1x1_Relu6_OUT_QNORM	12
+#define main_S51_Conv2d_32x32x1x1_Relu6_OUT_ZERO_POINT	0
+// S52_MatAdd_30x40x32
+#define main_S52_MatAdd_30x40x32_OUT_SCALE	0.03870689496397972
+#define main_S52_MatAdd_30x40x32_OUT_QSCALE	79
+#define main_S52_MatAdd_30x40x32_OUT_QNORM	11
+#define main_S52_MatAdd_30x40x32_OUT_ZERO_POINT	0
+// S53_Op_Conv_67_weights
+#define main_S53_Op_Conv_67_weights_OUT_SCALE	0.005422679707407951
+#define main_S53_Op_Conv_67_weights_OUT_QSCALE	89
+#define main_S53_Op_Conv_67_weights_OUT_QNORM	14
+#define main_S53_Op_Conv_67_weights_OUT_ZERO_POINT	128
+// S54_Op_constant__1295
+#define main_S54_Op_constant__1295_OUT_SCALE	0.0002098950935760513
+#define main_S54_Op_constant__1295_OUT_QSCALE	110
+#define main_S54_Op_constant__1295_OUT_QNORM	19
+#define main_S54_Op_constant__1295_OUT_ZERO_POINT	0
+// S55_Conv2d_32x32x1x1_Relu6
+#define main_S55_Conv2d_32x32x1x1_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S55_Conv2d_32x32x1x1_Relu6_OUT_QSCALE	96
+#define main_S55_Conv2d_32x32x1x1_Relu6_OUT_QNORM	12
+#define main_S55_Conv2d_32x32x1x1_Relu6_OUT_ZERO_POINT	0
+// S56_Op_Conv_71_weights
+#define main_S56_Op_Conv_71_weights_OUT_SCALE	0.00939497072249651
+#define main_S56_Op_Conv_71_weights_OUT_QSCALE	77
+#define main_S56_Op_Conv_71_weights_OUT_QNORM	13
+#define main_S56_Op_Conv_71_weights_OUT_ZERO_POINT	128
+// S57_Op_constant__1298
+#define main_S57_Op_constant__1298_OUT_SCALE	0.0002210581346469767
+#define main_S57_Op_constant__1298_OUT_QSCALE	116
+#define main_S57_Op_constant__1298_OUT_QNORM	19
+#define main_S57_Op_constant__1298_OUT_ZERO_POINT	0
+// S58_Conv2d_32x1x3x3_Relu6
+#define main_S58_Conv2d_32x1x3x3_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S58_Conv2d_32x1x3x3_Relu6_OUT_QSCALE	96
+#define main_S58_Conv2d_32x1x3x3_Relu6_OUT_QNORM	12
+#define main_S58_Conv2d_32x1x3x3_Relu6_OUT_ZERO_POINT	0
+// S59_Op_Conv_75_weights
+#define main_S59_Op_Conv_75_weights_OUT_SCALE	0.002655137563124299
+#define main_S59_Op_Conv_75_weights_OUT_QSCALE	87
+#define main_S59_Op_Conv_75_weights_OUT_QNORM	15
+#define main_S59_Op_Conv_75_weights_OUT_ZERO_POINT	128
+// S60_Op_constant__1301
+#define main_S60_Op_constant__1301_OUT_SCALE	6.247382501468939e-05
+#define main_S60_Op_constant__1301_OUT_QSCALE	66
+#define main_S60_Op_constant__1301_OUT_QNORM	20
+#define main_S60_Op_constant__1301_OUT_ZERO_POINT	0
+// S61_Conv2d_32x32x1x1_Relu6
+#define main_S61_Conv2d_32x32x1x1_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S61_Conv2d_32x32x1x1_Relu6_OUT_QSCALE	96
+#define main_S61_Conv2d_32x32x1x1_Relu6_OUT_QNORM	12
+#define main_S61_Conv2d_32x32x1x1_Relu6_OUT_ZERO_POINT	0
+// S62_MatAdd_30x40x32
+#define main_S62_MatAdd_30x40x32_OUT_SCALE	0.04691479355096817
+#define main_S62_MatAdd_30x40x32_OUT_QSCALE	96
+#define main_S62_MatAdd_30x40x32_OUT_QNORM	11
+#define main_S62_MatAdd_30x40x32_OUT_ZERO_POINT	0
+// S63_Op_Conv_80_weights
+#define main_S63_Op_Conv_80_weights_OUT_SCALE	0.002203954616561532
+#define main_S63_Op_Conv_80_weights_OUT_QSCALE	72
+#define main_S63_Op_Conv_80_weights_OUT_QNORM	15
+#define main_S63_Op_Conv_80_weights_OUT_ZERO_POINT	128
+// S64_Op_constant__1304
+#define main_S64_Op_constant__1304_OUT_SCALE	0.00010339807340642437
+#define main_S64_Op_constant__1304_OUT_QSCALE	108
+#define main_S64_Op_constant__1304_OUT_QNORM	20
+#define main_S64_Op_constant__1304_OUT_ZERO_POINT	0
+// S65_Conv2d_32x32x1x1_Relu6
+#define main_S65_Conv2d_32x32x1x1_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S65_Conv2d_32x32x1x1_Relu6_OUT_QSCALE	96
+#define main_S65_Conv2d_32x32x1x1_Relu6_OUT_QNORM	12
+#define main_S65_Conv2d_32x32x1x1_Relu6_OUT_ZERO_POINT	0
+// S66_Op_Conv_84_weights
+#define main_S66_Op_Conv_84_weights_OUT_SCALE	0.00731561379507184
+#define main_S66_Op_Conv_84_weights_OUT_QSCALE	120
+#define main_S66_Op_Conv_84_weights_OUT_QNORM	14
+#define main_S66_Op_Conv_84_weights_OUT_ZERO_POINT	128
+// S67_Op_constant__1307
+#define main_S67_Op_constant__1307_OUT_SCALE	0.000172132089295808
+#define main_S67_Op_constant__1307_OUT_QSCALE	90
+#define main_S67_Op_constant__1307_OUT_QNORM	19
+#define main_S67_Op_constant__1307_OUT_ZERO_POINT	0
+// S68_Conv2d_32x1x3x3_Relu6
+#define main_S68_Conv2d_32x1x3x3_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S68_Conv2d_32x1x3x3_Relu6_OUT_QSCALE	96
+#define main_S68_Conv2d_32x1x3x3_Relu6_OUT_QNORM	12
+#define main_S68_Conv2d_32x1x3x3_Relu6_OUT_ZERO_POINT	0
+// S69_Op_Conv_88_weights
+#define main_S69_Op_Conv_88_weights_OUT_SCALE	0.005029191263020039
+#define main_S69_Op_Conv_88_weights_OUT_QSCALE	82
+#define main_S69_Op_Conv_88_weights_OUT_QNORM	14
+#define main_S69_Op_Conv_88_weights_OUT_ZERO_POINT	128
+// S70_Op_constant__1310
+#define main_S70_Op_constant__1310_OUT_SCALE	0.00011833391207105973
+#define main_S70_Op_constant__1310_OUT_QSCALE	124
+#define main_S70_Op_constant__1310_OUT_QNORM	20
+#define main_S70_Op_constant__1310_OUT_ZERO_POINT	0
+// S71_Conv2d_32x32x1x1_Relu6
+#define main_S71_Conv2d_32x32x1x1_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S71_Conv2d_32x32x1x1_Relu6_OUT_QSCALE	96
+#define main_S71_Conv2d_32x32x1x1_Relu6_OUT_QNORM	12
+#define main_S71_Conv2d_32x32x1x1_Relu6_OUT_ZERO_POINT	0
+// S72_MatAdd_30x40x32
+#define main_S72_MatAdd_30x40x32_OUT_SCALE	0.05683133751153946
+#define main_S72_MatAdd_30x40x32_OUT_QSCALE	116
+#define main_S72_MatAdd_30x40x32_OUT_QNORM	11
+#define main_S72_MatAdd_30x40x32_OUT_ZERO_POINT	0
+// S73_Concat
+#define main_S73_Concat_OUT_SCALE	0.05683133751153946
+#define main_S73_Concat_OUT_QSCALE	116
+#define main_S73_Concat_OUT_QNORM	11
+#define main_S73_Concat_OUT_ZERO_POINT	0
+// S74_Op_Conv_94_weights
+#define main_S74_Op_Conv_94_weights_OUT_SCALE	0.001525245956145227
+#define main_S74_Op_Conv_94_weights_OUT_QSCALE	100
+#define main_S74_Op_Conv_94_weights_OUT_QNORM	16
+#define main_S74_Op_Conv_94_weights_OUT_ZERO_POINT	128
+// S75_Op_constant__1313
+#define main_S75_Op_constant__1313_OUT_SCALE	8.668176451465115e-05
+#define main_S75_Op_constant__1313_OUT_QSCALE	91
+#define main_S75_Op_constant__1313_OUT_QNORM	20
+#define main_S75_Op_constant__1313_OUT_ZERO_POINT	0
+// S76_Conv2d_64x64x1x1_Relu6
+#define main_S76_Conv2d_64x64x1x1_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S76_Conv2d_64x64x1x1_Relu6_OUT_QSCALE	96
+#define main_S76_Conv2d_64x64x1x1_Relu6_OUT_QNORM	12
+#define main_S76_Conv2d_64x64x1x1_Relu6_OUT_ZERO_POINT	0
+// S77_Op_Conv_98_weights
+#define main_S77_Op_Conv_98_weights_OUT_SCALE	0.0028771564830094576
+#define main_S77_Op_Conv_98_weights_OUT_QSCALE	94
+#define main_S77_Op_Conv_98_weights_OUT_QNORM	15
+#define main_S77_Op_Conv_98_weights_OUT_ZERO_POINT	128
+// S78_Op_constant__1316
+#define main_S78_Op_constant__1316_OUT_SCALE	6.769779960022253e-05
+#define main_S78_Op_constant__1316_OUT_QSCALE	71
+#define main_S78_Op_constant__1316_OUT_QNORM	20
+#define main_S78_Op_constant__1316_OUT_ZERO_POINT	0
+// S79_Conv2d_64x1x3x3_Relu6
+#define main_S79_Conv2d_64x1x3x3_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S79_Conv2d_64x1x3x3_Relu6_OUT_QSCALE	96
+#define main_S79_Conv2d_64x1x3x3_Relu6_OUT_QNORM	12
+#define main_S79_Conv2d_64x1x3x3_Relu6_OUT_ZERO_POINT	0
+// S80_Op_Conv_102_weights
+#define main_S80_Op_Conv_102_weights_OUT_SCALE	0.0050699179992079735
+#define main_S80_Op_Conv_102_weights_OUT_QSCALE	83
+#define main_S80_Op_Conv_102_weights_OUT_QNORM	14
+#define main_S80_Op_Conv_102_weights_OUT_ZERO_POINT	128
+// S81_Op_constant__1319
+#define main_S81_Op_constant__1319_OUT_SCALE	0.0001192921882166582
+#define main_S81_Op_constant__1319_OUT_QSCALE	125
+#define main_S81_Op_constant__1319_OUT_QNORM	20
+#define main_S81_Op_constant__1319_OUT_ZERO_POINT	0
+// S82_Conv2d_128x64x1x1_Relu6
+#define main_S82_Conv2d_128x64x1x1_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S82_Conv2d_128x64x1x1_Relu6_OUT_QSCALE	96
+#define main_S82_Conv2d_128x64x1x1_Relu6_OUT_QNORM	12
+#define main_S82_Conv2d_128x64x1x1_Relu6_OUT_ZERO_POINT	0
+// S83_Op_Conv_106_weights
+#define main_S83_Op_Conv_106_weights_OUT_SCALE	0.001619214192032814
+#define main_S83_Op_Conv_106_weights_OUT_QSCALE	106
+#define main_S83_Op_Conv_106_weights_OUT_QNORM	16
+#define main_S83_Op_Conv_106_weights_OUT_ZERO_POINT	128
+// S84_Op_constant__1322
+#define main_S84_Op_constant__1322_OUT_SCALE	3.8099157459595624e-05
+#define main_S84_Op_constant__1322_OUT_QSCALE	80
+#define main_S84_Op_constant__1322_OUT_QNORM	21
+#define main_S84_Op_constant__1322_OUT_ZERO_POINT	0
+// S85_Conv2d_64x128x1x1_Relu6
+#define main_S85_Conv2d_64x128x1x1_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S85_Conv2d_64x128x1x1_Relu6_OUT_QSCALE	96
+#define main_S85_Conv2d_64x128x1x1_Relu6_OUT_QNORM	12
+#define main_S85_Conv2d_64x128x1x1_Relu6_OUT_ZERO_POINT	0
+// S86_Op_Conv_110_weights
+#define main_S86_Op_Conv_110_weights_OUT_SCALE	0.0037050433456897736
+#define main_S86_Op_Conv_110_weights_OUT_QSCALE	121
+#define main_S86_Op_Conv_110_weights_OUT_QNORM	15
+#define main_S86_Op_Conv_110_weights_OUT_ZERO_POINT	128
+// S87_Op_constant__1325
+#define main_S87_Op_constant__1325_OUT_SCALE	8.71774904868182e-05
+#define main_S87_Op_constant__1325_OUT_QSCALE	91
+#define main_S87_Op_constant__1325_OUT_QNORM	20
+#define main_S87_Op_constant__1325_OUT_ZERO_POINT	0
+// S88_Conv2d_64x128x1x1_Relu6
+#define main_S88_Conv2d_64x128x1x1_Relu6_OUT_SCALE	0.07419303059577942
+#define main_S88_Conv2d_64x128x1x1_Relu6_OUT_QSCALE	76
+#define main_S88_Conv2d_64x128x1x1_Relu6_OUT_QNORM	10
+#define main_S88_Conv2d_64x128x1x1_Relu6_OUT_ZERO_POINT	0
+// S89_Op_Conv_114_weights
+#define main_S89_Op_Conv_114_weights_OUT_SCALE	0.0034384324681013823
+#define main_S89_Op_Conv_114_weights_OUT_QSCALE	113
+#define main_S89_Op_Conv_114_weights_OUT_QNORM	15
+#define main_S89_Op_Conv_114_weights_OUT_ZERO_POINT	128
+// S90_Op_constant__1328
+#define main_S90_Op_constant__1328_OUT_SCALE	8.090429336709134e-05
+#define main_S90_Op_constant__1328_OUT_QSCALE	85
+#define main_S90_Op_constant__1328_OUT_QNORM	20
+#define main_S90_Op_constant__1328_OUT_ZERO_POINT	0
+// S91_Conv2d_64x64x1x1_Relu6
+#define main_S91_Conv2d_64x64x1x1_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S91_Conv2d_64x64x1x1_Relu6_OUT_QSCALE	96
+#define main_S91_Conv2d_64x64x1x1_Relu6_OUT_QNORM	12
+#define main_S91_Conv2d_64x64x1x1_Relu6_OUT_ZERO_POINT	0
+// S92_Op_Conv_118_weights
+#define main_S92_Op_Conv_118_weights_OUT_SCALE	0.00996087770909071
+#define main_S92_Op_Conv_118_weights_OUT_QSCALE	82
+#define main_S92_Op_Conv_118_weights_OUT_QNORM	13
+#define main_S92_Op_Conv_118_weights_OUT_ZERO_POINT	128
+// S93_Op_constant__1331
+#define main_S93_Op_constant__1331_OUT_SCALE	0.00023437359315507553
+#define main_S93_Op_constant__1331_OUT_QSCALE	123
+#define main_S93_Op_constant__1331_OUT_QNORM	19
+#define main_S93_Op_constant__1331_OUT_ZERO_POINT	0
+// S94_Conv2d_64x1x3x3_Relu6
+#define main_S94_Conv2d_64x1x3x3_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S94_Conv2d_64x1x3x3_Relu6_OUT_QSCALE	96
+#define main_S94_Conv2d_64x1x3x3_Relu6_OUT_QNORM	12
+#define main_S94_Conv2d_64x1x3x3_Relu6_OUT_ZERO_POINT	0
+// S95_Op_Conv_122_weights
+#define main_S95_Op_Conv_122_weights_OUT_SCALE	0.002088341396301985
+#define main_S95_Op_Conv_122_weights_OUT_QSCALE	68
+#define main_S95_Op_Conv_122_weights_OUT_QNORM	15
+#define main_S95_Op_Conv_122_weights_OUT_ZERO_POINT	128
+// S96_Op_constant__1334
+#define main_S96_Op_constant__1334_OUT_SCALE	4.913744461887023e-05
+#define main_S96_Op_constant__1334_OUT_QSCALE	103
+#define main_S96_Op_constant__1334_OUT_QNORM	21
+#define main_S96_Op_constant__1334_OUT_ZERO_POINT	0
+// S97_Conv2d_64x64x1x1_Relu6
+#define main_S97_Conv2d_64x64x1x1_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S97_Conv2d_64x64x1x1_Relu6_OUT_QSCALE	96
+#define main_S97_Conv2d_64x64x1x1_Relu6_OUT_QNORM	12
+#define main_S97_Conv2d_64x64x1x1_Relu6_OUT_ZERO_POINT	0
+// S98_MatAdd_15x20x64
+#define main_S98_MatAdd_15x20x64_OUT_SCALE	0.04496002569794655
+#define main_S98_MatAdd_15x20x64_OUT_QSCALE	92
+#define main_S98_MatAdd_15x20x64_OUT_QNORM	11
+#define main_S98_MatAdd_15x20x64_OUT_ZERO_POINT	0
+// S99_Op_Conv_127_weights
+#define main_S99_Op_Conv_127_weights_OUT_SCALE	0.0027428774628788233
+#define main_S99_Op_Conv_127_weights_OUT_QSCALE	90
+#define main_S99_Op_Conv_127_weights_OUT_QNORM	15
+#define main_S99_Op_Conv_127_weights_OUT_ZERO_POINT	128
+// S100_Op_constant__1337
+#define main_S100_Op_constant__1337_OUT_SCALE	0.00012331984180491418
+#define main_S100_Op_constant__1337_OUT_QSCALE	65
+#define main_S100_Op_constant__1337_OUT_QNORM	19
+#define main_S100_Op_constant__1337_OUT_ZERO_POINT	0
+// S101_Conv2d_64x64x1x1_Relu6
+#define main_S101_Conv2d_64x64x1x1_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S101_Conv2d_64x64x1x1_Relu6_OUT_QSCALE	96
+#define main_S101_Conv2d_64x64x1x1_Relu6_OUT_QNORM	12
+#define main_S101_Conv2d_64x64x1x1_Relu6_OUT_ZERO_POINT	0
+// S102_Op_Conv_131_weights
+#define main_S102_Op_Conv_131_weights_OUT_SCALE	0.0080885523930192
+#define main_S102_Op_Conv_131_weights_OUT_QSCALE	66
+#define main_S102_Op_Conv_131_weights_OUT_QNORM	13
+#define main_S102_Op_Conv_131_weights_OUT_ZERO_POINT	128
+// S103_Op_constant__1340
+#define main_S103_Op_constant__1340_OUT_SCALE	0.00019031887983574587
+#define main_S103_Op_constant__1340_OUT_QSCALE	100
+#define main_S103_Op_constant__1340_OUT_QNORM	19
+#define main_S103_Op_constant__1340_OUT_ZERO_POINT	0
+// S104_Conv2d_64x1x3x3_Relu6
+#define main_S104_Conv2d_64x1x3x3_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S104_Conv2d_64x1x3x3_Relu6_OUT_QSCALE	96
+#define main_S104_Conv2d_64x1x3x3_Relu6_OUT_QNORM	12
+#define main_S104_Conv2d_64x1x3x3_Relu6_OUT_ZERO_POINT	0
+// S105_Op_Conv_135_weights
+#define main_S105_Op_Conv_135_weights_OUT_SCALE	0.004265230149030685
+#define main_S105_Op_Conv_135_weights_OUT_QSCALE	70
+#define main_S105_Op_Conv_135_weights_OUT_QNORM	14
+#define main_S105_Op_Conv_135_weights_OUT_ZERO_POINT	128
+// S106_Op_constant__1343
+#define main_S106_Op_constant__1343_OUT_SCALE	0.00010035835644778083
+#define main_S106_Op_constant__1343_OUT_QSCALE	105
+#define main_S106_Op_constant__1343_OUT_QNORM	20
+#define main_S106_Op_constant__1343_OUT_ZERO_POINT	0
+// S107_Conv2d_64x64x1x1_Relu6
+#define main_S107_Conv2d_64x64x1x1_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S107_Conv2d_64x64x1x1_Relu6_OUT_QSCALE	96
+#define main_S107_Conv2d_64x64x1x1_Relu6_OUT_QNORM	12
+#define main_S107_Conv2d_64x64x1x1_Relu6_OUT_ZERO_POINT	0
+// S108_MatAdd_15x20x64
+#define main_S108_MatAdd_15x20x64_OUT_SCALE	0.058609869331121445
+#define main_S108_MatAdd_15x20x64_OUT_QSCALE	120
+#define main_S108_MatAdd_15x20x64_OUT_QNORM	11
+#define main_S108_MatAdd_15x20x64_OUT_ZERO_POINT	0
+// S109_Op_Conv_140_weights
+#define main_S109_Op_Conv_140_weights_OUT_SCALE	0.002724488964304328
+#define main_S109_Op_Conv_140_weights_OUT_QSCALE	89
+#define main_S109_Op_Conv_140_weights_OUT_QNORM	15
+#define main_S109_Op_Conv_140_weights_OUT_ZERO_POINT	128
+// S110_Op_constant__1346
+#define main_S110_Op_constant__1346_OUT_SCALE	0.00015968194929882884
+#define main_S110_Op_constant__1346_OUT_QSCALE	84
+#define main_S110_Op_constant__1346_OUT_QNORM	19
+#define main_S110_Op_constant__1346_OUT_ZERO_POINT	0
+// S111_Conv2d_64x64x1x1_Relu6
+#define main_S111_Conv2d_64x64x1x1_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S111_Conv2d_64x64x1x1_Relu6_OUT_QSCALE	96
+#define main_S111_Conv2d_64x64x1x1_Relu6_OUT_QNORM	12
+#define main_S111_Conv2d_64x64x1x1_Relu6_OUT_ZERO_POINT	0
+// S112_Op_Conv_144_weights
+#define main_S112_Op_Conv_144_weights_OUT_SCALE	0.00581374391913414
+#define main_S112_Op_Conv_144_weights_OUT_QSCALE	95
+#define main_S112_Op_Conv_144_weights_OUT_QNORM	14
+#define main_S112_Op_Conv_144_weights_OUT_ZERO_POINT	128
+// S113_Op_constant__1349
+#define main_S113_Op_constant__1349_OUT_SCALE	0.0001367939745678621
+#define main_S113_Op_constant__1349_OUT_QSCALE	72
+#define main_S113_Op_constant__1349_OUT_QNORM	19
+#define main_S113_Op_constant__1349_OUT_ZERO_POINT	0
+// S114_Conv2d_64x1x3x3_Relu6
+#define main_S114_Conv2d_64x1x3x3_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S114_Conv2d_64x1x3x3_Relu6_OUT_QSCALE	96
+#define main_S114_Conv2d_64x1x3x3_Relu6_OUT_QNORM	12
+#define main_S114_Conv2d_64x1x3x3_Relu6_OUT_ZERO_POINT	0
+// S115_Op_Conv_148_weights
+#define main_S115_Op_Conv_148_weights_OUT_SCALE	0.005286692176014185
+#define main_S115_Op_Conv_148_weights_OUT_QSCALE	87
+#define main_S115_Op_Conv_148_weights_OUT_QNORM	14
+#define main_S115_Op_Conv_148_weights_OUT_ZERO_POINT	128
+// S116_Op_constant__1352
+#define main_S116_Op_constant__1352_OUT_SCALE	0.00012439275708268671
+#define main_S116_Op_constant__1352_OUT_QSCALE	65
+#define main_S116_Op_constant__1352_OUT_QNORM	19
+#define main_S116_Op_constant__1352_OUT_ZERO_POINT	0
+// S117_Conv2d_64x64x1x1_Relu6
+#define main_S117_Conv2d_64x64x1x1_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S117_Conv2d_64x64x1x1_Relu6_OUT_QSCALE	96
+#define main_S117_Conv2d_64x64x1x1_Relu6_OUT_QNORM	12
+#define main_S117_Conv2d_64x64x1x1_Relu6_OUT_ZERO_POINT	0
+// S118_MatAdd_15x20x64
+#define main_S118_MatAdd_15x20x64_OUT_SCALE	0.07419303059577942
+#define main_S118_MatAdd_15x20x64_OUT_QSCALE	76
+#define main_S118_MatAdd_15x20x64_OUT_QNORM	10
+#define main_S118_MatAdd_15x20x64_OUT_ZERO_POINT	0
+// S119_Concat
+#define main_S119_Concat_OUT_SCALE	0.07419303059577942
+#define main_S119_Concat_OUT_QSCALE	76
+#define main_S119_Concat_OUT_QNORM	10
+#define main_S119_Concat_OUT_ZERO_POINT	0
+// S120_Op_Conv_154_weights
+#define main_S120_Op_Conv_154_weights_OUT_SCALE	0.0014879932859912515
+#define main_S120_Op_Conv_154_weights_OUT_QSCALE	98
+#define main_S120_Op_Conv_154_weights_OUT_QNORM	16
+#define main_S120_Op_Conv_154_weights_OUT_ZERO_POINT	128
+// S121_Op_constant__1355
+#define main_S121_Op_constant__1355_OUT_SCALE	0.00011039873061235994
+#define main_S121_Op_constant__1355_OUT_QSCALE	116
+#define main_S121_Op_constant__1355_OUT_QNORM	20
+#define main_S121_Op_constant__1355_OUT_ZERO_POINT	0
+// S122_Conv2d_128x128x1x1_Relu6
+#define main_S122_Conv2d_128x128x1x1_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S122_Conv2d_128x128x1x1_Relu6_OUT_QSCALE	96
+#define main_S122_Conv2d_128x128x1x1_Relu6_OUT_QNORM	12
+#define main_S122_Conv2d_128x128x1x1_Relu6_OUT_ZERO_POINT	0
+// S123_Op_Conv_158_weights
+#define main_S123_Op_Conv_158_weights_OUT_SCALE	0.0028290983755141497
+#define main_S123_Op_Conv_158_weights_OUT_QSCALE	93
+#define main_S123_Op_Conv_158_weights_OUT_QNORM	15
+#define main_S123_Op_Conv_158_weights_OUT_ZERO_POINT	128
+// S124_Op_constant__1358
+#define main_S124_Op_constant__1358_OUT_SCALE	6.656702060033294e-05
+#define main_S124_Op_constant__1358_OUT_QSCALE	70
+#define main_S124_Op_constant__1358_OUT_QNORM	20
+#define main_S124_Op_constant__1358_OUT_ZERO_POINT	0
+// S125_Conv2d_128x1x3x3_Relu6
+#define main_S125_Conv2d_128x1x3x3_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S125_Conv2d_128x1x3x3_Relu6_OUT_QSCALE	96
+#define main_S125_Conv2d_128x1x3x3_Relu6_OUT_QNORM	12
+#define main_S125_Conv2d_128x1x3x3_Relu6_OUT_ZERO_POINT	0
+// S126_Op_Conv_162_weights
+#define main_S126_Op_Conv_162_weights_OUT_SCALE	0.002240656642243266
+#define main_S126_Op_Conv_162_weights_OUT_QSCALE	73
+#define main_S126_Op_Conv_162_weights_OUT_QNORM	15
+#define main_S126_Op_Conv_162_weights_OUT_ZERO_POINT	128
+// S127_Op_constant__1361
+#define main_S127_Op_constant__1361_OUT_SCALE	5.2721332758665083e-05
+#define main_S127_Op_constant__1361_OUT_QSCALE	111
+#define main_S127_Op_constant__1361_OUT_QNORM	21
+#define main_S127_Op_constant__1361_OUT_ZERO_POINT	0
+// S128_Conv2d_256x128x1x1_Relu6
+#define main_S128_Conv2d_256x128x1x1_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S128_Conv2d_256x128x1x1_Relu6_OUT_QSCALE	96
+#define main_S128_Conv2d_256x128x1x1_Relu6_OUT_QNORM	12
+#define main_S128_Conv2d_256x128x1x1_Relu6_OUT_ZERO_POINT	0
+// S129_Op_Conv_166_weights
+#define main_S129_Op_Conv_166_weights_OUT_SCALE	0.0023884596303105354
+#define main_S129_Op_Conv_166_weights_OUT_QSCALE	78
+#define main_S129_Op_Conv_166_weights_OUT_QNORM	15
+#define main_S129_Op_Conv_166_weights_OUT_ZERO_POINT	128
+// S130_Op_constant__1364
+#define main_S130_Op_constant__1364_OUT_SCALE	5.619905012495378e-05
+#define main_S130_Op_constant__1364_OUT_QSCALE	118
+#define main_S130_Op_constant__1364_OUT_QNORM	21
+#define main_S130_Op_constant__1364_OUT_ZERO_POINT	0
+// S131_Conv2d_128x256x1x1_Relu6
+#define main_S131_Conv2d_128x256x1x1_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S131_Conv2d_128x256x1x1_Relu6_OUT_QSCALE	96
+#define main_S131_Conv2d_128x256x1x1_Relu6_OUT_QNORM	12
+#define main_S131_Conv2d_128x256x1x1_Relu6_OUT_ZERO_POINT	0
+// S132_MaxPool_5x5
+#define main_S132_MaxPool_5x5_OUT_SCALE	0.023529411764705882
+#define main_S132_MaxPool_5x5_OUT_QSCALE	96
+#define main_S132_MaxPool_5x5_OUT_QNORM	12
+#define main_S132_MaxPool_5x5_OUT_ZERO_POINT	0
+// S133_MaxPool_9x9
+#define main_S133_MaxPool_9x9_OUT_SCALE	0.023529411764705882
+#define main_S133_MaxPool_9x9_OUT_QSCALE	96
+#define main_S133_MaxPool_9x9_OUT_QNORM	12
+#define main_S133_MaxPool_9x9_OUT_ZERO_POINT	0
+// S134_MaxPool_13x13
+#define main_S134_MaxPool_13x13_OUT_SCALE	0.023529411764705882
+#define main_S134_MaxPool_13x13_OUT_QSCALE	96
+#define main_S134_MaxPool_13x13_OUT_QNORM	12
+#define main_S134_MaxPool_13x13_OUT_ZERO_POINT	0
+// S135_Concat
+#define main_S135_Concat_OUT_SCALE	0.023529411764705882
+#define main_S135_Concat_OUT_QSCALE	96
+#define main_S135_Concat_OUT_QNORM	12
+#define main_S135_Concat_OUT_ZERO_POINT	0
+// S136_Op_Conv_174_weights
+#define main_S136_Op_Conv_174_weights_OUT_SCALE	0.000819520850200206
+#define main_S136_Op_Conv_174_weights_OUT_QSCALE	107
+#define main_S136_Op_Conv_174_weights_OUT_QNORM	17
+#define main_S136_Op_Conv_174_weights_OUT_ZERO_POINT	128
+// S137_Op_constant__1367
+#define main_S137_Op_constant__1367_OUT_SCALE	1.9282843534122495e-05
+#define main_S137_Op_constant__1367_OUT_QSCALE	81
+#define main_S137_Op_constant__1367_OUT_QNORM	22
+#define main_S137_Op_constant__1367_OUT_ZERO_POINT	0
+// S138_Conv2d_256x512x1x1_Relu6
+#define main_S138_Conv2d_256x512x1x1_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S138_Conv2d_256x512x1x1_Relu6_OUT_QSCALE	96
+#define main_S138_Conv2d_256x512x1x1_Relu6_OUT_QNORM	12
+#define main_S138_Conv2d_256x512x1x1_Relu6_OUT_ZERO_POINT	0
+// S139_Op_Conv_178_weights
+#define main_S139_Op_Conv_178_weights_OUT_SCALE	0.0016557398485019803
+#define main_S139_Op_Conv_178_weights_OUT_QSCALE	109
+#define main_S139_Op_Conv_178_weights_OUT_QNORM	16
+#define main_S139_Op_Conv_178_weights_OUT_ZERO_POINT	128
+// S140_Op_constant__1370
+#define main_S140_Op_constant__1370_OUT_SCALE	3.895858467063483e-05
+#define main_S140_Op_constant__1370_OUT_QSCALE	82
+#define main_S140_Op_constant__1370_OUT_QNORM	21
+#define main_S140_Op_constant__1370_OUT_ZERO_POINT	0
+// S141_Conv2d_128x256x1x1_Relu6
+#define main_S141_Conv2d_128x256x1x1_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S141_Conv2d_128x256x1x1_Relu6_OUT_QSCALE	96
+#define main_S141_Conv2d_128x256x1x1_Relu6_OUT_QNORM	12
+#define main_S141_Conv2d_128x256x1x1_Relu6_OUT_ZERO_POINT	0
+// S142_Op_Conv_182_weights
+#define main_S142_Op_Conv_182_weights_OUT_SCALE	0.0016170165035873652
+#define main_S142_Op_Conv_182_weights_OUT_QSCALE	106
+#define main_S142_Op_Conv_182_weights_OUT_QNORM	16
+#define main_S142_Op_Conv_182_weights_OUT_ZERO_POINT	128
+// S143_Op_constant__1373
+#define main_S143_Op_constant__1373_OUT_SCALE	3.804744714323212e-05
+#define main_S143_Op_constant__1373_OUT_QSCALE	80
+#define main_S143_Op_constant__1373_OUT_QNORM	21
+#define main_S143_Op_constant__1373_OUT_ZERO_POINT	0
+// S144_Conv2d_128x256x1x1_Relu6
+#define main_S144_Conv2d_128x256x1x1_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S144_Conv2d_128x256x1x1_Relu6_OUT_QSCALE	96
+#define main_S144_Conv2d_128x256x1x1_Relu6_OUT_QNORM	12
+#define main_S144_Conv2d_128x256x1x1_Relu6_OUT_ZERO_POINT	0
+// S145_Op_Conv_186_weights
+#define main_S145_Op_Conv_186_weights_OUT_SCALE	0.0024851346388459206
+#define main_S145_Op_Conv_186_weights_OUT_QSCALE	81
+#define main_S145_Op_Conv_186_weights_OUT_QNORM	15
+#define main_S145_Op_Conv_186_weights_OUT_ZERO_POINT	128
+// S146_Op_constant__1376
+#define main_S146_Op_constant__1376_OUT_SCALE	5.847375620813931e-05
+#define main_S146_Op_constant__1376_OUT_QSCALE	123
+#define main_S146_Op_constant__1376_OUT_QNORM	21
+#define main_S146_Op_constant__1376_OUT_ZERO_POINT	0
+// S147_Conv2d_128x128x1x1_Relu6
+#define main_S147_Conv2d_128x128x1x1_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S147_Conv2d_128x128x1x1_Relu6_OUT_QSCALE	96
+#define main_S147_Conv2d_128x128x1x1_Relu6_OUT_QNORM	12
+#define main_S147_Conv2d_128x128x1x1_Relu6_OUT_ZERO_POINT	0
+// S148_Op_Conv_190_weights
+#define main_S148_Op_Conv_190_weights_OUT_SCALE	0.006692284252494574
+#define main_S148_Op_Conv_190_weights_OUT_QSCALE	110
+#define main_S148_Op_Conv_190_weights_OUT_QNORM	14
+#define main_S148_Op_Conv_190_weights_OUT_ZERO_POINT	128
+// S149_Op_constant__1379
+#define main_S149_Op_constant__1379_OUT_SCALE	0.00015746551182340172
+#define main_S149_Op_constant__1379_OUT_QSCALE	83
+#define main_S149_Op_constant__1379_OUT_QNORM	19
+#define main_S149_Op_constant__1379_OUT_ZERO_POINT	0
+// S150_Conv2d_128x1x3x3_Relu6
+#define main_S150_Conv2d_128x1x3x3_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S150_Conv2d_128x1x3x3_Relu6_OUT_QSCALE	96
+#define main_S150_Conv2d_128x1x3x3_Relu6_OUT_QNORM	12
+#define main_S150_Conv2d_128x1x3x3_Relu6_OUT_ZERO_POINT	0
+// S151_Op_Conv_194_weights
+#define main_S151_Op_Conv_194_weights_OUT_SCALE	0.0025659408420324326
+#define main_S151_Op_Conv_194_weights_OUT_QSCALE	84
+#define main_S151_Op_Conv_194_weights_OUT_QNORM	15
+#define main_S151_Op_Conv_194_weights_OUT_ZERO_POINT	128
+// S152_Op_constant__1382
+#define main_S152_Op_constant__1382_OUT_SCALE	6.037507863605724e-05
+#define main_S152_Op_constant__1382_OUT_QSCALE	127
+#define main_S152_Op_constant__1382_OUT_QNORM	21
+#define main_S152_Op_constant__1382_OUT_ZERO_POINT	0
+// S153_Conv2d_128x128x1x1_Relu6
+#define main_S153_Conv2d_128x128x1x1_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S153_Conv2d_128x128x1x1_Relu6_OUT_QSCALE	96
+#define main_S153_Conv2d_128x128x1x1_Relu6_OUT_QNORM	12
+#define main_S153_Conv2d_128x128x1x1_Relu6_OUT_ZERO_POINT	0
+// S154_Concat
+#define main_S154_Concat_OUT_SCALE	0.023529411764705882
+#define main_S154_Concat_OUT_QSCALE	96
+#define main_S154_Concat_OUT_QNORM	12
+#define main_S154_Concat_OUT_ZERO_POINT	0
+// S155_Op_Conv_199_weights
+#define main_S155_Op_Conv_199_weights_OUT_SCALE	0.001959898043423891
+#define main_S155_Op_Conv_199_weights_OUT_QSCALE	64
+#define main_S155_Op_Conv_199_weights_OUT_QNORM	15
+#define main_S155_Op_Conv_199_weights_OUT_ZERO_POINT	128
+// S156_Op_constant__1385
+#define main_S156_Op_constant__1385_OUT_SCALE	4.6115248080562144e-05
+#define main_S156_Op_constant__1385_OUT_QSCALE	97
+#define main_S156_Op_constant__1385_OUT_QNORM	21
+#define main_S156_Op_constant__1385_OUT_ZERO_POINT	0
+// S157_Conv2d_256x256x1x1_Relu6
+#define main_S157_Conv2d_256x256x1x1_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S157_Conv2d_256x256x1x1_Relu6_OUT_QSCALE	96
+#define main_S157_Conv2d_256x256x1x1_Relu6_OUT_QNORM	12
+#define main_S157_Conv2d_256x256x1x1_Relu6_OUT_ZERO_POINT	0
+// S158_Op_Conv_203_weights
+#define main_S158_Op_Conv_203_weights_OUT_SCALE	0.0022361900191754103
+#define main_S158_Op_Conv_203_weights_OUT_QSCALE	73
+#define main_S158_Op_Conv_203_weights_OUT_QNORM	15
+#define main_S158_Op_Conv_203_weights_OUT_ZERO_POINT	128
+// S159_Op_constant__1388
+#define main_S159_Op_constant__1388_OUT_SCALE	5.261623574530377e-05
+#define main_S159_Op_constant__1388_OUT_QSCALE	110
+#define main_S159_Op_constant__1388_OUT_QNORM	21
+#define main_S159_Op_constant__1388_OUT_ZERO_POINT	0
+// S160_Conv2d_128x256x1x1_Relu6
+#define main_S160_Conv2d_128x256x1x1_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S160_Conv2d_128x256x1x1_Relu6_OUT_QSCALE	96
+#define main_S160_Conv2d_128x256x1x1_Relu6_OUT_QNORM	12
+#define main_S160_Conv2d_128x256x1x1_Relu6_OUT_ZERO_POINT	0
+// S161_Op_Resize_208_trans
+#define main_S161_Op_Resize_208_trans_OUT_SCALE	0.023529411764705882
+#define main_S161_Op_Resize_208_trans_OUT_QSCALE	96
+#define main_S161_Op_Resize_208_trans_OUT_QNORM	12
+#define main_S161_Op_Resize_208_trans_OUT_ZERO_POINT	0
+// S162_Op_Resize_208
+#define main_S162_Op_Resize_208_OUT_SCALE	0.023529411764705882
+#define main_S162_Op_Resize_208_OUT_QSCALE	96
+#define main_S162_Op_Resize_208_OUT_QNORM	12
+#define main_S162_Op_Resize_208_OUT_ZERO_POINT	0
+// S163_Op_Slice_213_trans_in0
+#define main_S163_Op_Slice_213_trans_in0_OUT_SCALE	0.023529411764705882
+#define main_S163_Op_Slice_213_trans_in0_OUT_QSCALE	96
+#define main_S163_Op_Slice_213_trans_in0_OUT_QNORM	12
+#define main_S163_Op_Slice_213_trans_in0_OUT_ZERO_POINT	0
+// S164_Op_Slice_213
+#define main_S164_Op_Slice_213_OUT_SCALE	0.023529411764705882
+#define main_S164_Op_Slice_213_OUT_QSCALE	96
+#define main_S164_Op_Slice_213_OUT_QNORM	12
+#define main_S164_Op_Slice_213_OUT_ZERO_POINT	0
+// S165_Op_Slice_213_trans_out0
+#define main_S165_Op_Slice_213_trans_out0_OUT_SCALE	0.023529411764705882
+#define main_S165_Op_Slice_213_trans_out0_OUT_QSCALE	96
+#define main_S165_Op_Slice_213_trans_out0_OUT_QNORM	12
+#define main_S165_Op_Slice_213_trans_out0_OUT_ZERO_POINT	0
+// S166_Concat
+#define main_S166_Concat_OUT_SCALE	0.023529411764705882
+#define main_S166_Concat_OUT_QSCALE	96
+#define main_S166_Concat_OUT_QNORM	12
+#define main_S166_Concat_OUT_ZERO_POINT	0
+// Slice_213_unused
+#define main_Slice_213_unused_OUT_SCALE	0.023529411764705882
+#define main_Slice_213_unused_OUT_QSCALE	96
+#define main_Slice_213_unused_OUT_QNORM	12
+#define main_Slice_213_unused_OUT_ZERO_POINT	0
+// S168_Op_Conv_215_weights
+#define main_S168_Op_Conv_215_weights_OUT_SCALE	0.0022899711038917303
+#define main_S168_Op_Conv_215_weights_OUT_QSCALE	75
+#define main_S168_Op_Conv_215_weights_OUT_QNORM	15
+#define main_S168_Op_Conv_215_weights_OUT_ZERO_POINT	128
+// S169_Op_constant__1391
+#define main_S169_Op_constant__1391_OUT_SCALE	5.3881673032746594e-05
+#define main_S169_Op_constant__1391_OUT_QSCALE	113
+#define main_S169_Op_constant__1391_OUT_QNORM	21
+#define main_S169_Op_constant__1391_OUT_ZERO_POINT	0
+// S170_Conv2d_64x256x1x1_Relu6
+#define main_S170_Conv2d_64x256x1x1_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S170_Conv2d_64x256x1x1_Relu6_OUT_QSCALE	96
+#define main_S170_Conv2d_64x256x1x1_Relu6_OUT_QNORM	12
+#define main_S170_Conv2d_64x256x1x1_Relu6_OUT_ZERO_POINT	0
+// S171_Op_Conv_219_weights
+#define main_S171_Op_Conv_219_weights_OUT_SCALE	0.001358373905532062
+#define main_S171_Op_Conv_219_weights_OUT_QSCALE	89
+#define main_S171_Op_Conv_219_weights_OUT_QNORM	16
+#define main_S171_Op_Conv_219_weights_OUT_ZERO_POINT	128
+// S172_Op_constant__1394
+#define main_S172_Op_constant__1394_OUT_SCALE	3.196173895369558e-05
+#define main_S172_Op_constant__1394_OUT_QSCALE	67
+#define main_S172_Op_constant__1394_OUT_QNORM	21
+#define main_S172_Op_constant__1394_OUT_ZERO_POINT	0
+// S173_Conv2d_64x256x1x1_Relu6
+#define main_S173_Conv2d_64x256x1x1_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S173_Conv2d_64x256x1x1_Relu6_OUT_QSCALE	96
+#define main_S173_Conv2d_64x256x1x1_Relu6_OUT_QNORM	12
+#define main_S173_Conv2d_64x256x1x1_Relu6_OUT_ZERO_POINT	0
+// S174_Op_Conv_223_weights
+#define main_S174_Op_Conv_223_weights_OUT_SCALE	0.0025892986450344324
+#define main_S174_Op_Conv_223_weights_OUT_QSCALE	85
+#define main_S174_Op_Conv_223_weights_OUT_QNORM	15
+#define main_S174_Op_Conv_223_weights_OUT_ZERO_POINT	128
+// S175_Op_constant__1397
+#define main_S175_Op_constant__1397_OUT_SCALE	6.0924674000810175e-05
+#define main_S175_Op_constant__1397_OUT_QSCALE	64
+#define main_S175_Op_constant__1397_OUT_QNORM	22
+#define main_S175_Op_constant__1397_OUT_ZERO_POINT	0
+// S176_Conv2d_64x64x1x1_Relu6
+#define main_S176_Conv2d_64x64x1x1_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S176_Conv2d_64x64x1x1_Relu6_OUT_QSCALE	96
+#define main_S176_Conv2d_64x64x1x1_Relu6_OUT_QNORM	12
+#define main_S176_Conv2d_64x64x1x1_Relu6_OUT_ZERO_POINT	0
+// S177_Op_Conv_227_weights
+#define main_S177_Op_Conv_227_weights_OUT_SCALE	0.007624541874974966
+#define main_S177_Op_Conv_227_weights_OUT_QSCALE	125
+#define main_S177_Op_Conv_227_weights_OUT_QNORM	14
+#define main_S177_Op_Conv_227_weights_OUT_ZERO_POINT	128
+// S178_Op_constant__1400
+#define main_S178_Op_constant__1400_OUT_SCALE	0.00017940098529352862
+#define main_S178_Op_constant__1400_OUT_QSCALE	94
+#define main_S178_Op_constant__1400_OUT_QNORM	19
+#define main_S178_Op_constant__1400_OUT_ZERO_POINT	0
+// S179_Conv2d_64x1x3x3_Relu6
+#define main_S179_Conv2d_64x1x3x3_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S179_Conv2d_64x1x3x3_Relu6_OUT_QSCALE	96
+#define main_S179_Conv2d_64x1x3x3_Relu6_OUT_QNORM	12
+#define main_S179_Conv2d_64x1x3x3_Relu6_OUT_ZERO_POINT	0
+// S180_Op_Conv_231_weights
+#define main_S180_Op_Conv_231_weights_OUT_SCALE	0.004157072864472866
+#define main_S180_Op_Conv_231_weights_OUT_QSCALE	68
+#define main_S180_Op_Conv_231_weights_OUT_QNORM	14
+#define main_S180_Op_Conv_231_weights_OUT_ZERO_POINT	128
+// S181_Op_constant__1403
+#define main_S181_Op_constant__1403_OUT_SCALE	9.781347916406744e-05
+#define main_S181_Op_constant__1403_OUT_QSCALE	103
+#define main_S181_Op_constant__1403_OUT_QNORM	20
+#define main_S181_Op_constant__1403_OUT_ZERO_POINT	0
+// S182_Conv2d_64x64x1x1_Relu6
+#define main_S182_Conv2d_64x64x1x1_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S182_Conv2d_64x64x1x1_Relu6_OUT_QSCALE	96
+#define main_S182_Conv2d_64x64x1x1_Relu6_OUT_QNORM	12
+#define main_S182_Conv2d_64x64x1x1_Relu6_OUT_ZERO_POINT	0
+// S183_Concat
+#define main_S183_Concat_OUT_SCALE	0.023529411764705882
+#define main_S183_Concat_OUT_QSCALE	96
+#define main_S183_Concat_OUT_QNORM	12
+#define main_S183_Concat_OUT_ZERO_POINT	0
+// S184_Op_Conv_236_weights
+#define main_S184_Op_Conv_236_weights_OUT_SCALE	0.0019122730009257793
+#define main_S184_Op_Conv_236_weights_OUT_QSCALE	125
+#define main_S184_Op_Conv_236_weights_OUT_QNORM	16
+#define main_S184_Op_Conv_236_weights_OUT_ZERO_POINT	128
+// S185_Op_constant__1406
+#define main_S185_Op_constant__1406_OUT_SCALE	4.499465884531246e-05
+#define main_S185_Op_constant__1406_OUT_QSCALE	94
+#define main_S185_Op_constant__1406_OUT_QNORM	21
+#define main_S185_Op_constant__1406_OUT_ZERO_POINT	0
+// S186_Conv2d_128x128x1x1_Relu6
+#define main_S186_Conv2d_128x128x1x1_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S186_Conv2d_128x128x1x1_Relu6_OUT_QSCALE	96
+#define main_S186_Conv2d_128x128x1x1_Relu6_OUT_QNORM	12
+#define main_S186_Conv2d_128x128x1x1_Relu6_OUT_ZERO_POINT	0
+// S187_Op_Conv_240_weights
+#define main_S187_Op_Conv_240_weights_OUT_SCALE	0.003584053134545684
+#define main_S187_Op_Conv_240_weights_OUT_QSCALE	117
+#define main_S187_Op_Conv_240_weights_OUT_QNORM	15
+#define main_S187_Op_Conv_240_weights_OUT_ZERO_POINT	128
+// S188_Op_constant__1409
+#define main_S188_Op_constant__1409_OUT_SCALE	8.433066198931021e-05
+#define main_S188_Op_constant__1409_OUT_QSCALE	88
+#define main_S188_Op_constant__1409_OUT_QNORM	20
+#define main_S188_Op_constant__1409_OUT_ZERO_POINT	0
+// S189_Conv2d_64x128x1x1_Relu6
+#define main_S189_Conv2d_64x128x1x1_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S189_Conv2d_64x128x1x1_Relu6_OUT_QSCALE	96
+#define main_S189_Conv2d_64x128x1x1_Relu6_OUT_QNORM	12
+#define main_S189_Conv2d_64x128x1x1_Relu6_OUT_ZERO_POINT	0
+// S190_Op_Resize_245_trans
+#define main_S190_Op_Resize_245_trans_OUT_SCALE	0.023529411764705882
+#define main_S190_Op_Resize_245_trans_OUT_QSCALE	96
+#define main_S190_Op_Resize_245_trans_OUT_QNORM	12
+#define main_S190_Op_Resize_245_trans_OUT_ZERO_POINT	0
+// S191_Op_Resize_245
+#define main_S191_Op_Resize_245_OUT_SCALE	0.023529411764705882
+#define main_S191_Op_Resize_245_OUT_QSCALE	96
+#define main_S191_Op_Resize_245_OUT_QNORM	12
+#define main_S191_Op_Resize_245_OUT_ZERO_POINT	0
+// S192_Op_Resize_245_trans_0
+#define main_S192_Op_Resize_245_trans_0_OUT_SCALE	0.023529411764705882
+#define main_S192_Op_Resize_245_trans_0_OUT_QSCALE	96
+#define main_S192_Op_Resize_245_trans_0_OUT_QNORM	12
+#define main_S192_Op_Resize_245_trans_0_OUT_ZERO_POINT	0
+// S193_Concat
+#define main_S193_Concat_OUT_SCALE	0.023529411764705882
+#define main_S193_Concat_OUT_QSCALE	96
+#define main_S193_Concat_OUT_QNORM	12
+#define main_S193_Concat_OUT_ZERO_POINT	0
+// S194_Op_Conv_247_weights
+#define main_S194_Op_Conv_247_weights_OUT_SCALE	0.003455371130257845
+#define main_S194_Op_Conv_247_weights_OUT_QSCALE	113
+#define main_S194_Op_Conv_247_weights_OUT_QNORM	15
+#define main_S194_Op_Conv_247_weights_OUT_ZERO_POINT	128
+// S195_Op_constant__1412
+#define main_S195_Op_constant__1412_OUT_SCALE	8.1302850123714e-05
+#define main_S195_Op_constant__1412_OUT_QSCALE	85
+#define main_S195_Op_constant__1412_OUT_QNORM	20
+#define main_S195_Op_constant__1412_OUT_ZERO_POINT	0
+// S196_Conv2d_32x128x1x1_Relu6
+#define main_S196_Conv2d_32x128x1x1_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S196_Conv2d_32x128x1x1_Relu6_OUT_QSCALE	96
+#define main_S196_Conv2d_32x128x1x1_Relu6_OUT_QNORM	12
+#define main_S196_Conv2d_32x128x1x1_Relu6_OUT_ZERO_POINT	0
+// S197_Op_Conv_251_weights
+#define main_S197_Op_Conv_251_weights_OUT_SCALE	0.004764331970363855
+#define main_S197_Op_Conv_251_weights_OUT_QSCALE	78
+#define main_S197_Op_Conv_251_weights_OUT_QNORM	14
+#define main_S197_Op_Conv_251_weights_OUT_ZERO_POINT	128
+// S198_Op_constant__1415
+#define main_S198_Op_constant__1415_OUT_SCALE	0.00011210192871444365
+#define main_S198_Op_constant__1415_OUT_QSCALE	118
+#define main_S198_Op_constant__1415_OUT_QNORM	20
+#define main_S198_Op_constant__1415_OUT_ZERO_POINT	0
+// S199_Conv2d_32x128x1x1_Relu6
+#define main_S199_Conv2d_32x128x1x1_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S199_Conv2d_32x128x1x1_Relu6_OUT_QSCALE	96
+#define main_S199_Conv2d_32x128x1x1_Relu6_OUT_QNORM	12
+#define main_S199_Conv2d_32x128x1x1_Relu6_OUT_ZERO_POINT	0
+// S200_Op_Conv_255_weights
+#define main_S200_Op_Conv_255_weights_OUT_SCALE	0.0041517228819429874
+#define main_S200_Op_Conv_255_weights_OUT_QSCALE	68
+#define main_S200_Op_Conv_255_weights_OUT_QNORM	14
+#define main_S200_Op_Conv_255_weights_OUT_ZERO_POINT	128
+// S201_Op_constant__1418
+#define main_S201_Op_constant__1418_OUT_SCALE	9.768759722218794e-05
+#define main_S201_Op_constant__1418_OUT_QSCALE	102
+#define main_S201_Op_constant__1418_OUT_QNORM	20
+#define main_S201_Op_constant__1418_OUT_ZERO_POINT	0
+// S202_Conv2d_32x32x1x1_Relu6
+#define main_S202_Conv2d_32x32x1x1_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S202_Conv2d_32x32x1x1_Relu6_OUT_QSCALE	96
+#define main_S202_Conv2d_32x32x1x1_Relu6_OUT_QNORM	12
+#define main_S202_Conv2d_32x32x1x1_Relu6_OUT_ZERO_POINT	0
+// S203_Op_Conv_259_weights
+#define main_S203_Op_Conv_259_weights_OUT_SCALE	0.008888108655810356
+#define main_S203_Op_Conv_259_weights_OUT_QSCALE	73
+#define main_S203_Op_Conv_259_weights_OUT_QNORM	13
+#define main_S203_Op_Conv_259_weights_OUT_ZERO_POINT	128
+// S204_Op_constant__1421
+#define main_S204_Op_constant__1421_OUT_SCALE	0.00020913196837200838
+#define main_S204_Op_constant__1421_OUT_QSCALE	110
+#define main_S204_Op_constant__1421_OUT_QNORM	19
+#define main_S204_Op_constant__1421_OUT_ZERO_POINT	0
+// S205_Conv2d_32x1x3x3_Relu6
+#define main_S205_Conv2d_32x1x3x3_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S205_Conv2d_32x1x3x3_Relu6_OUT_QSCALE	96
+#define main_S205_Conv2d_32x1x3x3_Relu6_OUT_QNORM	12
+#define main_S205_Conv2d_32x1x3x3_Relu6_OUT_ZERO_POINT	0
+// S206_Op_Conv_263_weights
+#define main_S206_Op_Conv_263_weights_OUT_SCALE	0.006460986100137234
+#define main_S206_Op_Conv_263_weights_OUT_QSCALE	106
+#define main_S206_Op_Conv_263_weights_OUT_QNORM	14
+#define main_S206_Op_Conv_263_weights_OUT_ZERO_POINT	128
+// S207_Op_constant__1424
+#define main_S207_Op_constant__1424_OUT_SCALE	0.0001520232023561702
+#define main_S207_Op_constant__1424_OUT_QSCALE	80
+#define main_S207_Op_constant__1424_OUT_QNORM	19
+#define main_S207_Op_constant__1424_OUT_ZERO_POINT	0
+// S208_Conv2d_32x32x1x1_Relu6
+#define main_S208_Conv2d_32x32x1x1_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S208_Conv2d_32x32x1x1_Relu6_OUT_QSCALE	96
+#define main_S208_Conv2d_32x32x1x1_Relu6_OUT_QNORM	12
+#define main_S208_Conv2d_32x32x1x1_Relu6_OUT_ZERO_POINT	0
+// S209_Concat
+#define main_S209_Concat_OUT_SCALE	0.023529411764705882
+#define main_S209_Concat_OUT_QSCALE	96
+#define main_S209_Concat_OUT_QNORM	12
+#define main_S209_Concat_OUT_ZERO_POINT	0
+// S210_Op_Conv_268_weights
+#define main_S210_Op_Conv_268_weights_OUT_SCALE	0.005852817092090845
+#define main_S210_Op_Conv_268_weights_OUT_QSCALE	96
+#define main_S210_Op_Conv_268_weights_OUT_QNORM	14
+#define main_S210_Op_Conv_268_weights_OUT_ZERO_POINT	128
+// S211_Op_constant__1427
+#define main_S211_Op_constant__1427_OUT_SCALE	0.000137713343343314
+#define main_S211_Op_constant__1427_OUT_QSCALE	72
+#define main_S211_Op_constant__1427_OUT_QNORM	19
+#define main_S211_Op_constant__1427_OUT_ZERO_POINT	0
+// S212_Conv2d_64x64x1x1_Relu6
+#define main_S212_Conv2d_64x64x1x1_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S212_Conv2d_64x64x1x1_Relu6_OUT_QSCALE	96
+#define main_S212_Conv2d_64x64x1x1_Relu6_OUT_QNORM	12
+#define main_S212_Conv2d_64x64x1x1_Relu6_OUT_ZERO_POINT	0
+// S213_Op_Conv_272_weights
+#define main_S213_Op_Conv_272_weights_OUT_SCALE	0.006129498593509197
+#define main_S213_Op_Conv_272_weights_OUT_QSCALE	100
+#define main_S213_Op_Conv_272_weights_OUT_QNORM	14
+#define main_S213_Op_Conv_272_weights_OUT_ZERO_POINT	128
+// S214_Op_constant__1430
+#define main_S214_Op_constant__1430_OUT_SCALE	0.00014422349631786345
+#define main_S214_Op_constant__1430_OUT_QSCALE	76
+#define main_S214_Op_constant__1430_OUT_QNORM	19
+#define main_S214_Op_constant__1430_OUT_ZERO_POINT	0
+// S215_Conv2d_64x1x3x3_Relu6
+#define main_S215_Conv2d_64x1x3x3_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S215_Conv2d_64x1x3x3_Relu6_OUT_QSCALE	96
+#define main_S215_Conv2d_64x1x3x3_Relu6_OUT_QNORM	12
+#define main_S215_Conv2d_64x1x3x3_Relu6_OUT_ZERO_POINT	0
+// S216_Op_Conv_276_weights
+#define main_S216_Op_Conv_276_weights_OUT_SCALE	0.0037295029032975435
+#define main_S216_Op_Conv_276_weights_OUT_QSCALE	122
+#define main_S216_Op_Conv_276_weights_OUT_QNORM	15
+#define main_S216_Op_Conv_276_weights_OUT_ZERO_POINT	128
+// S217_Op_constant__1433
+#define main_S217_Op_constant__1433_OUT_SCALE	8.775300948935396e-05
+#define main_S217_Op_constant__1433_OUT_QSCALE	92
+#define main_S217_Op_constant__1433_OUT_QNORM	20
+#define main_S217_Op_constant__1433_OUT_ZERO_POINT	0
+// S218_Conv2d_64x64x1x1_Relu6
+#define main_S218_Conv2d_64x64x1x1_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S218_Conv2d_64x64x1x1_Relu6_OUT_QSCALE	96
+#define main_S218_Conv2d_64x64x1x1_Relu6_OUT_QNORM	12
+#define main_S218_Conv2d_64x64x1x1_Relu6_OUT_ZERO_POINT	0
+// S219_Concat
+#define main_S219_Concat_OUT_SCALE	0.023529411764705882
+#define main_S219_Concat_OUT_QSCALE	96
+#define main_S219_Concat_OUT_QNORM	12
+#define main_S219_Concat_OUT_ZERO_POINT	0
+// S220_Op_Conv_281_weights
+#define main_S220_Op_Conv_281_weights_OUT_SCALE	0.0021541279274970293
+#define main_S220_Op_Conv_281_weights_OUT_QSCALE	71
+#define main_S220_Op_Conv_281_weights_OUT_QNORM	15
+#define main_S220_Op_Conv_281_weights_OUT_ZERO_POINT	128
+// S221_Op_constant__1436
+#define main_S221_Op_constant__1436_OUT_SCALE	5.06853629999301e-05
+#define main_S221_Op_constant__1436_OUT_QSCALE	106
+#define main_S221_Op_constant__1436_OUT_QNORM	21
+#define main_S221_Op_constant__1436_OUT_ZERO_POINT	0
+// S222_Conv2d_64x128x1x1_Relu6
+#define main_S222_Conv2d_64x128x1x1_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S222_Conv2d_64x128x1x1_Relu6_OUT_QSCALE	96
+#define main_S222_Conv2d_64x128x1x1_Relu6_OUT_QNORM	12
+#define main_S222_Conv2d_64x128x1x1_Relu6_OUT_ZERO_POINT	0
+// S223_Op_Conv_285_weights
+#define main_S223_Op_Conv_285_weights_OUT_SCALE	0.002468725899234414
+#define main_S223_Op_Conv_285_weights_OUT_QSCALE	81
+#define main_S223_Op_Conv_285_weights_OUT_QNORM	15
+#define main_S223_Op_Conv_285_weights_OUT_ZERO_POINT	128
+// S224_Op_constant__1439
+#define main_S224_Op_constant__1439_OUT_SCALE	5.808766821728033e-05
+#define main_S224_Op_constant__1439_OUT_QSCALE	122
+#define main_S224_Op_constant__1439_OUT_QNORM	21
+#define main_S224_Op_constant__1439_OUT_ZERO_POINT	0
+// S225_Conv2d_64x128x1x1_Relu6
+#define main_S225_Conv2d_64x128x1x1_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S225_Conv2d_64x128x1x1_Relu6_OUT_QSCALE	96
+#define main_S225_Conv2d_64x128x1x1_Relu6_OUT_QNORM	12
+#define main_S225_Conv2d_64x128x1x1_Relu6_OUT_ZERO_POINT	0
+// S226_Op_Conv_289_weights
+#define main_S226_Op_Conv_289_weights_OUT_SCALE	0.002628237009048462
+#define main_S226_Op_Conv_289_weights_OUT_QSCALE	86
+#define main_S226_Op_Conv_289_weights_OUT_QNORM	15
+#define main_S226_Op_Conv_289_weights_OUT_ZERO_POINT	128
+// S227_Op_constant__1442
+#define main_S227_Op_constant__1442_OUT_SCALE	6.184087080114028e-05
+#define main_S227_Op_constant__1442_OUT_QSCALE	65
+#define main_S227_Op_constant__1442_OUT_QNORM	20
+#define main_S227_Op_constant__1442_OUT_ZERO_POINT	0
+// S228_Conv2d_64x64x1x1_Relu6
+#define main_S228_Conv2d_64x64x1x1_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S228_Conv2d_64x64x1x1_Relu6_OUT_QSCALE	96
+#define main_S228_Conv2d_64x64x1x1_Relu6_OUT_QNORM	12
+#define main_S228_Conv2d_64x64x1x1_Relu6_OUT_ZERO_POINT	0
+// S229_Op_Conv_293_weights
+#define main_S229_Op_Conv_293_weights_OUT_SCALE	0.005756014492362738
+#define main_S229_Op_Conv_293_weights_OUT_QSCALE	94
+#define main_S229_Op_Conv_293_weights_OUT_QNORM	14
+#define main_S229_Op_Conv_293_weights_OUT_ZERO_POINT	128
+// S230_Op_constant__1445
+#define main_S230_Op_constant__1445_OUT_SCALE	0.00013543563511441735
+#define main_S230_Op_constant__1445_OUT_QSCALE	71
+#define main_S230_Op_constant__1445_OUT_QNORM	19
+#define main_S230_Op_constant__1445_OUT_ZERO_POINT	0
+// S231_Conv2d_64x1x3x3_Relu6
+#define main_S231_Conv2d_64x1x3x3_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S231_Conv2d_64x1x3x3_Relu6_OUT_QSCALE	96
+#define main_S231_Conv2d_64x1x3x3_Relu6_OUT_QNORM	12
+#define main_S231_Conv2d_64x1x3x3_Relu6_OUT_ZERO_POINT	0
+// S232_Op_Conv_297_weights
+#define main_S232_Op_Conv_297_weights_OUT_SCALE	0.003711917670443654
+#define main_S232_Op_Conv_297_weights_OUT_QSCALE	122
+#define main_S232_Op_Conv_297_weights_OUT_QNORM	15
+#define main_S232_Op_Conv_297_weights_OUT_ZERO_POINT	128
+// S233_Op_constant__1448
+#define main_S233_Op_constant__1448_OUT_SCALE	8.733923930455657e-05
+#define main_S233_Op_constant__1448_OUT_QSCALE	92
+#define main_S233_Op_constant__1448_OUT_QNORM	20
+#define main_S233_Op_constant__1448_OUT_ZERO_POINT	0
+// S234_Conv2d_64x64x1x1_Relu6
+#define main_S234_Conv2d_64x64x1x1_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S234_Conv2d_64x64x1x1_Relu6_OUT_QSCALE	96
+#define main_S234_Conv2d_64x64x1x1_Relu6_OUT_QNORM	12
+#define main_S234_Conv2d_64x64x1x1_Relu6_OUT_ZERO_POINT	0
+// S235_Concat
+#define main_S235_Concat_OUT_SCALE	0.023529411764705882
+#define main_S235_Concat_OUT_QSCALE	96
+#define main_S235_Concat_OUT_QNORM	12
+#define main_S235_Concat_OUT_ZERO_POINT	0
+// S236_Op_Conv_302_weights
+#define main_S236_Op_Conv_302_weights_OUT_SCALE	0.0028404847253113985
+#define main_S236_Op_Conv_302_weights_OUT_QSCALE	93
+#define main_S236_Op_Conv_302_weights_OUT_QNORM	15
+#define main_S236_Op_Conv_302_weights_OUT_ZERO_POINT	128
+// S237_Op_constant__1451
+#define main_S237_Op_constant__1451_OUT_SCALE	6.683493471320937e-05
+#define main_S237_Op_constant__1451_OUT_QSCALE	70
+#define main_S237_Op_constant__1451_OUT_QNORM	20
+#define main_S237_Op_constant__1451_OUT_ZERO_POINT	0
+// S238_Conv2d_128x128x1x1_Relu6
+#define main_S238_Conv2d_128x128x1x1_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S238_Conv2d_128x128x1x1_Relu6_OUT_QSCALE	96
+#define main_S238_Conv2d_128x128x1x1_Relu6_OUT_QNORM	12
+#define main_S238_Conv2d_128x128x1x1_Relu6_OUT_ZERO_POINT	0
+// S239_Op_Conv_306_weights
+#define main_S239_Op_Conv_306_weights_OUT_SCALE	0.007643739227205515
+#define main_S239_Op_Conv_306_weights_OUT_QSCALE	125
+#define main_S239_Op_Conv_306_weights_OUT_QNORM	14
+#define main_S239_Op_Conv_306_weights_OUT_ZERO_POINT	128
+// S240_Op_constant__1454
+#define main_S240_Op_constant__1454_OUT_SCALE	0.0001798526876989533
+#define main_S240_Op_constant__1454_OUT_QSCALE	94
+#define main_S240_Op_constant__1454_OUT_QNORM	19
+#define main_S240_Op_constant__1454_OUT_ZERO_POINT	0
+// S241_Conv2d_128x1x3x3_Relu6
+#define main_S241_Conv2d_128x1x3x3_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S241_Conv2d_128x1x3x3_Relu6_OUT_QSCALE	96
+#define main_S241_Conv2d_128x1x3x3_Relu6_OUT_QNORM	12
+#define main_S241_Conv2d_128x1x3x3_Relu6_OUT_ZERO_POINT	0
+// S242_Op_Conv_310_weights
+#define main_S242_Op_Conv_310_weights_OUT_SCALE	0.004026263020932674
+#define main_S242_Op_Conv_310_weights_OUT_QSCALE	66
+#define main_S242_Op_Conv_310_weights_OUT_QNORM	14
+#define main_S242_Op_Conv_310_weights_OUT_ZERO_POINT	128
+// S243_Op_constant__1457
+#define main_S243_Op_constant__1457_OUT_SCALE	9.473560049253351e-05
+#define main_S243_Op_constant__1457_OUT_QSCALE	99
+#define main_S243_Op_constant__1457_OUT_QNORM	20
+#define main_S243_Op_constant__1457_OUT_ZERO_POINT	0
+// S244_Conv2d_128x128x1x1_Relu6
+#define main_S244_Conv2d_128x128x1x1_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S244_Conv2d_128x128x1x1_Relu6_OUT_QSCALE	96
+#define main_S244_Conv2d_128x128x1x1_Relu6_OUT_QNORM	12
+#define main_S244_Conv2d_128x128x1x1_Relu6_OUT_ZERO_POINT	0
+// S245_Concat
+#define main_S245_Concat_OUT_SCALE	0.023529411764705882
+#define main_S245_Concat_OUT_QSCALE	96
+#define main_S245_Concat_OUT_QNORM	12
+#define main_S245_Concat_OUT_ZERO_POINT	0
+// S246_Op_Conv_315_weights
+#define main_S246_Op_Conv_315_weights_OUT_SCALE	0.0031535138841718435
+#define main_S246_Op_Conv_315_weights_OUT_QSCALE	103
+#define main_S246_Op_Conv_315_weights_OUT_QNORM	15
+#define main_S246_Op_Conv_315_weights_OUT_ZERO_POINT	128
+// S247_Op_constant__1460
+#define main_S247_Op_constant__1460_OUT_SCALE	7.420032668639632e-05
+#define main_S247_Op_constant__1460_OUT_QSCALE	78
+#define main_S247_Op_constant__1460_OUT_QNORM	20
+#define main_S247_Op_constant__1460_OUT_ZERO_POINT	0
+// S248_Conv2d_128x256x1x1_Relu6
+#define main_S248_Conv2d_128x256x1x1_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S248_Conv2d_128x256x1x1_Relu6_OUT_QSCALE	96
+#define main_S248_Conv2d_128x256x1x1_Relu6_OUT_QNORM	12
+#define main_S248_Conv2d_128x256x1x1_Relu6_OUT_ZERO_POINT	0
+// S249_Op_Conv_319_weights
+#define main_S249_Op_Conv_319_weights_OUT_SCALE	0.0016959157073870301
+#define main_S249_Op_Conv_319_weights_OUT_QSCALE	111
+#define main_S249_Op_Conv_319_weights_OUT_QNORM	16
+#define main_S249_Op_Conv_319_weights_OUT_ZERO_POINT	128
+// S250_Op_constant__1463
+#define main_S250_Op_constant__1463_OUT_SCALE	3.990389899734188e-05
+#define main_S250_Op_constant__1463_OUT_QSCALE	84
+#define main_S250_Op_constant__1463_OUT_QNORM	21
+#define main_S250_Op_constant__1463_OUT_ZERO_POINT	0
+// S251_Conv2d_128x256x1x1_Relu6
+#define main_S251_Conv2d_128x256x1x1_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S251_Conv2d_128x256x1x1_Relu6_OUT_QSCALE	96
+#define main_S251_Conv2d_128x256x1x1_Relu6_OUT_QNORM	12
+#define main_S251_Conv2d_128x256x1x1_Relu6_OUT_ZERO_POINT	0
+// S252_Op_Conv_323_weights
+#define main_S252_Op_Conv_323_weights_OUT_SCALE	0.004406952299177647
+#define main_S252_Op_Conv_323_weights_OUT_QSCALE	72
+#define main_S252_Op_Conv_323_weights_OUT_QNORM	14
+#define main_S252_Op_Conv_323_weights_OUT_ZERO_POINT	128
+// S253_Op_constant__1466
+#define main_S253_Op_constant__1466_OUT_SCALE	0.00010369299527476815
+#define main_S253_Op_constant__1466_OUT_QSCALE	109
+#define main_S253_Op_constant__1466_OUT_QNORM	20
+#define main_S253_Op_constant__1466_OUT_ZERO_POINT	0
+// S254_Conv2d_128x128x1x1_Relu6
+#define main_S254_Conv2d_128x128x1x1_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S254_Conv2d_128x128x1x1_Relu6_OUT_QSCALE	96
+#define main_S254_Conv2d_128x128x1x1_Relu6_OUT_QNORM	12
+#define main_S254_Conv2d_128x128x1x1_Relu6_OUT_ZERO_POINT	0
+// S255_Op_Conv_327_weights
+#define main_S255_Op_Conv_327_weights_OUT_SCALE	0.009303035214543343
+#define main_S255_Op_Conv_327_weights_OUT_QSCALE	76
+#define main_S255_Op_Conv_327_weights_OUT_QNORM	13
+#define main_S255_Op_Conv_327_weights_OUT_ZERO_POINT	128
+// S256_Op_constant__1469
+#define main_S256_Op_constant__1469_OUT_SCALE	0.00021889494622454923
+#define main_S256_Op_constant__1469_OUT_QSCALE	115
+#define main_S256_Op_constant__1469_OUT_QNORM	19
+#define main_S256_Op_constant__1469_OUT_ZERO_POINT	0
+// S257_Conv2d_128x1x3x3_Relu6
+#define main_S257_Conv2d_128x1x3x3_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S257_Conv2d_128x1x3x3_Relu6_OUT_QSCALE	96
+#define main_S257_Conv2d_128x1x3x3_Relu6_OUT_QNORM	12
+#define main_S257_Conv2d_128x1x3x3_Relu6_OUT_ZERO_POINT	0
+// S258_Op_Conv_331_weights
+#define main_S258_Op_Conv_331_weights_OUT_SCALE	0.004433468449860811
+#define main_S258_Op_Conv_331_weights_OUT_QSCALE	73
+#define main_S258_Op_Conv_331_weights_OUT_QNORM	14
+#define main_S258_Op_Conv_331_weights_OUT_ZERO_POINT	128
+// S259_Op_constant__1472
+#define main_S259_Op_constant__1472_OUT_SCALE	0.00010431690470260733
+#define main_S259_Op_constant__1472_OUT_QSCALE	109
+#define main_S259_Op_constant__1472_OUT_QNORM	20
+#define main_S259_Op_constant__1472_OUT_ZERO_POINT	0
+// S260_Conv2d_128x128x1x1_Relu6
+#define main_S260_Conv2d_128x128x1x1_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S260_Conv2d_128x128x1x1_Relu6_OUT_QSCALE	96
+#define main_S260_Conv2d_128x128x1x1_Relu6_OUT_QNORM	12
+#define main_S260_Conv2d_128x128x1x1_Relu6_OUT_ZERO_POINT	0
+// S261_Concat
+#define main_S261_Concat_OUT_SCALE	0.023529411764705882
+#define main_S261_Concat_OUT_QSCALE	96
+#define main_S261_Concat_OUT_QNORM	12
+#define main_S261_Concat_OUT_ZERO_POINT	0
+// S262_Op_Conv_336_weights
+#define main_S262_Op_Conv_336_weights_OUT_SCALE	0.0019920363556593657
+#define main_S262_Op_Conv_336_weights_OUT_QSCALE	65
+#define main_S262_Op_Conv_336_weights_OUT_QNORM	15
+#define main_S262_Op_Conv_336_weights_OUT_ZERO_POINT	128
+// S263_Op_constant__1475
+#define main_S263_Op_constant__1475_OUT_SCALE	4.6871443662573306e-05
+#define main_S263_Op_constant__1475_OUT_QSCALE	98
+#define main_S263_Op_constant__1475_OUT_QNORM	21
+#define main_S263_Op_constant__1475_OUT_ZERO_POINT	0
+// S264_Conv2d_256x256x1x1_Relu6
+#define main_S264_Conv2d_256x256x1x1_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S264_Conv2d_256x256x1x1_Relu6_OUT_QSCALE	96
+#define main_S264_Conv2d_256x256x1x1_Relu6_OUT_QNORM	12
+#define main_S264_Conv2d_256x256x1x1_Relu6_OUT_ZERO_POINT	0
+// S265_Op_Conv_340_weights
+#define main_S265_Op_Conv_340_weights_OUT_SCALE	0.002801479073241353
+#define main_S265_Op_Conv_340_weights_OUT_QSCALE	92
+#define main_S265_Op_Conv_340_weights_OUT_QNORM	15
+#define main_S265_Op_Conv_340_weights_OUT_ZERO_POINT	128
+// S266_Op_constant__1478
+#define main_S266_Op_constant__1478_OUT_SCALE	6.591715466450242e-05
+#define main_S266_Op_constant__1478_OUT_QSCALE	69
+#define main_S266_Op_constant__1478_OUT_QNORM	20
+#define main_S266_Op_constant__1478_OUT_ZERO_POINT	0
+// S267_Conv2d_64x64x1x1_Relu6
+#define main_S267_Conv2d_64x64x1x1_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S267_Conv2d_64x64x1x1_Relu6_OUT_QSCALE	96
+#define main_S267_Conv2d_64x64x1x1_Relu6_OUT_QNORM	12
+#define main_S267_Conv2d_64x64x1x1_Relu6_OUT_ZERO_POINT	0
+// S268_Op_Conv_344_weights
+#define main_S268_Op_Conv_344_weights_OUT_SCALE	0.001538968295790255
+#define main_S268_Op_Conv_344_weights_OUT_QSCALE	101
+#define main_S268_Op_Conv_344_weights_OUT_QNORM	16
+#define main_S268_Op_Conv_344_weights_OUT_ZERO_POINT	128
+// S269_Op_constant__1481
+#define main_S269_Op_constant__1481_OUT_SCALE	3.621101872447659e-05
+#define main_S269_Op_constant__1481_OUT_QSCALE	76
+#define main_S269_Op_constant__1481_OUT_QNORM	21
+#define main_S269_Op_constant__1481_OUT_ZERO_POINT	0
+// S270_Conv2d_64x1x3x3_Relu6
+#define main_S270_Conv2d_64x1x3x3_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S270_Conv2d_64x1x3x3_Relu6_OUT_QSCALE	96
+#define main_S270_Conv2d_64x1x3x3_Relu6_OUT_QNORM	12
+#define main_S270_Conv2d_64x1x3x3_Relu6_OUT_ZERO_POINT	0
+// S271_Op_Conv_348_weights
+#define main_S271_Op_Conv_348_weights_OUT_SCALE	0.0032675317488610744
+#define main_S271_Op_Conv_348_weights_OUT_QSCALE	107
+#define main_S271_Op_Conv_348_weights_OUT_QNORM	15
+#define main_S271_Op_Conv_348_weights_OUT_ZERO_POINT	128
+// S272_Op_constant__1484
+#define main_S272_Op_constant__1484_OUT_SCALE	7.688309997320176e-05
+#define main_S272_Op_constant__1484_OUT_QSCALE	81
+#define main_S272_Op_constant__1484_OUT_QNORM	20
+#define main_S272_Op_constant__1484_OUT_ZERO_POINT	0
+// S273_Conv2d_64x64x1x1_Relu6
+#define main_S273_Conv2d_64x64x1x1_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S273_Conv2d_64x64x1x1_Relu6_OUT_QSCALE	96
+#define main_S273_Conv2d_64x64x1x1_Relu6_OUT_QNORM	12
+#define main_S273_Conv2d_64x64x1x1_Relu6_OUT_ZERO_POINT	0
+// S274_Op_Conv_352_weights
+#define main_S274_Op_Conv_352_weights_OUT_SCALE	0.0038034955505281687
+#define main_S274_Op_Conv_352_weights_OUT_QSCALE	125
+#define main_S274_Op_Conv_352_weights_OUT_QNORM	15
+#define main_S274_Op_Conv_352_weights_OUT_ZERO_POINT	128
+// S275_Op_constant__1487
+#define main_S275_Op_constant__1487_OUT_SCALE	8.949401295360396e-05
+#define main_S275_Op_constant__1487_OUT_QSCALE	94
+#define main_S275_Op_constant__1487_OUT_QNORM	20
+#define main_S275_Op_constant__1487_OUT_ZERO_POINT	0
+// S276_Conv2d_64x1x3x3_Relu6
+#define main_S276_Conv2d_64x1x3x3_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S276_Conv2d_64x1x3x3_Relu6_OUT_QSCALE	96
+#define main_S276_Conv2d_64x1x3x3_Relu6_OUT_QNORM	12
+#define main_S276_Conv2d_64x1x3x3_Relu6_OUT_ZERO_POINT	0
+// S277_Op_Conv_356_weights
+#define main_S277_Op_Conv_356_weights_OUT_SCALE	0.0019918205216526985
+#define main_S277_Op_Conv_356_weights_OUT_QSCALE	65
+#define main_S277_Op_Conv_356_weights_OUT_QNORM	15
+#define main_S277_Op_Conv_356_weights_OUT_ZERO_POINT	128
+// S278_Op_constant__1490
+#define main_S278_Op_constant__1490_OUT_SCALE	4.686636521535761e-05
+#define main_S278_Op_constant__1490_OUT_QSCALE	98
+#define main_S278_Op_constant__1490_OUT_QNORM	21
+#define main_S278_Op_constant__1490_OUT_ZERO_POINT	0
+// S279_Conv2d_64x64x1x1_Relu6
+#define main_S279_Conv2d_64x64x1x1_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S279_Conv2d_64x64x1x1_Relu6_OUT_QSCALE	96
+#define main_S279_Conv2d_64x64x1x1_Relu6_OUT_QNORM	12
+#define main_S279_Conv2d_64x64x1x1_Relu6_OUT_ZERO_POINT	0
+// S280_Op_Conv_360_weights
+#define main_S280_Op_Conv_360_weights_OUT_SCALE	0.000778934801928699
+#define main_S280_Op_Conv_360_weights_OUT_QSCALE	102
+#define main_S280_Op_Conv_360_weights_OUT_QNORM	17
+#define main_S280_Op_Conv_360_weights_OUT_ZERO_POINT	128
+// S281_Op_constant_head_cls_preds_0_bias
+#define main_S281_Op_constant_head_cls_preds_0_bias_OUT_SCALE	1.8327877692439976e-05
+#define main_S281_Op_constant_head_cls_preds_0_bias_OUT_QSCALE	77
+#define main_S281_Op_constant_head_cls_preds_0_bias_OUT_QNORM	22
+#define main_S281_Op_constant_head_cls_preds_0_bias_OUT_ZERO_POINT	0
+// S282_Conv2d_1x64x1x1_Sigmoid
+#define main_S282_Conv2d_1x64x1x1_Sigmoid_OUT_SCALE	0.00392156862745098
+#define main_S282_Conv2d_1x64x1x1_Sigmoid_OUT_QSCALE	64
+#define main_S282_Conv2d_1x64x1x1_Sigmoid_OUT_QNORM	14
+#define main_S282_Conv2d_1x64x1x1_Sigmoid_OUT_ZERO_POINT	0
+// S283_Op_Concat_381_qin2
+#define main_S283_Op_Concat_381_qin2_OUT_SCALE	0.026118936017155647
+#define main_S283_Op_Concat_381_qin2_OUT_QSCALE	107
+#define main_S283_Op_Concat_381_qin2_OUT_QNORM	12
+#define main_S283_Op_Concat_381_qin2_OUT_ZERO_POINT	94
+// S284_Op_Conv_361_weights
+#define main_S284_Op_Conv_361_weights_OUT_SCALE	0.004129115026444197
+#define main_S284_Op_Conv_361_weights_OUT_QSCALE	68
+#define main_S284_Op_Conv_361_weights_OUT_QNORM	14
+#define main_S284_Op_Conv_361_weights_OUT_ZERO_POINT	128
+// S285_Op_constant__1493
+#define main_S285_Op_constant__1493_OUT_SCALE	9.715564768103992e-05
+#define main_S285_Op_constant__1493_OUT_QSCALE	102
+#define main_S285_Op_constant__1493_OUT_QNORM	20
+#define main_S285_Op_constant__1493_OUT_ZERO_POINT	0
+// S286_Conv2d_64x1x3x3_Relu6
+#define main_S286_Conv2d_64x1x3x3_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S286_Conv2d_64x1x3x3_Relu6_OUT_QSCALE	96
+#define main_S286_Conv2d_64x1x3x3_Relu6_OUT_QNORM	12
+#define main_S286_Conv2d_64x1x3x3_Relu6_OUT_ZERO_POINT	0
+// S287_Op_Conv_365_weights
+#define main_S287_Op_Conv_365_weights_OUT_SCALE	0.002765397308394313
+#define main_S287_Op_Conv_365_weights_OUT_QSCALE	91
+#define main_S287_Op_Conv_365_weights_OUT_QNORM	15
+#define main_S287_Op_Conv_365_weights_OUT_ZERO_POINT	128
+// S288_Op_constant__1496
+#define main_S288_Op_constant__1496_OUT_SCALE	6.506817196221913e-05
+#define main_S288_Op_constant__1496_OUT_QSCALE	68
+#define main_S288_Op_constant__1496_OUT_QNORM	20
+#define main_S288_Op_constant__1496_OUT_ZERO_POINT	0
+// S289_Conv2d_64x64x1x1_Relu6
+#define main_S289_Conv2d_64x64x1x1_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S289_Conv2d_64x64x1x1_Relu6_OUT_QSCALE	96
+#define main_S289_Conv2d_64x64x1x1_Relu6_OUT_QNORM	12
+#define main_S289_Conv2d_64x64x1x1_Relu6_OUT_ZERO_POINT	0
+// S290_Op_Conv_369_weights
+#define main_S290_Op_Conv_369_weights_OUT_SCALE	0.011063865385949612
+#define main_S290_Op_Conv_369_weights_OUT_QSCALE	91
+#define main_S290_Op_Conv_369_weights_OUT_QNORM	13
+#define main_S290_Op_Conv_369_weights_OUT_ZERO_POINT	128
+// S291_Op_constant__1499
+#define main_S291_Op_constant__1499_OUT_SCALE	0.000260326244375285
+#define main_S291_Op_constant__1499_OUT_QSCALE	68
+#define main_S291_Op_constant__1499_OUT_QNORM	18
+#define main_S291_Op_constant__1499_OUT_ZERO_POINT	0
+// S292_Conv2d_64x1x3x3_Relu6
+#define main_S292_Conv2d_64x1x3x3_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S292_Conv2d_64x1x3x3_Relu6_OUT_QSCALE	96
+#define main_S292_Conv2d_64x1x3x3_Relu6_OUT_QNORM	12
+#define main_S292_Conv2d_64x1x3x3_Relu6_OUT_ZERO_POINT	0
+// S293_Op_Conv_373_weights
+#define main_S293_Op_Conv_373_weights_OUT_SCALE	0.004192472901195288
+#define main_S293_Op_Conv_373_weights_OUT_QSCALE	69
+#define main_S293_Op_Conv_373_weights_OUT_QNORM	14
+#define main_S293_Op_Conv_373_weights_OUT_ZERO_POINT	128
+// S294_Op_constant__1502
+#define main_S294_Op_constant__1502_OUT_SCALE	9.864642120459501e-05
+#define main_S294_Op_constant__1502_OUT_QSCALE	103
+#define main_S294_Op_constant__1502_OUT_QNORM	20
+#define main_S294_Op_constant__1502_OUT_ZERO_POINT	0
+// S295_Conv2d_64x64x1x1_Relu6
+#define main_S295_Conv2d_64x64x1x1_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S295_Conv2d_64x64x1x1_Relu6_OUT_QSCALE	96
+#define main_S295_Conv2d_64x64x1x1_Relu6_OUT_QNORM	12
+#define main_S295_Conv2d_64x64x1x1_Relu6_OUT_ZERO_POINT	0
+// S296_Op_Conv_377_weights
+#define main_S296_Op_Conv_377_weights_OUT_SCALE	0.0020709445234388113
+#define main_S296_Op_Conv_377_weights_OUT_QSCALE	68
+#define main_S296_Op_Conv_377_weights_OUT_QNORM	15
+#define main_S296_Op_Conv_377_weights_OUT_ZERO_POINT	128
+// S297_Op_constant_head_reg_preds_0_bias
+#define main_S297_Op_constant_head_reg_preds_0_bias_OUT_SCALE	4.8728106433854384e-05
+#define main_S297_Op_constant_head_reg_preds_0_bias_OUT_QSCALE	102
+#define main_S297_Op_constant_head_reg_preds_0_bias_OUT_QNORM	21
+#define main_S297_Op_constant_head_reg_preds_0_bias_OUT_ZERO_POINT	0
+// S298_Conv2d_4x64x1x1
+#define main_S298_Conv2d_4x64x1x1_OUT_SCALE	0.026118936017155647
+#define main_S298_Conv2d_4x64x1x1_OUT_QSCALE	107
+#define main_S298_Conv2d_4x64x1x1_OUT_QNORM	12
+#define main_S298_Conv2d_4x64x1x1_OUT_ZERO_POINT	94
+// S299_Op_Conv_378_weights
+#define main_S299_Op_Conv_378_weights_OUT_SCALE	0.008368871174752712
+#define main_S299_Op_Conv_378_weights_OUT_QSCALE	69
+#define main_S299_Op_Conv_378_weights_OUT_QNORM	13
+#define main_S299_Op_Conv_378_weights_OUT_ZERO_POINT	128
+// S300_Op_constant_head_obj_preds_0_bias
+#define main_S300_Op_constant_head_obj_preds_0_bias_OUT_SCALE	0.00019691461587653441
+#define main_S300_Op_constant_head_obj_preds_0_bias_OUT_QSCALE	103
+#define main_S300_Op_constant_head_obj_preds_0_bias_OUT_QNORM	19
+#define main_S300_Op_constant_head_obj_preds_0_bias_OUT_ZERO_POINT	0
+// S301_Conv2d_1x64x1x1_Sigmoid
+#define main_S301_Conv2d_1x64x1x1_Sigmoid_OUT_SCALE	0.00392156862745098
+#define main_S301_Conv2d_1x64x1x1_Sigmoid_OUT_QSCALE	64
+#define main_S301_Conv2d_1x64x1x1_Sigmoid_OUT_QNORM	14
+#define main_S301_Conv2d_1x64x1x1_Sigmoid_OUT_ZERO_POINT	0
+// S302_Op_Concat_381_qin1
+#define main_S302_Op_Concat_381_qin1_OUT_SCALE	0.026118936017155647
+#define main_S302_Op_Concat_381_qin1_OUT_QSCALE	107
+#define main_S302_Op_Concat_381_qin1_OUT_QNORM	12
+#define main_S302_Op_Concat_381_qin1_OUT_ZERO_POINT	94
+// S303_Concat
+#define main_S303_Concat_OUT_SCALE	0.026118936017155647
+#define main_S303_Concat_OUT_QSCALE	107
+#define main_S303_Concat_OUT_QNORM	12
+#define main_S303_Concat_OUT_ZERO_POINT	94
+// S305_Op_Concat_490_qin0
+#define main_S305_Op_Concat_490_qin0_OUT_SCALE	0.03395460173487663
+#define main_S305_Op_Concat_490_qin0_OUT_QSCALE	70
+#define main_S305_Op_Concat_490_qin0_OUT_QNORM	11
+#define main_S305_Op_Concat_490_qin0_OUT_ZERO_POINT	103
+// S306_Op_Conv_382_weights
+#define main_S306_Op_Conv_382_weights_OUT_SCALE	0.003289429470896721
+#define main_S306_Op_Conv_382_weights_OUT_QSCALE	108
+#define main_S306_Op_Conv_382_weights_OUT_QNORM	15
+#define main_S306_Op_Conv_382_weights_OUT_ZERO_POINT	128
+// S307_Op_constant__1505
+#define main_S307_Op_constant__1505_OUT_SCALE	7.739834049168755e-05
+#define main_S307_Op_constant__1505_OUT_QSCALE	81
+#define main_S307_Op_constant__1505_OUT_QNORM	20
+#define main_S307_Op_constant__1505_OUT_ZERO_POINT	0
+// S308_Conv2d_64x128x1x1_Relu6
+#define main_S308_Conv2d_64x128x1x1_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S308_Conv2d_64x128x1x1_Relu6_OUT_QSCALE	96
+#define main_S308_Conv2d_64x128x1x1_Relu6_OUT_QNORM	12
+#define main_S308_Conv2d_64x128x1x1_Relu6_OUT_ZERO_POINT	0
+// S309_Op_Conv_386_weights
+#define main_S309_Op_Conv_386_weights_OUT_SCALE	0.003263133345171809
+#define main_S309_Op_Conv_386_weights_OUT_QSCALE	107
+#define main_S309_Op_Conv_386_weights_OUT_QNORM	15
+#define main_S309_Op_Conv_386_weights_OUT_ZERO_POINT	128
+// S310_Op_constant__1508
+#define main_S310_Op_constant__1508_OUT_SCALE	7.677960812168963e-05
+#define main_S310_Op_constant__1508_OUT_QSCALE	81
+#define main_S310_Op_constant__1508_OUT_QNORM	20
+#define main_S310_Op_constant__1508_OUT_ZERO_POINT	0
+// S311_Conv2d_64x1x3x3_Relu6
+#define main_S311_Conv2d_64x1x3x3_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S311_Conv2d_64x1x3x3_Relu6_OUT_QSCALE	96
+#define main_S311_Conv2d_64x1x3x3_Relu6_OUT_QNORM	12
+#define main_S311_Conv2d_64x1x3x3_Relu6_OUT_ZERO_POINT	0
+// S312_Op_Conv_390_weights
+#define main_S312_Op_Conv_390_weights_OUT_SCALE	0.0027857988607138395
+#define main_S312_Op_Conv_390_weights_OUT_QSCALE	91
+#define main_S312_Op_Conv_390_weights_OUT_QNORM	15
+#define main_S312_Op_Conv_390_weights_OUT_ZERO_POINT	128
+// S313_Op_constant__1511
+#define main_S313_Op_constant__1511_OUT_SCALE	6.554820848738446e-05
+#define main_S313_Op_constant__1511_OUT_QSCALE	69
+#define main_S313_Op_constant__1511_OUT_QNORM	20
+#define main_S313_Op_constant__1511_OUT_ZERO_POINT	0
+// S314_Conv2d_64x64x1x1_Relu6
+#define main_S314_Conv2d_64x64x1x1_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S314_Conv2d_64x64x1x1_Relu6_OUT_QSCALE	96
+#define main_S314_Conv2d_64x64x1x1_Relu6_OUT_QNORM	12
+#define main_S314_Conv2d_64x64x1x1_Relu6_OUT_ZERO_POINT	0
+// S315_Op_Conv_394_weights
+#define main_S315_Op_Conv_394_weights_OUT_SCALE	0.00514726247638464
+#define main_S315_Op_Conv_394_weights_OUT_QSCALE	84
+#define main_S315_Op_Conv_394_weights_OUT_QNORM	14
+#define main_S315_Op_Conv_394_weights_OUT_ZERO_POINT	128
+// S316_Op_constant__1514
+#define main_S316_Op_constant__1514_OUT_SCALE	0.00012111205826787387
+#define main_S316_Op_constant__1514_OUT_QSCALE	127
+#define main_S316_Op_constant__1514_OUT_QNORM	20
+#define main_S316_Op_constant__1514_OUT_ZERO_POINT	0
+// S317_Conv2d_64x1x3x3_Relu6
+#define main_S317_Conv2d_64x1x3x3_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S317_Conv2d_64x1x3x3_Relu6_OUT_QSCALE	96
+#define main_S317_Conv2d_64x1x3x3_Relu6_OUT_QNORM	12
+#define main_S317_Conv2d_64x1x3x3_Relu6_OUT_ZERO_POINT	0
+// S318_Op_Conv_398_weights
+#define main_S318_Op_Conv_398_weights_OUT_SCALE	0.004515261854976416
+#define main_S318_Op_Conv_398_weights_OUT_QSCALE	74
+#define main_S318_Op_Conv_398_weights_OUT_QNORM	14
+#define main_S318_Op_Conv_398_weights_OUT_ZERO_POINT	128
+// S319_Op_constant__1517
+#define main_S319_Op_constant__1517_OUT_SCALE	0.00010624145541120978
+#define main_S319_Op_constant__1517_OUT_QSCALE	111
+#define main_S319_Op_constant__1517_OUT_QNORM	20
+#define main_S319_Op_constant__1517_OUT_ZERO_POINT	0
+// S320_Conv2d_64x64x1x1_Relu6
+#define main_S320_Conv2d_64x64x1x1_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S320_Conv2d_64x64x1x1_Relu6_OUT_QSCALE	96
+#define main_S320_Conv2d_64x64x1x1_Relu6_OUT_QNORM	12
+#define main_S320_Conv2d_64x64x1x1_Relu6_OUT_ZERO_POINT	0
+// S321_Op_Conv_402_weights
+#define main_S321_Op_Conv_402_weights_OUT_SCALE	0.0007736822590231895
+#define main_S321_Op_Conv_402_weights_OUT_QSCALE	101
+#define main_S321_Op_Conv_402_weights_OUT_QNORM	17
+#define main_S321_Op_Conv_402_weights_OUT_ZERO_POINT	128
+// S322_Op_constant_head_cls_preds_1_bias
+#define main_S322_Op_constant_head_cls_preds_1_bias_OUT_SCALE	1.820428844760446e-05
+#define main_S322_Op_constant_head_cls_preds_1_bias_OUT_QSCALE	76
+#define main_S322_Op_constant_head_cls_preds_1_bias_OUT_QNORM	22
+#define main_S322_Op_constant_head_cls_preds_1_bias_OUT_ZERO_POINT	0
+// S323_Conv2d_1x64x1x1_Sigmoid
+#define main_S323_Conv2d_1x64x1x1_Sigmoid_OUT_SCALE	0.00392156862745098
+#define main_S323_Conv2d_1x64x1x1_Sigmoid_OUT_QSCALE	64
+#define main_S323_Conv2d_1x64x1x1_Sigmoid_OUT_QNORM	14
+#define main_S323_Conv2d_1x64x1x1_Sigmoid_OUT_ZERO_POINT	0
+// S324_Op_Concat_423_qin2
+#define main_S324_Op_Concat_423_qin2_OUT_SCALE	0.03209744766354561
+#define main_S324_Op_Concat_423_qin2_OUT_QSCALE	66
+#define main_S324_Op_Concat_423_qin2_OUT_QNORM	11
+#define main_S324_Op_Concat_423_qin2_OUT_ZERO_POINT	117
+// S325_Op_Conv_403_weights
+#define main_S325_Op_Conv_403_weights_OUT_SCALE	0.006834980566054583
+#define main_S325_Op_Conv_403_weights_OUT_QSCALE	112
+#define main_S325_Op_Conv_403_weights_OUT_QNORM	14
+#define main_S325_Op_Conv_403_weights_OUT_ZERO_POINT	128
+// S326_Op_constant__1520
+#define main_S326_Op_constant__1520_OUT_SCALE	0.00016082307214246078
+#define main_S326_Op_constant__1520_OUT_QSCALE	84
+#define main_S326_Op_constant__1520_OUT_QNORM	19
+#define main_S326_Op_constant__1520_OUT_ZERO_POINT	0
+// S327_Conv2d_64x1x3x3_Relu6
+#define main_S327_Conv2d_64x1x3x3_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S327_Conv2d_64x1x3x3_Relu6_OUT_QSCALE	96
+#define main_S327_Conv2d_64x1x3x3_Relu6_OUT_QNORM	12
+#define main_S327_Conv2d_64x1x3x3_Relu6_OUT_ZERO_POINT	0
+// S328_Op_Conv_407_weights
+#define main_S328_Op_Conv_407_weights_OUT_SCALE	0.0035946376156061888
+#define main_S328_Op_Conv_407_weights_OUT_QSCALE	118
+#define main_S328_Op_Conv_407_weights_OUT_QNORM	15
+#define main_S328_Op_Conv_407_weights_OUT_ZERO_POINT	128
+// S329_Op_constant__1523
+#define main_S329_Op_constant__1523_OUT_SCALE	8.457970860249855e-05
+#define main_S329_Op_constant__1523_OUT_QSCALE	89
+#define main_S329_Op_constant__1523_OUT_QNORM	20
+#define main_S329_Op_constant__1523_OUT_ZERO_POINT	0
+// S330_Conv2d_64x64x1x1_Relu6
+#define main_S330_Conv2d_64x64x1x1_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S330_Conv2d_64x64x1x1_Relu6_OUT_QSCALE	96
+#define main_S330_Conv2d_64x64x1x1_Relu6_OUT_QNORM	12
+#define main_S330_Conv2d_64x64x1x1_Relu6_OUT_ZERO_POINT	0
+// S331_Op_Conv_411_weights
+#define main_S331_Op_Conv_411_weights_OUT_SCALE	0.009518058970570564
+#define main_S331_Op_Conv_411_weights_OUT_QSCALE	78
+#define main_S331_Op_Conv_411_weights_OUT_QNORM	13
+#define main_S331_Op_Conv_411_weights_OUT_ZERO_POINT	128
+// S332_Op_constant__1526
+#define main_S332_Op_constant__1526_OUT_SCALE	0.0002239543287193074
+#define main_S332_Op_constant__1526_OUT_QSCALE	117
+#define main_S332_Op_constant__1526_OUT_QNORM	19
+#define main_S332_Op_constant__1526_OUT_ZERO_POINT	0
+// S333_Conv2d_64x1x3x3_Relu6
+#define main_S333_Conv2d_64x1x3x3_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S333_Conv2d_64x1x3x3_Relu6_OUT_QSCALE	96
+#define main_S333_Conv2d_64x1x3x3_Relu6_OUT_QNORM	12
+#define main_S333_Conv2d_64x1x3x3_Relu6_OUT_ZERO_POINT	0
+// S334_Op_Conv_415_weights
+#define main_S334_Op_Conv_415_weights_OUT_SCALE	0.004102036822587252
+#define main_S334_Op_Conv_415_weights_OUT_QSCALE	67
+#define main_S334_Op_Conv_415_weights_OUT_QNORM	14
+#define main_S334_Op_Conv_415_weights_OUT_ZERO_POINT	128
+// S335_Op_constant__1529
+#define main_S335_Op_constant__1529_OUT_SCALE	9.651851347264121e-05
+#define main_S335_Op_constant__1529_OUT_QSCALE	101
+#define main_S335_Op_constant__1529_OUT_QNORM	20
+#define main_S335_Op_constant__1529_OUT_ZERO_POINT	0
+// S336_Conv2d_64x64x1x1_Relu6
+#define main_S336_Conv2d_64x64x1x1_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S336_Conv2d_64x64x1x1_Relu6_OUT_QSCALE	96
+#define main_S336_Conv2d_64x64x1x1_Relu6_OUT_QNORM	12
+#define main_S336_Conv2d_64x64x1x1_Relu6_OUT_ZERO_POINT	0
+// S337_Op_Conv_419_weights
+#define main_S337_Op_Conv_419_weights_OUT_SCALE	0.002605865243822336
+#define main_S337_Op_Conv_419_weights_OUT_QSCALE	85
+#define main_S337_Op_Conv_419_weights_OUT_QNORM	15
+#define main_S337_Op_Conv_419_weights_OUT_ZERO_POINT	128
+// S338_Op_constant_head_reg_preds_1_bias
+#define main_S338_Op_constant_head_reg_preds_1_bias_OUT_SCALE	6.131447632523144e-05
+#define main_S338_Op_constant_head_reg_preds_1_bias_OUT_QSCALE	64
+#define main_S338_Op_constant_head_reg_preds_1_bias_OUT_QNORM	20
+#define main_S338_Op_constant_head_reg_preds_1_bias_OUT_ZERO_POINT	0
+// S339_Conv2d_4x64x1x1
+#define main_S339_Conv2d_4x64x1x1_OUT_SCALE	0.03209744766354561
+#define main_S339_Conv2d_4x64x1x1_OUT_QSCALE	66
+#define main_S339_Conv2d_4x64x1x1_OUT_QNORM	11
+#define main_S339_Conv2d_4x64x1x1_OUT_ZERO_POINT	117
+// S340_Op_Conv_420_weights
+#define main_S340_Op_Conv_420_weights_OUT_SCALE	0.006868595257401466
+#define main_S340_Op_Conv_420_weights_OUT_QSCALE	113
+#define main_S340_Op_Conv_420_weights_OUT_QNORM	14
+#define main_S340_Op_Conv_420_weights_OUT_ZERO_POINT	128
+// S341_Op_constant_head_obj_preds_1_bias
+#define main_S341_Op_constant_head_obj_preds_1_bias_OUT_SCALE	0.0001616140060565051
+#define main_S341_Op_constant_head_obj_preds_1_bias_OUT_QSCALE	85
+#define main_S341_Op_constant_head_obj_preds_1_bias_OUT_QNORM	19
+#define main_S341_Op_constant_head_obj_preds_1_bias_OUT_ZERO_POINT	0
+// S342_Conv2d_1x64x1x1_Sigmoid
+#define main_S342_Conv2d_1x64x1x1_Sigmoid_OUT_SCALE	0.00392156862745098
+#define main_S342_Conv2d_1x64x1x1_Sigmoid_OUT_QSCALE	64
+#define main_S342_Conv2d_1x64x1x1_Sigmoid_OUT_QNORM	14
+#define main_S342_Conv2d_1x64x1x1_Sigmoid_OUT_ZERO_POINT	0
+// S343_Op_Concat_423_qin1
+#define main_S343_Op_Concat_423_qin1_OUT_SCALE	0.03209744766354561
+#define main_S343_Op_Concat_423_qin1_OUT_QSCALE	66
+#define main_S343_Op_Concat_423_qin1_OUT_QNORM	11
+#define main_S343_Op_Concat_423_qin1_OUT_ZERO_POINT	117
+// S344_Concat
+#define main_S344_Concat_OUT_SCALE	0.03209744766354561
+#define main_S344_Concat_OUT_QSCALE	66
+#define main_S344_Concat_OUT_QNORM	11
+#define main_S344_Concat_OUT_ZERO_POINT	117
+// S346_Op_Concat_490_qin1
+#define main_S346_Op_Concat_490_qin1_OUT_SCALE	0.03395460173487663
+#define main_S346_Op_Concat_490_qin1_OUT_QSCALE	70
+#define main_S346_Op_Concat_490_qin1_OUT_QNORM	11
+#define main_S346_Op_Concat_490_qin1_OUT_ZERO_POINT	103
+// S347_Op_Conv_424_weights
+#define main_S347_Op_Conv_424_weights_OUT_SCALE	0.0021518392022699118
+#define main_S347_Op_Conv_424_weights_OUT_QSCALE	71
+#define main_S347_Op_Conv_424_weights_OUT_QNORM	15
+#define main_S347_Op_Conv_424_weights_OUT_ZERO_POINT	128
+// S348_Op_constant__1532
+#define main_S348_Op_constant__1532_OUT_SCALE	5.063151064164498e-05
+#define main_S348_Op_constant__1532_OUT_QSCALE	106
+#define main_S348_Op_constant__1532_OUT_QNORM	21
+#define main_S348_Op_constant__1532_OUT_ZERO_POINT	0
+// S349_Conv2d_64x256x1x1_Relu6
+#define main_S349_Conv2d_64x256x1x1_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S349_Conv2d_64x256x1x1_Relu6_OUT_QSCALE	96
+#define main_S349_Conv2d_64x256x1x1_Relu6_OUT_QNORM	12
+#define main_S349_Conv2d_64x256x1x1_Relu6_OUT_ZERO_POINT	0
+// S350_Op_Conv_428_weights
+#define main_S350_Op_Conv_428_weights_OUT_SCALE	0.003617449663579464
+#define main_S350_Op_Conv_428_weights_OUT_QSCALE	119
+#define main_S350_Op_Conv_428_weights_OUT_QNORM	15
+#define main_S350_Op_Conv_428_weights_OUT_ZERO_POINT	128
+// S351_Op_constant__1535
+#define main_S351_Op_constant__1535_OUT_SCALE	8.511646267245798e-05
+#define main_S351_Op_constant__1535_OUT_QSCALE	89
+#define main_S351_Op_constant__1535_OUT_QNORM	20
+#define main_S351_Op_constant__1535_OUT_ZERO_POINT	0
+// S352_Conv2d_64x1x3x3_Relu6
+#define main_S352_Conv2d_64x1x3x3_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S352_Conv2d_64x1x3x3_Relu6_OUT_QSCALE	96
+#define main_S352_Conv2d_64x1x3x3_Relu6_OUT_QNORM	12
+#define main_S352_Conv2d_64x1x3x3_Relu6_OUT_ZERO_POINT	0
+// S353_Op_Conv_432_weights
+#define main_S353_Op_Conv_432_weights_OUT_SCALE	0.004688704386353493
+#define main_S353_Op_Conv_432_weights_OUT_QSCALE	77
+#define main_S353_Op_Conv_432_weights_OUT_QNORM	14
+#define main_S353_Op_Conv_432_weights_OUT_ZERO_POINT	128
+// S354_Op_constant__1538
+#define main_S354_Op_constant__1538_OUT_SCALE	0.00011032245614949394
+#define main_S354_Op_constant__1538_OUT_QSCALE	116
+#define main_S354_Op_constant__1538_OUT_QNORM	20
+#define main_S354_Op_constant__1538_OUT_ZERO_POINT	0
+// S355_Conv2d_64x64x1x1_Relu6
+#define main_S355_Conv2d_64x64x1x1_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S355_Conv2d_64x64x1x1_Relu6_OUT_QSCALE	96
+#define main_S355_Conv2d_64x64x1x1_Relu6_OUT_QNORM	12
+#define main_S355_Conv2d_64x64x1x1_Relu6_OUT_ZERO_POINT	0
+// S356_Op_Conv_436_weights
+#define main_S356_Op_Conv_436_weights_OUT_SCALE	0.0034412555396556854
+#define main_S356_Op_Conv_436_weights_OUT_QSCALE	113
+#define main_S356_Op_Conv_436_weights_OUT_QNORM	15
+#define main_S356_Op_Conv_436_weights_OUT_ZERO_POINT	128
+// S357_Op_constant__1541
+#define main_S357_Op_constant__1541_OUT_SCALE	8.097071858013377e-05
+#define main_S357_Op_constant__1541_OUT_QSCALE	85
+#define main_S357_Op_constant__1541_OUT_QNORM	20
+#define main_S357_Op_constant__1541_OUT_ZERO_POINT	0
+// S358_Conv2d_64x1x3x3_Relu6
+#define main_S358_Conv2d_64x1x3x3_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S358_Conv2d_64x1x3x3_Relu6_OUT_QSCALE	96
+#define main_S358_Conv2d_64x1x3x3_Relu6_OUT_QNORM	12
+#define main_S358_Conv2d_64x1x3x3_Relu6_OUT_ZERO_POINT	0
+// S359_Op_Conv_440_weights
+#define main_S359_Op_Conv_440_weights_OUT_SCALE	0.0021420640405267477
+#define main_S359_Op_Conv_440_weights_OUT_QSCALE	70
+#define main_S359_Op_Conv_440_weights_OUT_QNORM	15
+#define main_S359_Op_Conv_440_weights_OUT_ZERO_POINT	128
+// S360_Op_constant__1544
+#define main_S360_Op_constant__1544_OUT_SCALE	5.040150683592347e-05
+#define main_S360_Op_constant__1544_OUT_QSCALE	106
+#define main_S360_Op_constant__1544_OUT_QNORM	21
+#define main_S360_Op_constant__1544_OUT_ZERO_POINT	0
+// S361_Conv2d_64x64x1x1_Relu6
+#define main_S361_Conv2d_64x64x1x1_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S361_Conv2d_64x64x1x1_Relu6_OUT_QSCALE	96
+#define main_S361_Conv2d_64x64x1x1_Relu6_OUT_QNORM	12
+#define main_S361_Conv2d_64x64x1x1_Relu6_OUT_ZERO_POINT	0
+// S362_Op_Conv_444_weights
+#define main_S362_Op_Conv_444_weights_OUT_SCALE	0.0008215048001147807
+#define main_S362_Op_Conv_444_weights_OUT_QSCALE	108
+#define main_S362_Op_Conv_444_weights_OUT_QNORM	17
+#define main_S362_Op_Conv_444_weights_OUT_ZERO_POINT	128
+// S363_Op_constant_head_cls_preds_2_bias
+#define main_S363_Op_constant_head_cls_preds_2_bias_OUT_SCALE	1.9329524708583075e-05
+#define main_S363_Op_constant_head_cls_preds_2_bias_OUT_QSCALE	81
+#define main_S363_Op_constant_head_cls_preds_2_bias_OUT_QNORM	22
+#define main_S363_Op_constant_head_cls_preds_2_bias_OUT_ZERO_POINT	0
+// S364_Conv2d_1x64x1x1_Sigmoid
+#define main_S364_Conv2d_1x64x1x1_Sigmoid_OUT_SCALE	0.00392156862745098
+#define main_S364_Conv2d_1x64x1x1_Sigmoid_OUT_QSCALE	64
+#define main_S364_Conv2d_1x64x1x1_Sigmoid_OUT_QNORM	14
+#define main_S364_Conv2d_1x64x1x1_Sigmoid_OUT_ZERO_POINT	0
+// S365_Op_Concat_465_qin2
+#define main_S365_Op_Concat_465_qin2_OUT_SCALE	0.03395460173487663
+#define main_S365_Op_Concat_465_qin2_OUT_QSCALE	70
+#define main_S365_Op_Concat_465_qin2_OUT_QNORM	11
+#define main_S365_Op_Concat_465_qin2_OUT_ZERO_POINT	103
+// S366_Op_Conv_445_weights
+#define main_S366_Op_Conv_445_weights_OUT_SCALE	0.004421001300215721
+#define main_S366_Op_Conv_445_weights_OUT_QSCALE	72
+#define main_S366_Op_Conv_445_weights_OUT_QNORM	14
+#define main_S366_Op_Conv_445_weights_OUT_ZERO_POINT	128
+// S367_Op_constant__1547
+#define main_S367_Op_constant__1547_OUT_SCALE	0.00010402356000507579
+#define main_S367_Op_constant__1547_OUT_QSCALE	109
+#define main_S367_Op_constant__1547_OUT_QNORM	20
+#define main_S367_Op_constant__1547_OUT_ZERO_POINT	0
+// S368_Conv2d_64x1x3x3_Relu6
+#define main_S368_Conv2d_64x1x3x3_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S368_Conv2d_64x1x3x3_Relu6_OUT_QSCALE	96
+#define main_S368_Conv2d_64x1x3x3_Relu6_OUT_QNORM	12
+#define main_S368_Conv2d_64x1x3x3_Relu6_OUT_ZERO_POINT	0
+// S369_Op_Conv_449_weights
+#define main_S369_Op_Conv_449_weights_OUT_SCALE	0.003960008267313242
+#define main_S369_Op_Conv_449_weights_OUT_QSCALE	65
+#define main_S369_Op_Conv_449_weights_OUT_QNORM	14
+#define main_S369_Op_Conv_449_weights_OUT_ZERO_POINT	128
+// S370_Op_constant__1550
+#define main_S370_Op_constant__1550_OUT_SCALE	9.317666511325275e-05
+#define main_S370_Op_constant__1550_OUT_QSCALE	98
+#define main_S370_Op_constant__1550_OUT_QNORM	20
+#define main_S370_Op_constant__1550_OUT_ZERO_POINT	0
+// S371_Conv2d_64x64x1x1_Relu6
+#define main_S371_Conv2d_64x64x1x1_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S371_Conv2d_64x64x1x1_Relu6_OUT_QSCALE	96
+#define main_S371_Conv2d_64x64x1x1_Relu6_OUT_QNORM	12
+#define main_S371_Conv2d_64x64x1x1_Relu6_OUT_ZERO_POINT	0
+// S372_Op_Conv_453_weights
+#define main_S372_Op_Conv_453_weights_OUT_SCALE	0.004148122388869524
+#define main_S372_Op_Conv_453_weights_OUT_QSCALE	68
+#define main_S372_Op_Conv_453_weights_OUT_QNORM	14
+#define main_S372_Op_Conv_453_weights_OUT_ZERO_POINT	128
+// S373_Op_constant__1553
+#define main_S373_Op_constant__1553_OUT_SCALE	9.760287973810645e-05
+#define main_S373_Op_constant__1553_OUT_QSCALE	102
+#define main_S373_Op_constant__1553_OUT_QNORM	20
+#define main_S373_Op_constant__1553_OUT_ZERO_POINT	0
+// S374_Conv2d_64x1x3x3_Relu6
+#define main_S374_Conv2d_64x1x3x3_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S374_Conv2d_64x1x3x3_Relu6_OUT_QSCALE	96
+#define main_S374_Conv2d_64x1x3x3_Relu6_OUT_QNORM	12
+#define main_S374_Conv2d_64x1x3x3_Relu6_OUT_ZERO_POINT	0
+// S375_Op_Conv_457_weights
+#define main_S375_Op_Conv_457_weights_OUT_SCALE	0.0019618577789515257
+#define main_S375_Op_Conv_457_weights_OUT_QSCALE	64
+#define main_S375_Op_Conv_457_weights_OUT_QNORM	15
+#define main_S375_Op_Conv_457_weights_OUT_ZERO_POINT	128
+// S376_Op_constant__1556
+#define main_S376_Op_constant__1556_OUT_SCALE	4.616135950474178e-05
+#define main_S376_Op_constant__1556_OUT_QSCALE	97
+#define main_S376_Op_constant__1556_OUT_QNORM	21
+#define main_S376_Op_constant__1556_OUT_ZERO_POINT	0
+// S377_Conv2d_64x64x1x1_Relu6
+#define main_S377_Conv2d_64x64x1x1_Relu6_OUT_SCALE	0.023529411764705882
+#define main_S377_Conv2d_64x64x1x1_Relu6_OUT_QSCALE	96
+#define main_S377_Conv2d_64x64x1x1_Relu6_OUT_QNORM	12
+#define main_S377_Conv2d_64x64x1x1_Relu6_OUT_ZERO_POINT	0
+// S378_Op_Conv_461_weights
+#define main_S378_Op_Conv_461_weights_OUT_SCALE	0.0044964635744690895
+#define main_S378_Op_Conv_461_weights_OUT_QSCALE	74
+#define main_S378_Op_Conv_461_weights_OUT_QNORM	14
+#define main_S378_Op_Conv_461_weights_OUT_ZERO_POINT	128
+// S379_Op_constant_head_reg_preds_2_bias
+#define main_S379_Op_constant_head_reg_preds_2_bias_OUT_SCALE	0.00010579914292868445
+#define main_S379_Op_constant_head_reg_preds_2_bias_OUT_QSCALE	111
+#define main_S379_Op_constant_head_reg_preds_2_bias_OUT_QNORM	20
+#define main_S379_Op_constant_head_reg_preds_2_bias_OUT_ZERO_POINT	0
+// S380_Conv2d_4x64x1x1
+#define main_S380_Conv2d_4x64x1x1_OUT_SCALE	0.03395460173487663
+#define main_S380_Conv2d_4x64x1x1_OUT_QSCALE	70
+#define main_S380_Conv2d_4x64x1x1_OUT_QNORM	11
+#define main_S380_Conv2d_4x64x1x1_OUT_ZERO_POINT	103
+// S381_Op_Conv_462_weights
+#define main_S381_Op_Conv_462_weights_OUT_SCALE	0.006680069025605917
+#define main_S381_Op_Conv_462_weights_OUT_QSCALE	109
+#define main_S381_Op_Conv_462_weights_OUT_QNORM	14
+#define main_S381_Op_Conv_462_weights_OUT_ZERO_POINT	128
+// S382_Op_constant_head_obj_preds_2_bias
+#define main_S382_Op_constant_head_obj_preds_2_bias_OUT_SCALE	0.0001571780947201392
+#define main_S382_Op_constant_head_obj_preds_2_bias_OUT_QSCALE	82
+#define main_S382_Op_constant_head_obj_preds_2_bias_OUT_QNORM	19
+#define main_S382_Op_constant_head_obj_preds_2_bias_OUT_ZERO_POINT	0
+// S383_Conv2d_1x64x1x1_Sigmoid
+#define main_S383_Conv2d_1x64x1x1_Sigmoid_OUT_SCALE	0.00392156862745098
+#define main_S383_Conv2d_1x64x1x1_Sigmoid_OUT_QSCALE	64
+#define main_S383_Conv2d_1x64x1x1_Sigmoid_OUT_QNORM	14
+#define main_S383_Conv2d_1x64x1x1_Sigmoid_OUT_ZERO_POINT	0
+// S384_Op_Concat_465_qin1
+#define main_S384_Op_Concat_465_qin1_OUT_SCALE	0.03395460173487663
+#define main_S384_Op_Concat_465_qin1_OUT_QSCALE	70
+#define main_S384_Op_Concat_465_qin1_OUT_QNORM	11
+#define main_S384_Op_Concat_465_qin1_OUT_ZERO_POINT	103
+// S385_Concat
+#define main_S385_Concat_OUT_SCALE	0.03395460173487663
+#define main_S385_Concat_OUT_QSCALE	70
+#define main_S385_Concat_OUT_QNORM	11
+#define main_S385_Concat_OUT_ZERO_POINT	103
+// S387_Concat
+#define main_S387_Concat_OUT_SCALE	0.03395460173487663
+#define main_S387_Concat_OUT_QSCALE	70
+#define main_S387_Concat_OUT_QNORM	11
+#define main_S387_Concat_OUT_ZERO_POINT	103
+// S388_Op_output_1_qin0
+#define main_S388_Op_output_1_qin0_OUT_SCALE	1.0
+#define main_S388_Op_output_1_qin0_OUT_QSCALE	64
+#define main_S388_Op_output_1_qin0_OUT_QNORM	6
+#define main_S388_Op_output_1_qin0_OUT_ZERO_POINT	0
+// Output_1
+#define main_Output_1_OUT_SCALE	1.0
+#define main_Output_1_OUT_QSCALE	64
+#define main_Output_1_OUT_QNORM	6
+#define main_Output_1_OUT_ZERO_POINT	0
+#endif //MAIN_GRAPHINFO_H
