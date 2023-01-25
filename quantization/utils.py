@@ -107,8 +107,8 @@ class CostomCOCODaset():
         img = img.astype(np.uint16)
         output = np.zeros((img.shape[0] // 2, img.shape[1] // 2, input_channels), dtype=np.int16) 
         output[:, :, 0] =  img[1::2,  ::2, 0]
-        output[:, :, 1] = (img[ ::2,  ::2, 1] + img[1::2, 1::2, 1]) / 2 
-        output[:, :, 2] =  img[ ::2, 1::2, 2]
+        output[:, :, 1] = (img[ ::2,  ::2, 0] + img[1::2, 1::2, 0]) / 2 
+        output[:, :, 2] =  img[ ::2, 1::2, 0]
         output = output.astype(np.uint8)
         output = output.transpose(swap)
         return output 
