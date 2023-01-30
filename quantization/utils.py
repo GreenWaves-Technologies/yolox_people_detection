@@ -99,9 +99,9 @@ class CostomCOCODaset():
 
         # get correct size 
         if h > input_size[0]: 
-            img = img[:input_size[0], :, :]
+            img = img[:2 * input_size[0], :, :]
         if w > input_size[1]: 
-            img = img[:, :input_size[1], :] 
+            img = img[:, :2 * input_size[1], :] 
 
         # reszie by demosaicing
         img = img.astype(np.uint16)
