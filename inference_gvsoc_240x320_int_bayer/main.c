@@ -9,7 +9,6 @@
  */
 
 
-
 /* Autotiler includes. */
 #include "main.h"
 #include "mainKernels.h"
@@ -19,7 +18,6 @@
 #include "decoding.h"
 #include "postprocessing.h"
 #include "draw.h"
-
 
 #if SILENT
 #define PRINTF(...) ((void) 0)
@@ -57,14 +55,13 @@ AT_DEFAULTFLASH_EXT_ADDR_TYPE main_L3_Flash = 0;
 /* Outputs */
 L2_MEM float Output_1[9480];
 
-
 /* Copy inputs function */
 void copy_inputs() {
     int status;
-
 #ifdef CI
     /* ------------------- reading data for test ----------------------*/
-    printf("\n\t\t*** READING TEST INPUT ***\n");
+
+    PRINTF("\n\t\t*** READING TEST INPUT ***\n");
     status = ReadImageFromFile(
         "../../../test_data/input.pgm",
         W_INP, 
@@ -76,7 +73,7 @@ void copy_inputs() {
         0
     );
 
-#else
+#endif 
 
     PRINTF("\n\t\t*** READING INPUT FROM PPM FILE ***\n");
     PRINTF("Number of input channels: %d\n", CHANNELS);
@@ -91,15 +88,13 @@ void copy_inputs() {
         0 // transpose from HWC to CHW 
     );
 
-#endif
-
     if (status != 0) {
-        printf("Error reading image from file %s (error: %d) \n", STR(INPUT_FILE_NAME), status);
+        PRINTF("Error reading image from file %s (error: %d) \n", STR(INPUT_FILE_NAME), status);
         exit(-1);
     } 
 
-
 }
+
 
 void ci_output_test(float * model_output, char * GT_file_name, float * GT_buffer){
 
@@ -122,16 +117,13 @@ void ci_output_test(float * model_output, char * GT_file_name, float * GT_buffer
     }
 
     if (diff > 0.01){
-        printf("CI test failed, the difference between the model output and the ground truth is %f\n", diff);
+        PRINTF("CI test failed, the difference between the model output and the ground truth is %f\n", diff);
         exit(-1);
     }
     else{
-        printf("CI test passed, the difference between the model output and the ground truth is %f\n", diff);
+        PRINTF("CI test passed, the difference between the model output and the ground truth is %f\n", diff);
     }
-
-
 }
-
 
 
 
@@ -139,8 +131,7 @@ void ci_output_test(float * model_output, char * GT_file_name, float * GT_buffer
 void write_outputs() {
 
 #ifdef CI
-
-    printf("\t\t***Start CI output test***\n");
+    PRINTF("\t\t***Start CI output test***\n");
     char GT_file[] = "../../../test_data/gt_boxes.bin";
     ci_output_test(Output_1, GT_file, (float *) main_L2_Memory_Dyn);
 
@@ -176,8 +167,6 @@ static void cluster()
 
     mainCNN(Output_1);
 }
-
-
 static int open_camera(struct pi_device *device)
 {
     PRINTF("Opening CSI2 camera\n");
@@ -221,8 +210,6 @@ void send_image_to_uart(pi_device_t* uart_dev,uint8_t* img,int img_w,int img_h,i
     //Write Image row by row
     for(int i=0;i<img_h;i++) pi_uart_write(uart_dev,&(img[i*img_w*pixel_size]),img_w*pixel_size);
 }
-
-
 int test_main(void)
 {
     PRINTF("Entering main controller\n");
@@ -244,7 +231,7 @@ int test_main(void)
     pi_open_from_conf(&cluster_dev, (void *) &cl_conf);
     if (pi_cluster_open(&cluster_dev))
     {
-        printf("Cluster open failed !\n");
+        PRINTF("Cluster open failed !\n");
         pmsis_exit(-4);
     }
 
@@ -254,19 +241,20 @@ int test_main(void)
     int cur_pe_freq = pi_freq_set(PI_FREQ_DOMAIN_PERIPH, FREQ_PE*1000*1000);
     if (cur_fc_freq == -1 || cur_cl_freq == -1 || cur_pe_freq == -1)
     {
-        printf("Error changing frequency !\nTest failed...\n");
+        PRINTF("Error changing frequency !\nTest failed...\n");
         pmsis_exit(-4);
     }
 	PRINTF("FC Frequency as %d Hz, CL Frequency = %d Hz, PERIIPH Frequency = %d Hz\n", 
             pi_freq_get(PI_FREQ_DOMAIN_FC), pi_freq_get(PI_FREQ_DOMAIN_CL), pi_freq_get(PI_FREQ_DOMAIN_PERIPH));
 
+    
 
     // IMPORTANT - MUST BE CALLED AFTER THE CLUSTER IS SWITCHED ON!!!!
     PRINTF("Constructor\n");
     int ConstructorErr = mainCNN_Construct();
     if (ConstructorErr)
     {
-        printf("Graph constructor exited with error: %d\n(check the generated file mainKernels.c to see which memory have failed to be allocated)\n", ConstructorErr);
+        PRINTF("Graph constructor exited with error: %d\n(check the generated file mainKernels.c to see which memory have failed to be allocated)\n", ConstructorErr);
         pmsis_exit(-6);
     }
     
@@ -315,7 +303,6 @@ int test_main(void)
                 cam_image[i * W_CAM + j] = (cam_image[(i * W_CAM + j) *2 +1] << 6) | (cam_image[(i * W_CAM + j) *2] >> 2);
             }
         }
-
     #endif
 
 
@@ -328,7 +315,7 @@ int test_main(void)
     /* ------ SLICING ------*/
     PRINTF("\t\t***Start slicing***\n");
     slicing_cycles = gap_fc_readhwtimer();
-    
+
     #ifdef DEMO
     slicing_hwc_channel(
         cam_image, 

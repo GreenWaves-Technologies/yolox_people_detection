@@ -48,8 +48,9 @@ READFS_FILES=$(abspath $(MODEL_TENSORS))
 
 
 # Application modes:
-#  - CI       Compare newtwork outputs with expected results on test samples
-#  - DEMO     Run the network on a .ppm image and save the output in a .ppm file with drawn boxes 
+#  - CI        Compare newtwork outputs with expected results on test samples
+#  - DEMO      Run the network on a .ppm image and save the output in a .ppm file with drawn boxes 
+#  - INFERENCE Run in Inference on static image  
 
 mode?=CI
 ifeq (,$(filter $(mode), CI DEMO INFERENCE))
