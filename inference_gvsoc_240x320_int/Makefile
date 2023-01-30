@@ -52,10 +52,18 @@ READFS_FILES=$(abspath $(MODEL_TENSORS))
 #  - DEMO     Run the network on a .ppm image and save the output in a .ppm file with drawn boxes 
 
 mode?=CI
-ifeq (,$(filter $(mode), CI DEMO))
+ifeq (,$(filter $(mode), CI DEMO INFERENCE))
     $(error Invalid mode $(mode))
 endif
 APP_CFLAGS += -D$(mode) 
+
+#uncomment this line to hide printfs
+ifeq '$(mode)' 'DEMO'
+  APP_CFLAGS += -DSILENT=1
+else ifeq '$(mode)' 'INFERENCE'
+    APP_CLFAGS += -DPERF
+endif
+
 
 
 # build depends on the model

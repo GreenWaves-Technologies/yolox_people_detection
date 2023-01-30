@@ -19,6 +19,12 @@
 #include "postprocessing.h"
 #include "draw.h"
 
+#if SILENT
+#define PRINTF(...) ((void) 0)
+#else
+#define PRINTF printf
+#endif
+
 // parameters needed for decoding layer
 // !!! do not forget to change the stride sizes accordint to the input size !!!  
 tTuple feature_maps[STRIDE_SIZE] = {{30.0, 40.0}, {15.0, 20.0}, {8.0, 10.0}};
@@ -54,7 +60,8 @@ void copy_inputs() {
     int status;
 #ifdef CI
     /* ------------------- reading data for test ----------------------*/
-    printf("\n\t\t*** READING TEST INPUT ***\n");
+
+    PRINTF("\n\t\t*** READING TEST INPUT ***\n");
     status = ReadImageFromFile(
         "../../../test_data/input.ppm",
         W_INP, 
@@ -68,7 +75,7 @@ void copy_inputs() {
 
 #endif 
 
-    printf("\n\t\t*** READING INPUT FROM PPM FILE ***\n");
+    PRINTF("\n\t\t*** READING INPUT FROM PPM FILE ***\n");
     status = ReadImageFromFile(
         STR(INPUT_FILE_NAME),
         W_INP, 
@@ -81,7 +88,7 @@ void copy_inputs() {
     );
 
     if (status != 0) {
-        printf("Error reading image from file %s (error: %d) \n", STR(INPUT_FILE_NAME), status);
+        PRINTF("Error reading image from file %s (error: %d) \n", STR(INPUT_FILE_NAME), status);
         exit(-1);
     } 
 
@@ -109,11 +116,11 @@ void ci_output_test(float * model_output, char * GT_file_name, float * GT_buffer
     }
 
     if (diff > 0.01){
-        printf("CI test failed, the difference between the model output and the ground truth is %f\n", diff);
+        PRINTF("CI test failed, the difference between the model output and the ground truth is %f\n", diff);
         exit(-1);
     }
     else{
-        printf("CI test passed, the difference between the model output and the ground truth is %f\n", diff);
+        PRINTF("CI test passed, the difference between the model output and the ground truth is %f\n", diff);
     }
 }
 
@@ -123,13 +130,13 @@ void ci_output_test(float * model_output, char * GT_file_name, float * GT_buffer
 void write_outputs() {
 
 #ifdef CI
-    printf("\t\t***Start CI output test***\n");
+    PRINTF("\t\t***Start CI output test***\n");
     char GT_file[] = "../../../test_data/gt_boxes.bin";
     ci_output_test(Output_1, GT_file, (float *) main_L2_Memory_Dyn);
 
 #else
     /* ------ SAVE ------*/
-    printf("\t\t***Start saving output***\n");
+    PRINTF("\t\t***Start saving output***\n");
 
     switch_fs_t fs;
     __FS_INIT(fs);
@@ -151,7 +158,7 @@ void write_outputs() {
 static void cluster()
 {
     #ifdef PERF
-    printf("\t\t***Start CLUSTER timer***\n");
+    PRINTF("\t\t***Start CLUSTER timer***\n");
     gap_cl_starttimer();
     gap_cl_resethwtimer();
     #endif
@@ -161,7 +168,7 @@ static void cluster()
 
 int test_main(void)
 {
-    printf("Entering main controller\n");
+    PRINTF("Entering main controller\n");
 
     /* Configure And open cluster. */
     struct pi_device cluster_dev;
@@ -180,7 +187,7 @@ int test_main(void)
     pi_open_from_conf(&cluster_dev, (void *) &cl_conf);
     if (pi_cluster_open(&cluster_dev))
     {
-        printf("Cluster open failed !\n");
+        PRINTF("Cluster open failed !\n");
         pmsis_exit(-4);
     }
 
@@ -190,20 +197,20 @@ int test_main(void)
     int cur_pe_freq = pi_freq_set(PI_FREQ_DOMAIN_PERIPH, FREQ_PE*1000*1000);
     if (cur_fc_freq == -1 || cur_cl_freq == -1 || cur_pe_freq == -1)
     {
-        printf("Error changing frequency !\nTest failed...\n");
+        PRINTF("Error changing frequency !\nTest failed...\n");
         pmsis_exit(-4);
     }
-	printf("FC Frequency as %d Hz, CL Frequency = %d Hz, PERIIPH Frequency = %d Hz\n", 
+	PRINTF("FC Frequency as %d Hz, CL Frequency = %d Hz, PERIIPH Frequency = %d Hz\n", 
             pi_freq_get(PI_FREQ_DOMAIN_FC), pi_freq_get(PI_FREQ_DOMAIN_CL), pi_freq_get(PI_FREQ_DOMAIN_PERIPH));
 
     
 
     // IMPORTANT - MUST BE CALLED AFTER THE CLUSTER IS SWITCHED ON!!!!
-    printf("Constructor\n");
+    PRINTF("Constructor\n");
     int ConstructorErr = mainCNN_Construct();
     if (ConstructorErr)
     {
-        printf("Graph constructor exited with error: %d\n(check the generated file mainKernels.c to see which memory have failed to be allocated)\n", ConstructorErr);
+        PRINTF("Graph constructor exited with error: %d\n(check the generated file mainKernels.c to see which memory have failed to be allocated)\n", ConstructorErr);
         pmsis_exit(-6);
     }
     
@@ -214,13 +221,13 @@ int test_main(void)
     copy_inputs();
 
     #ifdef PERF
-    printf("\t\t***Start FC timer***\n");
+    PRINTF("\t\t***Start FC timer***\n");
     gap_fc_starttimer();
     gap_fc_resethwtimer();
     #endif
 
     /* ------ SLICING ------*/
-    printf("\t\t***Start slicing***\n");
+    PRINTF("\t\t***Start slicing***\n");
     slicing_cycles = gap_fc_readhwtimer();
     slicing_hwc_channel(
         main_L2_Memory_Dyn + (H_INP * W_INP * CHANNELS), 
@@ -233,14 +240,14 @@ int test_main(void)
 
 
     /* ------ INFERENCE ------*/
-    printf("\t\t***Call CLUSTER***\n");
+    PRINTF("\t\t***Call CLUSTER***\n");
     struct pi_cluster_task task;
     pi_cluster_task(&task, (void (*)(void *))cluster, NULL);
     pi_cluster_task_stacks(&task, NULL, SLAVE_STACK_SIZE);
     pi_cluster_send_task_to_cl(&cluster_dev, &task);
 
     /* ------ DECODING ------*/
-    printf("\t\t***Start decoding***\n");
+    PRINTF("\t\t***Start decoding***\n");
     decoding_cycles = gap_fc_readhwtimer();
     decoding(
         Output_1,
@@ -253,13 +260,13 @@ int test_main(void)
 
     /* ------ POST PROCESSING ------*/
     /* ------ xywh2xyxy ------*/
-    printf("\t\t***Start xywh2xyxy***\n");
+    PRINTF("\t\t***Start xywh2xyxy***\n");
     xywh2xyxy_cycles = gap_fc_readhwtimer();
     xywh2xyxy(Output_1, (int) (RAWS));
     xywh2xyxy_cycles = gap_fc_readhwtimer() - xywh2xyxy_cycles;
 
     /* ------ filter boxes ------*/
-    printf("\t\t***Start filter boxes ***\n");
+    PRINTF("\t\t***Start filter boxes ***\n");
     //cast model_L2_Memory_Dyn to float16
     float * main_L2_Memory_Dyn_casted = (float *) main_L2_Memory_Dyn;
     *num_val_boxes = 0;
@@ -274,7 +281,7 @@ int test_main(void)
     filter_boxes_cycles = gap_fc_readhwtimer() - filter_boxes_cycles;
 
     /* ------ conver boxes ------*/
-    printf("\t\t***Start conver boxes ***\n");
+    PRINTF("\t\t***Start conver boxes ***\n");
     bbox_cycles = gap_fc_readhwtimer();
     to_bboxes(
         (main_L2_Memory_Dyn_casted + (RAWS * 6)), 
@@ -284,7 +291,7 @@ int test_main(void)
     bbox_cycles = gap_fc_readhwtimer() - bbox_cycles;
     
     /* ------ nms ------*/
-    printf("\t\t***Start nms ***\n");
+    PRINTF("\t\t***Start nms ***\n");
     final_valid_boxes = 0;
     nms_cycles = gap_fc_readhwtimer();
     nms(
@@ -298,7 +305,7 @@ int test_main(void)
 
     #ifdef DEMO
         /* ------ DRAW REATANGLES ------*/
-        printf("\t\t***Start draw reactangles ***\n");
+        PRINTF("\t\t***Start draw reactangles ***\n");
         draw_boxes(
             main_L2_Memory_Dyn_casted,
             Output_1,
@@ -307,7 +314,7 @@ int test_main(void)
     #endif
 
     /* ------ END ------*/
-    printf("\t\t***Runner completed***\n");
+    PRINTF("\t\t***Runner completed***\n");
 
     write_outputs();
 
@@ -346,13 +353,13 @@ int test_main(void)
     }
 #endif
 
-    printf("Ended\n");
+    PRINTF("Ended\n");
     pmsis_exit(0);
     return 0;
 }
 
 int main(int argc, char *argv[])
 {
-    printf("\n\n\t *** NNTOOL main Example ***\n\n");
+    PRINTF("\n\n\t *** NNTOOL main Example ***\n\n");
     return test_main();
 }
