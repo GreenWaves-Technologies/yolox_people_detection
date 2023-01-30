@@ -10,6 +10,10 @@
 #define STACK_SIZE      1024
 #endif
 
+// CI test parameters
+#define OUTPUT_BOX_SIZE 7 
+#define CI_TEST_BOX_NUM 11 
+
 // parameters needed for slicing layer
 #define H_INP 240
 #define W_INP 320
@@ -27,7 +31,7 @@
 #define RAWS 1580
 
 // parameters needed for postprocessing layer
-#define CONF_THRESH 0.45
+#define CONF_THRESH 0.01
 
 // parameters needed for function to_boxes
 #define top_k_boxes 400 

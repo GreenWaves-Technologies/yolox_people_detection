@@ -123,14 +123,14 @@ void ci_output_test(float * model_output, char * GT_file_name, float * GT_buffer
 
     // here 11 is the number of boxes and 7 is the number of parameters for each box
     // the numbers are hard coded here since we know this number ahead 
-    ret_GT = __READ(File_GT, GT_buffer, 11 * 7 * sizeof(float));
+    ret_GT = __READ(File_GT, GT_buffer, CI_TEST_BOX_NUM * OUTPUT_BOX_SIZE * sizeof(float));
 
     __CLOSE(File_GT);
     __FS_DEINIT(fs);
 
     //check the difference between the model output and the ground truth
     float diff = 0;
-    for (int i = 0; i < 11 * 7; i++){
+    for (int i = 0; i < CI_TEST_BOX_NUM * OUTPUT_BOX_SIZE; i++){
         diff += Abs(model_output[i] - GT_buffer[i]);
     }
 
