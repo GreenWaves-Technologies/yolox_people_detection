@@ -19,10 +19,6 @@
 #include "postprocessing.h"
 #include "draw.h"
 
-#ifdef __EMUL__
-#define pmsis_exit(n) exit(n)
-#endif
-
 // parameters needed for decoding layer
 // !!! do not forget to change the stride sizes accordint to the input size !!!  
 tTuple feature_maps[STRIDE_SIZE] = {{30.0, 40.0}, {15.0, 20.0}, {8.0, 10.0}};
@@ -58,11 +54,6 @@ void copy_inputs() {
     int status;
 #ifdef CI
     /* ------------------- reading data for test ----------------------*/
-    if (CONF_THRESH > 0.01){
-        printf("CONF_THRESH = %f is larger than shoud be for CI test,\
-                please set it to 0.01 and run again", CONF_THRESH);
-    }
-
     printf("\n\t\t*** READING TEST INPUT ***\n");
     status = ReadImageFromFile(
         "../../../test_data/input.ppm",
@@ -106,9 +97,6 @@ void ci_output_test(float * model_output, char * GT_file_name, float * GT_buffer
     int ret_GT = 0;
 
     File_GT = __OPEN_READ(fs, GT_file_name);
-
-    // here 3 is the number of boxes and 7 is the number of parameters for each box
-    // the numbers are hard coded here since we know this number ahead 
     ret_GT = __READ(File_GT, GT_buffer, CI_TEST_BOX_NUM * OUTPUT_BOX_SIZE * sizeof(float));
 
     __CLOSE(File_GT);
@@ -175,7 +163,6 @@ int test_main(void)
 {
     printf("Entering main controller\n");
 
-#ifndef __EMUL__
     /* Configure And open cluster. */
     struct pi_device cluster_dev;
     struct pi_cluster_conf cl_conf;
@@ -209,7 +196,6 @@ int test_main(void)
 	printf("FC Frequency as %d Hz, CL Frequency = %d Hz, PERIIPH Frequency = %d Hz\n", 
             pi_freq_get(PI_FREQ_DOMAIN_FC), pi_freq_get(PI_FREQ_DOMAIN_CL), pi_freq_get(PI_FREQ_DOMAIN_PERIPH));
 
-#endif
     
 
     // IMPORTANT - MUST BE CALLED AFTER THE CLUSTER IS SWITCHED ON!!!!
@@ -248,16 +234,10 @@ int test_main(void)
 
     /* ------ INFERENCE ------*/
     printf("\t\t***Call CLUSTER***\n");
-#ifndef __EMUL__
     struct pi_cluster_task task;
     pi_cluster_task(&task, (void (*)(void *))cluster, NULL);
     pi_cluster_task_stacks(&task, NULL, SLAVE_STACK_SIZE);
-
     pi_cluster_send_task_to_cl(&cluster_dev, &task);
-#else
-    cluster();
-#endif
-
 
     /* ------ DECODING ------*/
     printf("\t\t***Start decoding***\n");
@@ -334,7 +314,6 @@ int test_main(void)
     mainCNN_Destruct();
 
 #ifdef PERF
-// #ifndef PERF
     {
       unsigned int TotalCycles = 0, TotalOper = 0;
       printf("\n");
@@ -375,10 +354,5 @@ int test_main(void)
 int main(int argc, char *argv[])
 {
     printf("\n\n\t *** NNTOOL main Example ***\n\n");
-    #ifdef __EMUL__
-    test_main();
-    #else
-    return pmsis_kickoff((void *) test_main);
-    #endif
-    return 0;
+    return test_main();
 }

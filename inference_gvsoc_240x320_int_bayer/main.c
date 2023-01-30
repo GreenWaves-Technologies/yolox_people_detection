@@ -20,9 +20,6 @@
 #include "postprocessing.h"
 #include "draw.h"
 
-#ifdef __EMUL__
-#define pmsis_exit(n) exit(n)
-#endif
 
 #if SILENT
 #define PRINTF(...) ((void) 0)
@@ -67,13 +64,6 @@ void copy_inputs() {
 
 #ifdef CI
     /* ------------------- reading data for test ----------------------*/
-    if (CONF_THRESH > 0.01){
-        printf("CONF_THRESH = %f is larger than shoud be for CI test,\
-                please set it to 0.01 and run again", CONF_THRESH);
-        exit(-1);
-    }
-
-
     printf("\n\t\t*** READING TEST INPUT ***\n");
     status = ReadImageFromFile(
         "../../../test_data/input.pgm",
@@ -120,9 +110,6 @@ void ci_output_test(float * model_output, char * GT_file_name, float * GT_buffer
     int ret_GT = 0;
 
     File_GT = __OPEN_READ(fs, GT_file_name);
-
-    // here 11 is the number of boxes and 7 is the number of parameters for each box
-    // the numbers are hard coded here since we know this number ahead 
     ret_GT = __READ(File_GT, GT_buffer, CI_TEST_BOX_NUM * OUTPUT_BOX_SIZE * sizeof(float));
 
     __CLOSE(File_GT);
@@ -240,7 +227,6 @@ int test_main(void)
 {
     PRINTF("Entering main controller\n");
 
-#ifndef __EMUL__
     /* Configure And open cluster. */
     struct pi_device cluster_dev;
     struct pi_cluster_conf cl_conf;
@@ -274,8 +260,6 @@ int test_main(void)
 	PRINTF("FC Frequency as %d Hz, CL Frequency = %d Hz, PERIIPH Frequency = %d Hz\n", 
             pi_freq_get(PI_FREQ_DOMAIN_FC), pi_freq_get(PI_FREQ_DOMAIN_CL), pi_freq_get(PI_FREQ_DOMAIN_PERIPH));
 
-#endif
-    
 
     // IMPORTANT - MUST BE CALLED AFTER THE CLUSTER IS SWITCHED ON!!!!
     PRINTF("Constructor\n");
@@ -286,11 +270,9 @@ int test_main(void)
         pmsis_exit(-6);
     }
     
-    #ifndef __EMUL__
     struct pi_cluster_task task;
     pi_cluster_task(&task, (void (*)(void *))cluster, NULL);
     pi_cluster_task_stacks(&task, NULL, SLAVE_STACK_SIZE);
-    #endif
 
     /*
      * Put here Your input settings
@@ -370,12 +352,7 @@ int test_main(void)
 
     /* ------ INFERENCE ------*/
     PRINTF("\t\t***Call CLUSTER***\n");
-#ifndef __EMUL__
     pi_cluster_send_task_to_cl(&cluster_dev, &task);
-#else
-    cluster();
-#endif
-
 
     /* ------ DECODING ------*/
     PRINTF("\t\t***Start decoding***\n");
