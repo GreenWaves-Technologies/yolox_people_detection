@@ -36,7 +36,8 @@ def make_parser():
     )
     parser.add_argument(
         "--input_size", 
-        type=tuple, 
+        type=int, 
+        nargs='+',
         default=(240,320), 
         help="input size"
     )
@@ -82,7 +83,7 @@ def main():
         image_folder     = args.coco_path,
         annotations      = annotations,
         max_size         = args.quant_dataset_size,
-        input_size       = args.input_size,
+        input_size       = tuple(args.input_size),
         transpose_to_chw = True,
         input_channels   = args.input_channels,
     )
@@ -153,17 +154,22 @@ def main():
     graph[0].allocate = 1
     res = graph.execute_on_target(
         pmsis_os='freertos',
-        directory="./GVSOC_INFERENCE_TEMPLATE",
+        directory="./GVSOC_INFERENCE_TEMPLATE_NEW_DEFFLASH",
         pretty=True,
         input_tensors=[qout[0][0]],
         output_tensors=6,
         dont_run=False,
         do_clean=False,
-        cmake=False,
+        cmake=True,
+        at_loglevel=1, 
+        platform = "gvsoc", # 'board'
         settings={
             'l1_size': 128000,
             'l2_size': 1000000,
             'tensor_directory': './weights_tensors',
+            "l3_ram_device": "AT_MEM_L3_DEFAULTRAM",
+            # "l3_flash_device": "AT_MEM_L3_MRAMFLASH",
+            "l3_flash_device":  "AT_MEM_L3_DEFAULTFLASH",
         }
     ) 
     logger.info("Finished generating GVSOC inference tamplete !!!")

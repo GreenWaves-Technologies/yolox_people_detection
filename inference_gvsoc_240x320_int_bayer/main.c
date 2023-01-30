@@ -9,7 +9,6 @@
  */
 
 
-
 /* Autotiler includes. */
 #include "main.h"
 #include "mainKernels.h"
@@ -20,10 +19,6 @@
 #include "postprocessing.h"
 #include "draw.h"
 
-#ifdef __EMUL__
-#define pmsis_exit(n) exit(n)
-#endif
-
 #if SILENT
 #define PRINTF(...) ((void) 0)
 #else
@@ -32,8 +27,8 @@
 
 // parameters needed for decoding layer
 // !!! do not forget to change the stride sizes accordint to the input size !!!  
-tTuple feature_maps[STACK_SIZE] = {{30.0, 40.0}, {15.0, 20.0}, {8.0, 10.0}};
-float strides[STACK_SIZE] = {8.0, 16.0, 32.0};
+tTuple feature_maps[STRIDE_SIZE] = {{30.0, 40.0}, {15.0, 20.0}, {8.0, 10.0}};
+float strides[STRIDE_SIZE] = {8.0, 16.0, 32.0};
 
 // parameters needed for postprocessing layer
 unsigned int * num_val_boxes;
@@ -62,10 +57,27 @@ L2_MEM float Output_1[9480];
 
 /* Copy inputs function */
 void copy_inputs() {
+    int status;
+#ifdef CI
+    /* ------------------- reading data for test ----------------------*/
+
+    PRINTF("\n\t\t*** READING TEST INPUT ***\n");
+    status = ReadImageFromFile(
+        "../../../test_data/input.pgm",
+        W_INP, 
+        H_INP, 
+        CHANNELS, 
+        main_L2_Memory_Dyn + (H_INP * W_INP * CHANNELS),
+        W_INP * H_INP * CHANNELS * sizeof(char), 
+        IMGIO_OUTPUT_CHAR,
+        0
+    );
+
+#endif 
 
     PRINTF("\n\t\t*** READING INPUT FROM PPM FILE ***\n");
     PRINTF("Number of input channels: %d\n", CHANNELS);
-    int status = ReadImageFromFile(
+    status = ReadImageFromFile(
         STR(INPUT_FILE_NAME),
         W_INP, 
         H_INP, 
@@ -76,18 +88,54 @@ void copy_inputs() {
         0 // transpose from HWC to CHW 
     );
 
-
     if (status != 0) {
-        printf("Error reading image from file %s (error: %d) \n", STR(INPUT_FILE_NAME), status);
+        PRINTF("Error reading image from file %s (error: %d) \n", STR(INPUT_FILE_NAME), status);
         exit(-1);
     } 
 
 }
 
+
+void ci_output_test(float * model_output, char * GT_file_name, float * GT_buffer){
+
+    switch_fs_t fs;
+    __FS_INIT(fs); 
+
+    void *File_GT;
+    int ret_GT = 0;
+
+    File_GT = __OPEN_READ(fs, GT_file_name);
+    ret_GT = __READ(File_GT, GT_buffer, CI_TEST_BOX_NUM * OUTPUT_BOX_SIZE * sizeof(float));
+
+    __CLOSE(File_GT);
+    __FS_DEINIT(fs);
+
+    //check the difference between the model output and the ground truth
+    float diff = 0;
+    for (int i = 0; i < CI_TEST_BOX_NUM * OUTPUT_BOX_SIZE; i++){
+        diff += Abs(model_output[i] - GT_buffer[i]);
+    }
+
+    if (diff > 0.01){
+        PRINTF("CI test failed, the difference between the model output and the ground truth is %f\n", diff);
+        exit(-1);
+    }
+    else{
+        PRINTF("CI test passed, the difference between the model output and the ground truth is %f\n", diff);
+    }
+}
+
+
+
 /* Copy inputs function */
 void write_outputs() {
 
+#ifdef CI
+    PRINTF("\t\t***Start CI output test***\n");
+    char GT_file[] = "../../../test_data/gt_boxes.bin";
+    ci_output_test(Output_1, GT_file, (float *) main_L2_Memory_Dyn);
 
+#else
     /* ------ SAVE ------*/
     PRINTF("\t\t***Start saving output***\n");
 
@@ -97,11 +145,14 @@ void write_outputs() {
     void *File_Output_1;
     int ret_Output_1 = 0;
 
+    printf("final_valid_boxes = %d \n", final_valid_boxes);
     File_Output_1 = __OPEN_WRITE(fs, STR(OUTPUT_BIN_FILE_NAME));
     ret_Output_1 = __WRITE(File_Output_1, Output_1, final_valid_boxes * 7 * sizeof(float));
 
     __CLOSE(File_Output_1);
     __FS_DEINIT(fs);
+
+#endif
 
 }
 
@@ -116,8 +167,6 @@ static void cluster()
 
     mainCNN(Output_1);
 }
-
-
 static int open_camera(struct pi_device *device)
 {
     PRINTF("Opening CSI2 camera\n");
@@ -161,13 +210,10 @@ void send_image_to_uart(pi_device_t* uart_dev,uint8_t* img,int img_w,int img_h,i
     //Write Image row by row
     for(int i=0;i<img_h;i++) pi_uart_write(uart_dev,&(img[i*img_w*pixel_size]),img_w*pixel_size);
 }
-
-
 int test_main(void)
 {
     PRINTF("Entering main controller\n");
 
-#ifndef __EMUL__
     /* Configure And open cluster. */
     struct pi_device cluster_dev;
     struct pi_cluster_conf cl_conf;
@@ -185,7 +231,7 @@ int test_main(void)
     pi_open_from_conf(&cluster_dev, (void *) &cl_conf);
     if (pi_cluster_open(&cluster_dev))
     {
-        printf("Cluster open failed !\n");
+        PRINTF("Cluster open failed !\n");
         pmsis_exit(-4);
     }
 
@@ -195,13 +241,12 @@ int test_main(void)
     int cur_pe_freq = pi_freq_set(PI_FREQ_DOMAIN_PERIPH, FREQ_PE*1000*1000);
     if (cur_fc_freq == -1 || cur_cl_freq == -1 || cur_pe_freq == -1)
     {
-        printf("Error changing frequency !\nTest failed...\n");
+        PRINTF("Error changing frequency !\nTest failed...\n");
         pmsis_exit(-4);
     }
 	PRINTF("FC Frequency as %d Hz, CL Frequency = %d Hz, PERIIPH Frequency = %d Hz\n", 
             pi_freq_get(PI_FREQ_DOMAIN_FC), pi_freq_get(PI_FREQ_DOMAIN_CL), pi_freq_get(PI_FREQ_DOMAIN_PERIPH));
 
-#endif
     
 
     // IMPORTANT - MUST BE CALLED AFTER THE CLUSTER IS SWITCHED ON!!!!
@@ -209,15 +254,13 @@ int test_main(void)
     int ConstructorErr = mainCNN_Construct();
     if (ConstructorErr)
     {
-        printf("Graph constructor exited with error: %d\n(check the generated file mainKernels.c to see which memory have failed to be allocated)\n", ConstructorErr);
+        PRINTF("Graph constructor exited with error: %d\n(check the generated file mainKernels.c to see which memory have failed to be allocated)\n", ConstructorErr);
         pmsis_exit(-6);
     }
     
-    #ifndef __EMUL__
     struct pi_cluster_task task;
     pi_cluster_task(&task, (void (*)(void *))cluster, NULL);
     pi_cluster_task_stacks(&task, NULL, SLAVE_STACK_SIZE);
-    #endif
 
     /*
      * Put here Your input settings
@@ -260,7 +303,6 @@ int test_main(void)
                 cam_image[i * W_CAM + j] = (cam_image[(i * W_CAM + j) *2 +1] << 6) | (cam_image[(i * W_CAM + j) *2] >> 2);
             }
         }
-
     #endif
 
 
@@ -273,7 +315,7 @@ int test_main(void)
     /* ------ SLICING ------*/
     PRINTF("\t\t***Start slicing***\n");
     slicing_cycles = gap_fc_readhwtimer();
-    
+
     #ifdef DEMO
     slicing_hwc_channel(
         cam_image, 
@@ -297,12 +339,7 @@ int test_main(void)
 
     /* ------ INFERENCE ------*/
     PRINTF("\t\t***Call CLUSTER***\n");
-#ifndef __EMUL__
     pi_cluster_send_task_to_cl(&cluster_dev, &task);
-#else
-    cluster();
-#endif
-
 
     /* ------ DECODING ------*/
     PRINTF("\t\t***Start decoding***\n");
@@ -395,9 +432,7 @@ int test_main(void)
     /* ------ END ------*/
     PRINTF("\t\t***Runner completed***\n");
 
-    #ifdef CI 
-        write_outputs();
-    #endif
+    write_outputs();
 
     mainCNN_Destruct();
 

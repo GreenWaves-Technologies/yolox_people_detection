@@ -48,12 +48,23 @@ READFS_FILES=$(abspath $(MODEL_TENSORS))
 
 
 # Application modes:
-#  - CI       Compare newtwork outputs with expected results on test samples
+#  - CI        Compare newtwork outputs with expected results on test samples
+#  - DEMO      Run the network on a .ppm image and save the output in a .ppm file with drawn boxes 
+#  - INFERENCE Run in Inference on static image  
+
 mode?=CI
-ifeq (,$(filter $(mode), CI INFERENCE))
+ifeq (,$(filter $(mode), CI DEMO INFERENCE))
     $(error Invalid mode $(mode))
 endif
 APP_CFLAGS += -D$(mode) 
+
+#uncomment this line to hide printfs
+ifeq '$(mode)' 'DEMO'
+  APP_CFLAGS += -DSILENT=1
+else ifeq '$(mode)' 'INFERENCE'
+    APP_CLFAGS += -DPERF
+endif
+
 
 
 # build depends on the model
