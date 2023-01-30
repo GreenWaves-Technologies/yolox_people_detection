@@ -17,7 +17,7 @@
 // parameters needed for slicing layer
 #define H_INP 240
 #define W_INP 320
-#define CHANNELS 1
+#define CHANNELS 3
 
 #define H_CAM 240
 #define W_CAM 320

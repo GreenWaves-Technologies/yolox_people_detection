@@ -14,16 +14,12 @@ def make_parser():
         "--onnx_path", 
         type=str, 
         default="./weights/yolox-QVGA-bayer-BGR.onnx", 
-        # default="./weights/model.onnx", 
-        # default="./weights/model_bayer.onnx", 
         help="path to onnx model"
     )
     parser.add_argument(
         "--coco_path", 
         type=str, 
-        default="/home/abduragim/data/coco/val2017_VGA_v2", 
-        # default="/home/abduragim/data/coco/val2017", 
-        # default="/home/abduragim/data/coco/val2017_1c_syn", 
+    default="~/data/coco/val2017_VGA_v2", 
         help="path to coco dataset images"
     ) 
     parser.add_argument(
@@ -37,8 +33,7 @@ def make_parser():
     parser.add_argument(
         "--coco_annotations_path", 
         type=str, 
-        default="/home/abduragim/data/coco/annotations/instances_val2017_VGA.json", 
-        # default="/home/abduragim/data/coco/annotations/instances_val2017.json", 
+        default="~/data/coco/annotations/instances_val2017_VGA.json", 
         help="path to coco dataset annotations"
     ) 
     parser.add_argument(
@@ -52,7 +47,6 @@ def make_parser():
         type=int, 
         nargs='+',
         default=(480, 640), 
-        # default=(240, 320), 
         help="input size"
     )
     parser.add_argument(
@@ -170,7 +164,7 @@ def main():
     graph[0].allocate = 1
     res = graph.execute_on_target(
         pmsis_os='freertos',
-        directory="./GVSOC_INFERENCE_TEMPLATE_n",
+        directory="./GVSOC_INFERENCE_TEMPLATE",
         pretty=True,
         input_tensors=[qout[0][0]],
         output_tensors=6,
@@ -183,8 +177,7 @@ def main():
             'l1_size': 128000,
             'l2_size': 1000000,
             'tensor_directory': './weights_tensors',
-
-            # 'graph_const_exec_from_flash': True,
+            'graph_const_exec_from_flash': True,
 
             'l3_ram_device': 'AT_MEM_L3_DEFAULTRAM',
             # "l3_flash_device": "AT_MEM_L3_MRAMFLASH",

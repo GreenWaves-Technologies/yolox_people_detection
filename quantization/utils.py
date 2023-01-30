@@ -53,8 +53,6 @@ class CostomCOCODaset():
         if self._idx >= self.max_idx:
             raise StopIteration()
 
-        print(self._idx)
-
         filename = self.annotations[self._idx]["file_name"]
 
         if self.img_type == "bayer":
@@ -67,13 +65,8 @@ class CostomCOCODaset():
             cv2.IMREAD_UNCHANGED
         )
 
-        print(image.shape)
-
-        cv2.imwrite("./read_img.png", image)
-
         if len(image.shape) == 2:
             image = np.expand_dims(image, axis=2)
-
 
         if self.img_type == "bayer" and self.input_channels == 3: 
             image = self.preproc_bayer(
@@ -87,8 +80,6 @@ class CostomCOCODaset():
                 self.input_size, 
                 input_channels = self.input_channels
             )
-
-        cv2.imwrite("./proccsed_image.png", image.transpose(1, 2, 0)) 
 
         image = self.slicing(image)
 
@@ -105,7 +96,6 @@ class CostomCOCODaset():
     def preproc_bayer(img, input_size, input_channels, swap=(2, 0, 1)):
         #BGR image
         h, w, c = img.shape 
-        print("input shape: ", input_size)
 
         # get correct size 
         if h > input_size[0]: 
@@ -116,7 +106,6 @@ class CostomCOCODaset():
         # reszie by demosaicing
         img = img.astype(np.uint16)
         output = np.zeros((img.shape[0] // 2, img.shape[1] // 2, input_channels), dtype=np.int16) 
-        print( img[1::2,  ::2, 0].shape)
         output[:, :, 0] =  img[1::2,  ::2, 0]
         output[:, :, 1] = (img[ ::2,  ::2, 1] + img[1::2, 1::2, 1]) / 2 
         output[:, :, 2] =  img[ ::2, 1::2, 2]
