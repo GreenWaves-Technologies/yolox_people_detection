@@ -148,8 +148,8 @@ message(STATUS "Generating model")
 add_custom_command(
   OUTPUT ${AT_MODEL_PATH} ${MODEL_EXPRESSIONS} ${AT_TENSORS_DIR}
   COMMENT "Generating the autotiler model"
-  DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/nntool_generate_model.py
-  COMMAND python3 ${CMAKE_CURRENT_SOURCE_DIR}/nntool_generate_model.py ${CMAKE_CURRENT_SOURCE_DIR}/ yolox-QVGA-bayer-BGR.onnx precalculated_stats_bayer_v2_qvga_trainset_nonpadded.pickle ${AT_MODEL_PATH}
+  DEPENDS ../../model_generator/nntool_generate_model.py
+  COMMAND python3 ../../model_generator/nntool_generate_model.py ${CMAKE_CURRENT_SOURCE_DIR}/ yolox-QVGA-bayer-BGR.onnx precalculated_stats_bayer_v2_qvga_trainset_nonpadded.pickle ${AT_MODEL_PATH}
 )
 
 ###############################################################################
