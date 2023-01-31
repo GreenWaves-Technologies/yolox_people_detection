@@ -149,7 +149,7 @@ add_custom_command(
   OUTPUT ${AT_MODEL_PATH} ${MODEL_EXPRESSIONS} ${AT_TENSORS_DIR}
   COMMENT "Generating the autotiler model"
   DEPENDS ../../model_generator/nntool_generate_model.py
-  COMMAND python3 ../../model_generator/nntool_generate_model.py ${CMAKE_CURRENT_SOURCE_DIR}/ yolox-QVGA-bayer-BGR.onnx precalculated_stats_bayer_v2_valset.pickle ${AT_MODEL_PATH}
+  COMMAND python3 ../../model_generator/nntool_generate_model.py ${CMAKE_CURRENT_SOURCE_DIR}/ yolox_nano_MVGA_less_chan.onnx precalculated_stats_bayer_MVGA_train_non_padded.pickle ${AT_MODEL_PATH}
 )
 
 ###############################################################################
