@@ -167,6 +167,8 @@ static void cluster()
 
     mainCNN(Output_1);
 }
+
+
 static int open_camera(struct pi_device *device)
 {
     PRINTF("Opening CSI2 camera\n");
@@ -210,6 +212,8 @@ void send_image_to_uart(pi_device_t* uart_dev,uint8_t* img,int img_w,int img_h,i
     //Write Image row by row
     for(int i=0;i<img_h;i++) pi_uart_write(uart_dev,&(img[i*img_w*pixel_size]),img_w*pixel_size);
 }
+
+
 int test_main(void)
 {
     PRINTF("Entering main controller\n");
@@ -303,6 +307,7 @@ int test_main(void)
                 cam_image[i * W_CAM + j] = (cam_image[(i * W_CAM + j) *2 +1] << 6) | (cam_image[(i * W_CAM + j) *2] >> 2);
             }
         }
+
     #endif
 
 

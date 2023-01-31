@@ -91,7 +91,7 @@ void draw_boxes(
         H_INP, 
         CHANNELS, 
         image,
-        GRAY_SCALE_IO
+        RGB888_IO // GRAY_SCALE_IO
     ); 
 }
 
