@@ -45,9 +45,6 @@ at_model_dir = os.path.split(at_model_path)[0]
 model_path = Path(cur_dir).parent / "weights" / model_name
 stats_path = Path(cur_dir).parent / "weights" / stats_name
 
-# model_path =  os.path.join(at_model_dir, "weights", model_name)
-# stats_path = os.path.join(at_model_dir, "weights", stats_name)
-
 logger.info(f"Model path: {str(model_path)}")
 logger.info(f"Calibration path: {str(stats_path)}")
 logger.info(f"AT model path: {at_model_path}")
