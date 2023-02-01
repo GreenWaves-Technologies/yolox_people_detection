@@ -20,6 +20,7 @@ set(SLICING             ${CMAKE_CURRENT_SOURCE_DIR}/slicing.c)
 set(DECODING            ${CMAKE_CURRENT_SOURCE_DIR}/decoding.c)
 set(POSTPROCESSING      ${CMAKE_CURRENT_SOURCE_DIR}/postprocessing.c)
 set(DRAW                ${CMAKE_CURRENT_SOURCE_DIR}/draw.c)  
+set(COMPRESS            ${CMAKE_CURRENT_SOURCE_DIR}/jpeg_compress.c)  
 
 ###############################################################################
 # CMake pre initialization
@@ -46,6 +47,7 @@ list(APPEND TARGET_SRCS ${MAIN}
                         ${DECODING}
                         ${POSTPROCESSING}
                         ${DRAW}
+                        ${COMPRESS}
 )
 
 list(APPEND TARGET_INCS -I.
