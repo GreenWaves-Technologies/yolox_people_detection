@@ -58,10 +58,7 @@ void draw_boxes(
     int final_valid_boxes
     ){
 
-    printf("Pointer ot L2 mem in draw_boxes: %p \n", model_L2_Memory_Dyn_casted);
     unsigned char * image = (unsigned char *) model_L2_Memory_Dyn_casted;
-    printf("Casted pointer to L2 mem in draw_boxes: %p \n", image);
-
     int status = ReadImageFromFile(
         STR(INPUT_FILE_NAME),
         W_INP, 
@@ -82,8 +79,8 @@ void draw_boxes(
         int y2 = (int) Output_1[i*7 + 3];
     
 
-        float score = Output_1[i*7 + 4] * Output_1[i*7 + 5];
-        int cls = (int) Output_1[i*7 + 6];
+        float score =       Output_1[i*7 + 4] * Output_1[i*7 + 5];
+        int   cls   = (int) Output_1[i*7 + 6];
 
         draw_rectangle(image, W_INP, H_INP, x1, y1, x2, y2, 255);
     }
@@ -97,19 +94,6 @@ void draw_boxes(
     //     image,
     //     RGB888_IO // GRAY_SCALE_IO
     // ); 
-
-    /* ----------------------- JPEG COMPRESSION --------------------- */
-    printf("\n\t\t*** JPEG COMPRESSION ***\n");
-    uint8_t * jpeg_img = (uint8_t *) image;
-    printf("Casted to uint8_t pointer to L2 mem in draw_boxes: %p \n", jpeg_img);
-    // if !(compress(image)){
-        // printf("JPEG compression failed\n");
-    // }
-
-    // if compression is not successful print error message
-    if (compress(jpeg_img) != 1){
-        printf("JPEG compression failed\n");
-    }
 
 
 

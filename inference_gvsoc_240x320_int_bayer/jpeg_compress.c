@@ -5,7 +5,7 @@
 
 PI_L2 char jpeg_image[2048*50]; // how to set the size of the jpeg image?
 
-int compress(uint8_t * image){
+char * compress(uint8_t * image, int * size){
 
     jpeg_encoder_t enc;
     unsigned int image_size = W_INP * H_INP * CHANNELS;
@@ -30,13 +30,13 @@ int compress(uint8_t * image){
 
     if (jpeg_encoder_open(&enc, &enc_conf)){
         printf("Error opening JPEG encoder\n");
-        return -1;
+        // return -1;
     }
 
 
     if (jpeg_encoder_start(&enc)){
         printf("Error starting JPEG encoder\n");
-        return -1;
+        // return -1;
     }
 
 
@@ -49,7 +49,7 @@ int compress(uint8_t * image){
 
     if (jpeg_encoder_header(&enc, &bitstream, &header_size)){
         printf("Error getting JPEG header\n");
-        return -1;
+        // return -1;
     }
 
 
@@ -68,8 +68,9 @@ int compress(uint8_t * image){
 
     if (jpeg_encoder_process(&enc, &buffer, &bitstream, &body_size)){
         printf("Error encoding JPEG image\n");
-        return -1;
+        // return -1;
     }
+
 
     pi_perf_stop();
     printf("Jpeg encoding done! Performance: %d Cycles\n", pi_perf_read(PI_PERF_CYCLES));    
@@ -77,34 +78,19 @@ int compress(uint8_t * image){
 
     // An finally get the footer
     bitstream.data = &jpeg_image[body_size + header_size];
-    if (jpeg_encoder_footer(&enc, &bitstream, &footer_size))
-        return -1;
+    if (jpeg_encoder_footer(&enc, &bitstream, &footer_size)){
+        printf("Error getting JPEG footer\n");
+        // return -1;
+    }
 
     int bitstream_size = body_size + header_size + footer_size;
+    *size = bitstream_size;
 
     printf("Encoding done at addr %p size %d bytes\n", jpeg_image, bitstream_size);
 
     jpeg_encoder_stop(&enc);
     jpeg_encoder_close(&enc);
 
-    // Now flush the image to the workstation using semi-hosting
-    printf("Writing jpeg image\n");
-
-    struct pi_fs_conf host_fs_conf;
-    pi_fs_conf_init(&host_fs_conf);
-    struct pi_device host_fs;
-
-    host_fs_conf.type = PI_FS_HOST;
-    pi_open_from_conf(&host_fs, &host_fs_conf);
-
-    if (pi_fs_mount(&host_fs))
-        return -1;
-
-    void *File = pi_fs_open(&host_fs, "../imgTest.jpg", PI_FS_FLAGS_WRITE);
-
-    pi_fs_write(File, jpeg_image, bitstream_size);
-
-    printf(" HERE HERE\n");
-    return 1;
+    return jpeg_image;
 
 }

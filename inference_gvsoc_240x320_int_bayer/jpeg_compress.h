@@ -3,4 +3,4 @@
 #include "gaplib/ImgIO.h"
 #include "main.h"
 
-int compress(uint8_t * l2_mem);
+char * compress(uint8_t * l2_mem, int * size);

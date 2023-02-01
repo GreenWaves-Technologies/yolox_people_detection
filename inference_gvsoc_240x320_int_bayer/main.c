@@ -18,6 +18,7 @@
 #include "decoding.h"
 #include "postprocessing.h"
 #include "draw.h"
+#include "jpeg_compress.h"
 
 #if SILENT
 #define PRINTF(...) ((void) 0)
@@ -76,7 +77,6 @@ void copy_inputs() {
 #endif 
 
     PRINTF("\n\t\t*** READING INPUT FROM PPM FILE ***\n");
-    PRINTF("Number of input channels: %d\n", CHANNELS);
     status = ReadImageFromFile(
         STR(INPUT_FILE_NAME),
         W_INP, 
@@ -145,7 +145,6 @@ void write_outputs() {
     void *File_Output_1;
     int ret_Output_1 = 0;
 
-    printf("final_valid_boxes = %d \n", final_valid_boxes);
     File_Output_1 = __OPEN_WRITE(fs, STR(OUTPUT_BIN_FILE_NAME));
     ret_Output_1 = __WRITE(File_Output_1, Output_1, final_valid_boxes * 7 * sizeof(float));
 
@@ -433,6 +432,43 @@ int test_main(void)
             Output_1,
             final_valid_boxes
         );    
+
+        /* ------ JPEG COMPRESSION ------ */
+        PRINTF("\t\t***Start JPEG compression ***\n");
+
+        int bitstream_size;
+        char * jpeg_image;
+        jpeg_image = compress((uint8_t *) main_L2_Memory_Dyn_casted, &bitstream_size);
+        
+        /* ------ FLUSH COMPRESSED IMAGE  ------ */
+        PRINTF("\t\t***Start flushing compressed image ***\n");
+
+        struct pi_fs_conf host_fs_conf;
+        pi_fs_conf_init(&host_fs_conf);
+        struct pi_device host_fs;
+
+        host_fs_conf.type = PI_FS_HOST;
+        pi_open_from_conf(&host_fs, &host_fs_conf);
+
+        if (pi_fs_mount(&host_fs))
+            return -1;
+
+        void *File = pi_fs_open(&host_fs, "../imgTest.jpg", PI_FS_FLAGS_WRITE);
+
+        pi_fs_write(File, jpeg_image, bitstream_size);        
+
+
+        /* ------ WRITE IMAGE -------- */
+        // unsigned char * image2out = ;
+        // int status = WriteImageToFile(
+        //     STR(OUTPUT_FILE_NAME),
+        //     W_INP, 
+        //     H_INP, 
+        //     CHANNELS, 
+        //     (unsigned char *) main_L2_Memory_Dyn_casted,
+        //     RGB888_IO // GRAY_SCALE_IO
+        // ); 
+
     #endif
     /* ------ END ------*/
     PRINTF("\t\t***Runner completed***\n");
