@@ -20,6 +20,7 @@
 #include "draw.h"
 #include "jpeg_compress.h"
 #include "img_flush.h"
+#include "bsp/camera/ov5647.h"
 
 #if SILENT
 #define PRINTF(...) ((void) 0)
