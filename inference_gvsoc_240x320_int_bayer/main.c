@@ -19,6 +19,7 @@
 #include "postprocessing.h"
 #include "draw.h"
 #include "jpeg_compress.h"
+#include "img_flush.h"
 
 #if SILENT
 #define PRINTF(...) ((void) 0)
@@ -425,6 +426,7 @@ int test_main(void)
     #endif
 
     #ifdef INFERENCE
+
         /* ------ DRAW REATANGLES ------*/
         PRINTF("\t\t***Start draw reactangles ***\n");
         draw_boxes(
@@ -433,6 +435,7 @@ int test_main(void)
             final_valid_boxes
         );    
 
+        #ifdef COMPRESS 
         /* ------ JPEG COMPRESSION ------ */
         PRINTF("\t\t***Start JPEG compression ***\n");
 
@@ -443,31 +446,22 @@ int test_main(void)
         /* ------ FLUSH COMPRESSED IMAGE  ------ */
         PRINTF("\t\t***Start flushing compressed image ***\n");
 
-        struct pi_fs_conf host_fs_conf;
-        pi_fs_conf_init(&host_fs_conf);
-        struct pi_device host_fs;
-
-        host_fs_conf.type = PI_FS_HOST;
-        pi_open_from_conf(&host_fs, &host_fs_conf);
-
-        if (pi_fs_mount(&host_fs))
+        if (flush_iamge(jpeg_image, bitstream_size)){
+            PRINTF("Error flushing image\n");
             return -1;
+        }
 
-        void *File = pi_fs_open(&host_fs, "../imgTest.jpg", PI_FS_FLAGS_WRITE);
-
-        pi_fs_write(File, jpeg_image, bitstream_size);        
-
-
+        #else 
         /* ------ WRITE IMAGE -------- */
-        // unsigned char * image2out = ;
-        // int status = WriteImageToFile(
-        //     STR(OUTPUT_FILE_NAME),
-        //     W_INP, 
-        //     H_INP, 
-        //     CHANNELS, 
-        //     (unsigned char *) main_L2_Memory_Dyn_casted,
-        //     RGB888_IO // GRAY_SCALE_IO
-        // ); 
+        int status = WriteImageToFile(
+            STR(OUTPUT_FILE_NAME),
+            W_INP, 
+            H_INP, 
+            CHANNELS, 
+            (unsigned char *) main_L2_Memory_Dyn_casted,
+            RGB888_IO // GRAY_SCALE_IO
+        ); 
+        #endif
 
     #endif
     /* ------ END ------*/

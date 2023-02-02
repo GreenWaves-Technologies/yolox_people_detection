@@ -21,6 +21,7 @@ set(DECODING            ${CMAKE_CURRENT_SOURCE_DIR}/decoding.c)
 set(POSTPROCESSING      ${CMAKE_CURRENT_SOURCE_DIR}/postprocessing.c)
 set(DRAW                ${CMAKE_CURRENT_SOURCE_DIR}/draw.c)  
 set(COMPRESS            ${CMAKE_CURRENT_SOURCE_DIR}/jpeg_compress.c)  
+set(FLUSH               ${CMAKE_CURRENT_SOURCE_DIR}/img_flush.c)  
 
 ###############################################################################
 # CMake pre initialization
@@ -48,6 +49,7 @@ list(APPEND TARGET_SRCS ${MAIN}
                         ${POSTPROCESSING}
                         ${DRAW}
                         ${COMPRESS}
+                        ${FLUSH}
 )
 
 list(APPEND TARGET_INCS -I.
@@ -101,6 +103,7 @@ else()
 endif()
 
 list(APPEND TARGET_PREPROCESSOR -DPERF
+                                -DCOMPRESS
                                 -D${MODE}
                                 -DAT_MODEL_PREFIX=${MODEL_PREFIX}
                                 -DSTACK_SIZE=${CONFIG_CL_MASTER_CORE_STACK_SIZE}

@@ -84,19 +84,6 @@ void draw_boxes(
 
         draw_rectangle(image, W_INP, H_INP, x1, y1, x2, y2, 255);
     }
-
-    /* ----------------------- SAVE IMAGE --------------------- */
-    // status = WriteImageToFile(
-    //     STR(OUTPUT_FILE_NAME),
-    //     W_INP, 
-    //     H_INP, 
-    //     CHANNELS, 
-    //     image,
-    //     RGB888_IO // GRAY_SCALE_IO
-    // ); 
-
-
-
 }
 
 

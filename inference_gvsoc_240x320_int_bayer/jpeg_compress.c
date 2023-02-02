@@ -3,7 +3,7 @@
 #include "gaplib/ImgIO.h"
 #include "main.h"
 
-PI_L2 char jpeg_image[2048*50]; // how to set the size of the jpeg image?
+PI_L2 char jpeg_image[2048*50]; // how to set the size of the jpeg image? how to get this buffer the main.c file?
 
 char * compress(uint8_t * image, int * size){
 
@@ -27,18 +27,15 @@ char * compress(uint8_t * image, int * size){
     enc_conf.width  = W_INP;
     enc_conf.height = H_INP;
 
-
     if (jpeg_encoder_open(&enc, &enc_conf)){
         printf("Error opening JPEG encoder\n");
         // return -1;
     }
 
-
     if (jpeg_encoder_start(&enc)){
         printf("Error starting JPEG encoder\n");
         // return -1;
     }
-
 
     // Get the header so that we can produce full JPEG image
     pi_buffer_t bitstream;
@@ -46,12 +43,10 @@ char * compress(uint8_t * image, int * size){
     bitstream.size = image_size;
     uint32_t header_size, footer_size, body_size;
 
-
     if (jpeg_encoder_header(&enc, &bitstream, &header_size)){
         printf("Error getting JPEG header\n");
         // return -1;
     }
-
 
     // // Now get the encoded image
     pi_buffer_t buffer;
@@ -60,7 +55,6 @@ char * compress(uint8_t * image, int * size){
     buffer.width   = W_INP;
     buffer.height  = H_INP;
     bitstream.data = &jpeg_image[header_size];
-
 
     pi_perf_conf(1<<PI_PERF_CYCLES);
     pi_perf_start();
@@ -71,10 +65,8 @@ char * compress(uint8_t * image, int * size){
         // return -1;
     }
 
-
     pi_perf_stop();
     printf("Jpeg encoding done! Performance: %d Cycles\n", pi_perf_read(PI_PERF_CYCLES));    
-    
 
     // An finally get the footer
     bitstream.data = &jpeg_image[body_size + header_size];
@@ -83,11 +75,13 @@ char * compress(uint8_t * image, int * size){
         // return -1;
     }
 
+    // calculate the total size and return it 
     int bitstream_size = body_size + header_size + footer_size;
     *size = bitstream_size;
 
     printf("Encoding done at addr %p size %d bytes\n", jpeg_image, bitstream_size);
 
+    // close the endoer 
     jpeg_encoder_stop(&enc);
     jpeg_encoder_close(&enc);
 
