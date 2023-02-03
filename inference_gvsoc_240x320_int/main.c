@@ -10,6 +10,7 @@
 
 
 /* Autotiler includes. */
+#include "bsp/camera/ov5647.h"
 #include "main.h"
 #include "mainKernels.h"
 #include "gaplib/fs_switch.h"
@@ -63,7 +64,7 @@ void copy_inputs() {
 
     PRINTF("\n\t\t*** READING TEST INPUT ***\n");
     status = ReadImageFromFile(
-        "../../../test_data/input.ppm",
+        STR(TEST_INPUT_FILE_NAME),
         W_INP, 
         H_INP, 
         CHANNELS, 
@@ -72,9 +73,7 @@ void copy_inputs() {
         IMGIO_OUTPUT_CHAR,
         0
     );
-
-#endif 
-
+#else
     PRINTF("\n\t\t*** READING INPUT FROM PPM FILE ***\n");
     status = ReadImageFromFile(
         STR(INPUT_FILE_NAME),
@@ -91,6 +90,7 @@ void copy_inputs() {
         PRINTF("Error reading image from file %s (error: %d) \n", STR(INPUT_FILE_NAME), status);
         exit(-1);
     } 
+#endif 
 
 }
 
@@ -131,7 +131,7 @@ void write_outputs() {
 
 #ifdef CI
     PRINTF("\t\t***Start CI output test***\n");
-    char GT_file[] = "../../../test_data/gt_boxes.bin";
+    char GT_file[] = STR(TEST_OUTPUT_FILE_NAME); 
     ci_output_test(Output_1, GT_file, (float *) main_L2_Memory_Dyn);
 
 #else
