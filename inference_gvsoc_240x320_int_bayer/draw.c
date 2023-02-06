@@ -1,6 +1,7 @@
 #include "draw.h"
 #include "main.h"
 #include "gaplib/ImgIO.h"
+#include "jpeg_compress.h"
 
 void draw_rectangle(
     unsigned char *Img, 
@@ -78,21 +79,11 @@ void draw_boxes(
         int y2 = (int) Output_1[i*7 + 3];
     
 
-        float score = Output_1[i*7 + 4] * Output_1[i*7 + 5];
-        int cls = (int) Output_1[i*7 + 6];
+        float score =       Output_1[i*7 + 4] * Output_1[i*7 + 5];
+        int   cls   = (int) Output_1[i*7 + 6];
 
         draw_rectangle(image, W_INP, H_INP, x1, y1, x2, y2, 255);
     }
-
-    /* ----------------------- SAVE IMAGE --------------------- */
-    status = WriteImageToFile(
-        STR(OUTPUT_FILE_NAME),
-        W_INP, 
-        H_INP, 
-        CHANNELS, 
-        image,
-        RGB888_IO // GRAY_SCALE_IO
-    ); 
 }
 
 
