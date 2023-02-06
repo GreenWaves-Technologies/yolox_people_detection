@@ -82,6 +82,24 @@ void slicing_hwc_channel(char * Input, unsigned char * Output, int h, int w, int
 }
 
 
+void slicing_hwc_channel_less_buffer(char * Input, char * Output, int h, int w, int channels){
+    
+    int str_idx, end_idx, num_element = w * channels * 2;
+    for(int r = 0; r < h / 2; r++){
+        
+        // slice the matrix  
+        str_idx = r * w * channels * 2;
+        slicing_hwc_channel(Input + str_idx, Output, 2, w, channels);
+
+        // copy the element from buffer to input
+        for(int i = 0; i < num_element; i++){
+            Input[str_idx + i] = Output[i];
+        }
+    }  
+}
+
+
+
 void slicing_hw_channel(char * Input, unsigned char * Output, int h, int w, int channels){
 
     unsigned int o_h = h / 2, o_w  =  w / 2; 

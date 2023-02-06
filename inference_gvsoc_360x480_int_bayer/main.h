@@ -31,7 +31,7 @@
 #define RAWS 3570 
 
 // parameters needed for postprocessing layer
-#define CONF_THRESH 0.01
+#define CONF_THRESH 0.4
 
 // parameters needed for function to_boxes
 #define top_k_boxes 400 

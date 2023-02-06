@@ -89,7 +89,8 @@ void copy_inputs() {
         H_INP, 
         CHANNELS, 
         // main_L2_Memory_Dyn + (H_INP * W_INP * CHANNELS),
-        main_L2_Memory_Dyn,
+        // main_L2_Memory_Dyn,
+        Input_1,
         W_INP * H_INP * CHANNELS * sizeof(char), 
         IMGIO_OUTPUT_CHAR,
         0 // transpose from HWC to CHW 
@@ -337,13 +338,22 @@ int test_main(void)
         CHANNELS
         );
     #else
-    slicing_hwc_channel(
-        main_L2_Memory_Dyn + (H_INP * W_INP * CHANNELS), 
+
+    // slicing_hwc_channel(
+    //     main_L2_Memory_Dyn + (H_INP * W_INP * CHANNELS), 
+    //     Input_1, 
+    //     H_INP, 
+    //     W_INP,
+    //     CHANNELS
+    //     );
+
+    slicing_hwc_channel_less_buffer(
         Input_1, 
-        H_INP, 
+        main_L2_Memory_Dyn + (H_INP * W_INP * CHANNELS), 
+        H_INP,
         W_INP,
         CHANNELS
-        );
+    );
     #endif
 
     slicing_cycles = gap_fc_readhwtimer() - slicing_cycles;
