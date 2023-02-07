@@ -20,8 +20,6 @@ set(SLICING             ${CMAKE_CURRENT_SOURCE_DIR}/slicing.c)
 set(DECODING            ${CMAKE_CURRENT_SOURCE_DIR}/decoding.c)
 set(POSTPROCESSING      ${CMAKE_CURRENT_SOURCE_DIR}/postprocessing.c)
 set(DRAW                ${CMAKE_CURRENT_SOURCE_DIR}/draw.c)  
-set(COMPRESS            ${CMAKE_CURRENT_SOURCE_DIR}/jpeg_compress.c)  
-set(FLUSH               ${CMAKE_CURRENT_SOURCE_DIR}/img_flush.c)  
 
 ###############################################################################
 # CMake pre initialization
@@ -48,8 +46,6 @@ list(APPEND TARGET_SRCS ${MAIN}
                         ${DECODING}
                         ${POSTPROCESSING}
                         ${DRAW}
-                        ${COMPRESS}
-                        ${FLUSH}
 )
 
 list(APPEND TARGET_INCS -I.
@@ -82,6 +78,8 @@ message(STATUS "Clock speeds - Cluster ${FREQ_CL} FC ${FREQ_FC} Peripheral ${FRE
 # math(EXPR FREQ_FC ${CONFIG_FREQUENCY_FC}/1000000 OUTPUT_FORMAT DECIMAL)
 # math(EXPR FREQ_PE ${CONFIG_FREQUENCY_PERIPH}/1000000 OUTPUT_FORMAT DECIMAL)
 
+
+
 set(TEST_INPUT_FILE_NAME      ${CMAKE_CURRENT_SOURCE_DIR}/test_data/input.ppm)
 set(TEST_OUTPUT_FILE_NAME     ${CMAKE_CURRENT_SOURCE_DIR}/test_data/gt_boxes.bin)
 set(INPUT_FILE_NAME           ${CMAKE_CURRENT_SOURCE_DIR}/input_rgb.ppm)
@@ -105,7 +103,6 @@ else()
 endif()
 
 list(APPEND TARGET_PREPROCESSOR -DPERF
-                                -DCOMPRESS
                                 -D${MODE}
                                 -DAT_MODEL_PREFIX=${MODEL_PREFIX}
                                 -DSTACK_SIZE=${CONFIG_CL_MASTER_CORE_STACK_SIZE}
@@ -145,9 +142,9 @@ endif()
 add_custom_target(run ${CMAKE_CURRENT_BINARY_DIR}/${TARGET_NAME})
 endif()
 
-target_compile_options(${TARGET_NAME} PUBLIC   ${TARGET_CFLAGS}
-                                                ${TARGET_INCS}
-                                                ${TARGET_PREPROCESSOR})
+target_compile_options(${TARGET_NAME} PUBLIC  ${TARGET_CFLAGS}
+                                              ${TARGET_INCS}
+                                              ${TARGET_PREPROCESSOR})
 
 ###############################################################################
 # Commands added for specific application
@@ -158,7 +155,7 @@ add_custom_command(
   OUTPUT ${AT_MODEL_PATH} ${MODEL_EXPRESSIONS} ${AT_TENSORS_DIR}
   COMMENT "Generating the autotiler model"
   DEPENDS ../../model_generator/nntool_generate_model.py
-  COMMAND python3 ../../model_generator/nntool_generate_model.py ${CMAKE_CURRENT_SOURCE_DIR}/ yolox-QVGA-bayer-BGR.onnx precalculated_stats_bayer_v2_qvga_trainset_nonpadded.pickle ${AT_MODEL_PATH}
+  COMMAND python3 ../../model_generator/nntool_generate_model.py ${CMAKE_CURRENT_SOURCE_DIR}/ model.onnx precalculated_stats_rgb.pickle ${AT_MODEL_PATH}
 )
 
 ###############################################################################
