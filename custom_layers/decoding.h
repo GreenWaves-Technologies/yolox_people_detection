@@ -1,5 +1,3 @@
-// #include "Gap.h"
-
 typedef struct{
     float h;
     float w;

@@ -15,11 +15,10 @@ set(MAIN                main.c)
 set(MODEL_EXPRESSIONS   ${CMAKE_CURRENT_SOURCE_DIR}/Expression_Kernels.c)
 set(AT_MODEL_PATH       ${CMAKE_CURRENT_SOURCE_DIR}/./model.c)
 set(AT_TENSORS_DIR      ${CMAKE_CURRENT_SOURCE_DIR}/./weights_tensors)
-
-set(SLICING             ${CMAKE_CURRENT_SOURCE_DIR}/slicing.c)
-set(DECODING            ${CMAKE_CURRENT_SOURCE_DIR}/decoding.c)
-set(POSTPROCESSING      ${CMAKE_CURRENT_SOURCE_DIR}/postprocessing.c)
-set(DRAW                ${CMAKE_CURRENT_SOURCE_DIR}/draw.c)  
+set(SLICING             ../custom_layers/slicing.c)
+set(DECODING            ../custom_layers/decoding.c)
+set(POSTPROCESSING      ../custom_layers/postprocessing.c)
+set(DRAW                ../custom_layers/draw.c)  
 
 ###############################################################################
 # CMake pre initialization

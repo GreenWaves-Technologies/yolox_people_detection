@@ -1,5 +1,4 @@
 #include "postprocessing.h"
-#include "main.h"
 
 void xywh2xyxy(float * input, unsigned int rows){
 
@@ -44,10 +43,10 @@ void filter_boxes(float * Input, float * Output, float conf_thresh, unsigned int
     }
 }
 
-void to_bboxes(float * input, Box * output, int num_val_boxes){
+void to_bboxes(float * input, Box * output, int num_val_boxes, int top_k_b){
 
     int count = 0;
-    for (int i = 0; i < top_k_boxes; i++){
+    for (int i = 0; i < top_k_b; i++){
         output[i].x1 = input[count + 0];
         output[i].y1 = input[count + 1];
         output[i].x2 = input[count + 2];
@@ -98,14 +97,15 @@ void nms(
     float * Output, 
     float nms_thresh, 
     int num_val_boxes, 
-    int * val_final_boxes
+    int * val_final_boxes,
+    int top_k_b
     ){
 
     int count = 0;
     int val_boxes;
 
-    if (num_val_boxes > top_k_boxes){
-        val_boxes = top_k_boxes;
+    if (num_val_boxes > top_k_b){
+        val_boxes = top_k_b;
     }
     else{
         val_boxes = num_val_boxes;

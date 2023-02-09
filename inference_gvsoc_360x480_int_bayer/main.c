@@ -14,10 +14,10 @@
 #include "mainKernels.h"
 #include "gaplib/fs_switch.h"
 #include "gaplib/ImgIO.h"
-#include "slicing.h"
-#include "decoding.h"
-#include "postprocessing.h"
-#include "draw.h"
+#include "../custom_layers/slicing.h"
+#include "../custom_layers/decoding.h"
+#include "../custom_layers/postprocessing.h"
+#include "../custom_layers/draw.h"
 #include "bsp/camera/ov5647.h"
 
 #if SILENT
@@ -331,14 +331,6 @@ int test_main(void)
         );
     #else
 
-    // slicing_hwc_channel(
-    //     main_L2_Memory_Dyn + (H_INP * W_INP * CHANNELS), 
-    //     Input_1, 
-    //     H_INP, 
-    //     W_INP,
-    //     CHANNELS
-    //     );
-
     slicing_hwc_channel_less_buffer(
         Input_1, 
         main_L2_Memory_Dyn + (H_INP * W_INP * CHANNELS), 
@@ -395,7 +387,8 @@ int test_main(void)
     to_bboxes(
         (main_L2_Memory_Dyn_casted + (RAWS * 6)), 
         bboxes, 
-        *num_val_boxes
+        *num_val_boxes,
+        top_k_boxes
         );
     bbox_cycles = gap_fc_readhwtimer() - bbox_cycles;
     
@@ -408,7 +401,8 @@ int test_main(void)
         Output_1,
         NMS_THRESH, 
         *num_val_boxes, 
-        &final_valid_boxes
+        &final_valid_boxes,
+        top_k_boxes
         );
     nms_cycles = gap_fc_readhwtimer() - nms_cycles;
 
@@ -440,8 +434,10 @@ int test_main(void)
         draw_boxes(
             main_L2_Memory_Dyn_casted,
             Output_1,
-            final_valid_boxes
-        );    
+            final_valid_boxes,
+            H_INP,
+            W_INP,
+            CHANNELS);
     #endif
     /* ------ END ------*/
     PRINTF("\t\t***Runner completed***\n");

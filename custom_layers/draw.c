@@ -1,5 +1,4 @@
 #include "draw.h"
-#include "main.h"
 #include "gaplib/ImgIO.h"
 
 void draw_rectangle(
@@ -10,6 +9,7 @@ void draw_rectangle(
     int y, 
     int w, 
     int h, 
+    int channels,
     unsigned char ColorValue
     ){
 
@@ -22,15 +22,15 @@ void draw_rectangle(
     y1 = h - 1;
     if (x0 >= 0 && x0 < W) {
         for (int i = y0; i <= y1; i++)
-            for(int c = 0; c < CHANNELS; c++)
-                Img[CHANNELS*(i * W + x0) + c] = ColorValue;
+            for(int c = 0; c < channels; c++)
+                Img[channels * (i * W + x0) + c] = ColorValue;
     }
 
     x1 = w - 1;
     if (x1 >= 0 && x1 < W) {
         for (int i = y0; i <= y1; i++)
-            for(int c = 0; c < CHANNELS; c++)
-                Img[CHANNELS*(i * W + x1) + c] = ColorValue;
+            for(int c = 0; c < channels ; c++)
+                Img[channels * (i * W + x1) + c] = ColorValue;
     }
 
     x0 = MAX(MIN(x, W - 1), 0);
@@ -39,14 +39,14 @@ void draw_rectangle(
     y0 = y;
     if (y0 >= 0 && y0 < H) {
         for (int i = x0; i <= x1; i++)
-            for(int c = 0; c < CHANNELS; c++)
-                Img[CHANNELS*(y0 * W + i) + c] = ColorValue;
+            for(int c = 0; c < channels; c++)
+                Img[channels * (y0 * W + i) + c] = ColorValue;
     }
 
     if (y1 >= 0 && y1 < H) {
         for (int i = x0; i <= x1; i++)
-            for(int c = 0; c < CHANNELS; c++)
-                Img[CHANNELS*(y1 * W + i) + c] = ColorValue;
+            for(int c = 0; c < channels; c++)
+                Img[channels * (y1 * W + i) + c] = ColorValue;
     }
 }
 
@@ -54,17 +54,20 @@ void draw_rectangle(
 void draw_boxes(
     float * model_L2_Memory_Dyn_casted,
     float * Output_1,
-    int final_valid_boxes
+    int final_valid_boxes,
+    int height,
+    int width, 
+    int channels
     ){
 
     unsigned char * image = (unsigned char *) model_L2_Memory_Dyn_casted;
     int status = ReadImageFromFile(
         STR(INPUT_FILE_NAME),
-        W_INP, 
-        H_INP, 
-        CHANNELS, 
+        width, 
+        height, 
+        channels, 
         image,
-        W_INP * H_INP * CHANNELS * sizeof(char), 
+        width * height * channels * sizeof(char), 
         IMGIO_OUTPUT_CHAR,
         0 
     );
@@ -81,15 +84,15 @@ void draw_boxes(
         float score = Output_1[i*7 + 4] * Output_1[i*7 + 5];
         int cls = (int) Output_1[i*7 + 6];
 
-        draw_rectangle(image, W_INP, H_INP, x1, y1, x2, y2, 255);
+        draw_rectangle(image, width, height, x1, y1, x2, y2, channels, 255);
     }
 
     /* ----------------------- SAVE IMAGE --------------------- */
     status = WriteImageToFile(
         STR(OUTPUT_FILE_NAME),
-        W_INP, 
-        H_INP, 
-        CHANNELS, 
+        width, 
+        height , 
+        channels, 
         image,
         RGB888_IO // GRAY_SCALE_IO
     ); 
