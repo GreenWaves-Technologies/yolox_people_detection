@@ -19,7 +19,7 @@ def make_parser():
     parser.add_argument(
         "--coco_path", 
         type=str, 
-        default="/home/abduragim/data/coco/train2017_MVGA_v2", 
+        default="~/data/coco/train2017_MVGA_v2", 
         help="path to coco dataset images"
     ) 
     parser.add_argument(
@@ -32,20 +32,20 @@ def make_parser():
     parser.add_argument(
         "--coco_annotations_path", 
         type=str, 
-        default="/home/abduragim/data/coco/annotations/instances_train2017_MVGA.json", 
+        default="~/data/coco/annotations/instances_train2017_MVGA.json", 
         help="path to coco dataset annotations"
     ) 
     parser.add_argument(
         "--quant_dataset_size", 
         type=int, 
-        default=1, 
-        help="size of dataset for quantization"
+        default=1000, 
+        help="size f dataset for quantization"
     )
     parser.add_argument(
         "--input_size", 
         type=int, 
         nargs='+',
-        default=(720, 960), 
+        default=(360, 480), 
         help="input size"
     )
     parser.add_argument(
@@ -161,7 +161,7 @@ def main():
     graph[0].allocate = 1
     res = graph.execute_on_target(
         pmsis_os='freertos',
-        directory="./GVSOC_INFERENCE_TEMPLATE_less_ram",
+        directory="./GVSOC_INFERENCE_TEMPLATE",
         pretty=True,
         input_tensors=[qout[0][0]],
         output_tensors=6,
