@@ -18,6 +18,7 @@
 #include "decoding.h"
 #include "postprocessing.h"
 #include "draw.h"
+#include "bsp/camera/ov5647.h"
 
 #if SILENT
 #define PRINTF(...) ((void) 0)
@@ -63,38 +64,29 @@ void copy_inputs() {
 
     PRINTF("\n\t\t*** READING TEST INPUT ***\n");
     status = ReadImageFromFile(
-        "../../../test_data/input.pgm",
+        STR(TEST_INPUT_FILE_NAME),
         W_INP, 
         H_INP, 
         CHANNELS, 
-        main_L2_Memory_Dyn + (H_INP * W_INP * CHANNELS),
+        Input_1,
         W_INP * H_INP * CHANNELS * sizeof(char), 
         IMGIO_OUTPUT_CHAR,
         0
     );
 
-#endif 
-
+#else
     PRINTF("\n\t\t*** READING INPUT FROM PPM FILE ***\n");
-    PRINTF("Number of input channels: %d\n", CHANNELS);
-    PRINTF("Input image size %d \n", W_INP * H_INP * CHANNELS * sizeof(char));
-    // PRINTF("%d", (main_L2_Memory_Dyn + (H_INP * W_INP * CHANNELS))[518400]);
-    PRINTF("%p \n", main_L2_Memory_Dyn);
-    // PRINTF("%d \n", (main_L2_Memory_Dyn + (H_INP * W_INP * CHANNELS))[500000]);
-    PRINTF("%d \n", (main_L2_Memory_Dyn )[500000]);
-    
     status = ReadImageFromFile(
         STR(INPUT_FILE_NAME),
         W_INP, 
         H_INP, 
         CHANNELS, 
-        // main_L2_Memory_Dyn + (H_INP * W_INP * CHANNELS),
-        // main_L2_Memory_Dyn,
         Input_1,
         W_INP * H_INP * CHANNELS * sizeof(char), 
         IMGIO_OUTPUT_CHAR,
         0 // transpose from HWC to CHW 
     );
+#endif 
 
     if (status != 0) {
         PRINTF("Error reading image from file %s (error: %d) \n", STR(INPUT_FILE_NAME), status);
@@ -140,7 +132,7 @@ void write_outputs() {
 
 #ifdef CI
     PRINTF("\t\t***Start CI output test***\n");
-    char GT_file[] = "../../../test_data/gt_boxes.bin";
+    char GT_file[] = STR(TEST_OUTPUT_FILE_NAME); 
     ci_output_test(Output_1, GT_file, (float *) main_L2_Memory_Dyn);
 
 #else
@@ -177,49 +169,49 @@ static void cluster()
 }
 
 
-// static int open_camera(struct pi_device *device)
-// {
-//     PRINTF("Opening CSI2 camera\n");
+static int open_camera(struct pi_device *device)
+{
+    PRINTF("Opening CSI2 camera\n");
 
-//     struct pi_ov5647_conf cam_conf;
-//     pi_ov5647_conf_init(&cam_conf);
+    struct pi_ov5647_conf cam_conf;
+    pi_ov5647_conf_init(&cam_conf);
 
-//     cam_conf.format=PI_CAMERA_QVGA;
-//     pi_open_from_conf(device, &cam_conf);
-//     if (pi_camera_open(device))
-//         return -1;
+    cam_conf.format=PI_CAMERA_QVGA;
+    pi_open_from_conf(device, &cam_conf);
+    if (pi_camera_open(device))
+        return -1;
 
-//     return 0;
-// }
+    return 0;
+}
 
-// uint8_t UART_START_COM[] = {0xF1,0x1F};
+uint8_t UART_START_COM[] = {0xF1,0x1F};
 
-// void init_uart_communication(pi_device_t* uart_dev,uint32_t baudrate ){
-//     pi_pad_function_set(PI_PAD_065, PI_PAD_FUNC0);
-//     pi_pad_function_set(PI_PAD_066, PI_PAD_FUNC0);
+void init_uart_communication(pi_device_t* uart_dev,uint32_t baudrate ){
+    pi_pad_function_set(PI_PAD_065, PI_PAD_FUNC0);
+    pi_pad_function_set(PI_PAD_066, PI_PAD_FUNC0);
 
-//     struct pi_uart_conf config = {0};
-//     /* Init & open uart. */
-//     pi_uart_conf_init(&config);
-//     config.uart_id = 1;
-//     config.use_fast_clk = 0;              // Enable the fast clk for uart
-//     config.baudrate_bps = baudrate;
-//     config.enable_tx = 1;
-//     config.enable_rx = 0;
-//     pi_open_from_conf(uart_dev, &config);
+    struct pi_uart_conf config = {0};
+    /* Init & open uart. */
+    pi_uart_conf_init(&config);
+    config.uart_id = 1;
+    config.use_fast_clk = 0;              // Enable the fast clk for uart
+    config.baudrate_bps = baudrate;
+    config.enable_tx = 1;
+    config.enable_rx = 0;
+    pi_open_from_conf(uart_dev, &config);
 
-//     if (pi_uart_open(uart_dev))
-//     {
-//         pmsis_exit(-117);
-//     }
-// }
+    if (pi_uart_open(uart_dev))
+    {
+        pmsis_exit(-117);
+    }
+}
 
-// void send_image_to_uart(pi_device_t* uart_dev,uint8_t* img,int img_w,int img_h,int pixel_size){
+void send_image_to_uart(pi_device_t* uart_dev,uint8_t* img,int img_w,int img_h,int pixel_size){
 
-//     pi_uart_write(uart_dev,UART_START_COM,2);
-//     //Write Image row by row
-//     for(int i=0;i<img_h;i++) pi_uart_write(uart_dev,&(img[i*img_w*pixel_size]),img_w*pixel_size);
-// }
+    pi_uart_write(uart_dev,UART_START_COM,2);
+    //Write Image row by row
+    for(int i=0;i<img_h;i++) pi_uart_write(uart_dev,&(img[i*img_w*pixel_size]),img_w*pixel_size);
+}
 
 
 int test_main(void)
@@ -279,42 +271,42 @@ int test_main(void)
     */
     #if defined CI || defined INFERENCE
     copy_inputs();
-    // #elif defined DEMO
+    #elif defined DEMO
 
-    // pi_device_t uart_dev;
-    // init_uart_communication(&uart_dev,3000000);
+    pi_device_t uart_dev;
+    init_uart_communication(&uart_dev,3000000);
     
-    // //Open camera
-    // struct pi_device camera;
-    // pi_evt_t cam_task;
+    //Open camera
+    struct pi_device camera;
+    pi_evt_t cam_task;
 
-    // if (open_camera(&camera))
-    // {
-    //     printf("Failed to open camera\n");
-    //     return -1;
-    // }
-    // //turn on camera
-    // pi_camera_control(&camera, PI_CAMERA_CMD_ON, 0);
+    if (open_camera(&camera))
+    {
+        printf("Failed to open camera\n");
+        return -1;
+    }
+    //turn on camera
+    pi_camera_control(&camera, PI_CAMERA_CMD_ON, 0);
 
-    // uint8_t* cam_image = pi_l2_malloc(H_CAM*W_CAM*BYTES_CAM);
-    // if(cam_image==NULL){
-    //     printf("Error allocating image");
-    //     return -1;
-    // }
+    uint8_t* cam_image = pi_l2_malloc(H_CAM*W_CAM*BYTES_CAM);
+    if(cam_image==NULL){
+        printf("Error allocating image");
+        return -1;
+    }
 
-    // //Loop through images coming from camera
-    // while(1){
-    //     pi_camera_control(&camera, PI_CAMERA_CMD_START, 0);
-    //     pi_camera_capture_async(&camera, cam_image, H_CAM*W_CAM*BYTES_CAM, pi_evt_sig_init(&cam_task));
-    //     pi_evt_wait(&cam_task);
-    //     pi_camera_control(&camera, PI_CAMERA_CMD_STOP, 0);
+    //Loop through images coming from camera
+    while(1){
+        pi_camera_control(&camera, PI_CAMERA_CMD_START, 0);
+        pi_camera_capture_async(&camera, cam_image, H_CAM*W_CAM*BYTES_CAM, pi_evt_sig_init(&cam_task));
+        pi_evt_wait(&cam_task);
+        pi_camera_control(&camera, PI_CAMERA_CMD_STOP, 0);
         
-    //     for (int i = 0; i < H_CAM; i++) { // Put pixels on 8 bits instead of 10 to go on 1 byte encoding only
-    //         for (int j = 0; j < W_CAM; j++) {
-    //             // Shifts bits to delete the 2 LSB, on the 10 useful bits
-    //             cam_image[i * W_CAM + j] = (cam_image[(i * W_CAM + j) *2 +1] << 6) | (cam_image[(i * W_CAM + j) *2] >> 2);
-    //         }
-    //     }
+        for (int i = 0; i < H_CAM; i++) { // Put pixels on 8 bits instead of 10 to go on 1 byte encoding only
+            for (int j = 0; j < W_CAM; j++) {
+                // Shifts bits to delete the 2 LSB, on the 10 useful bits
+                cam_image[i * W_CAM + j] = (cam_image[(i * W_CAM + j) *2 +1] << 6) | (cam_image[(i * W_CAM + j) *2] >> 2);
+            }
+        }
 
     #endif
 
@@ -458,7 +450,8 @@ int test_main(void)
 
     mainCNN_Destruct();
 
-#ifdef PERF
+// #ifdef PERF
+#ifndef PERF
     {
       unsigned int TotalCycles = 0, TotalOper = 0;
       printf("\n");

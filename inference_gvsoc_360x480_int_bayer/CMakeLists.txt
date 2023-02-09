@@ -78,9 +78,11 @@ message(STATUS "Clock speeds - Cluster ${FREQ_CL} FC ${FREQ_FC} Peripheral ${FRE
 # math(EXPR FREQ_FC ${CONFIG_FREQUENCY_FC}/1000000 OUTPUT_FORMAT DECIMAL)
 # math(EXPR FREQ_PE ${CONFIG_FREQUENCY_PERIPH}/1000000 OUTPUT_FORMAT DECIMAL)
 
-set(INPUT_FILE_NAME ${CMAKE_CURRENT_SOURCE_DIR}/input_rgb.ppm)
-set(OUTPUT_FILE_NAME ${CMAKE_CURRENT_SOURCE_DIR}/output.ppm)
-set(OUTPUT_BIN_FILE_NAME ${CMAKE_CURRENT_SOURCE_DIR}/output.bin)
+set(TEST_INPUT_FILE_NAME      ${CMAKE_CURRENT_SOURCE_DIR}/test_data/input.ppm)
+set(TEST_OUTPUT_FILE_NAME     ${CMAKE_CURRENT_SOURCE_DIR}/test_data/gt_boxes.bin)
+set(INPUT_FILE_NAME           ${CMAKE_CURRENT_SOURCE_DIR}/input_rgb.ppm)
+set(OUTPUT_FILE_NAME          ${CMAKE_CURRENT_SOURCE_DIR}/output.ppm)
+set(OUTPUT_BIN_FILE_NAME      ${CMAKE_CURRENT_SOURCE_DIR}/output.bin)
 
 
 if(NOT DEFINED MODE)
@@ -109,6 +111,8 @@ list(APPEND TARGET_PREPROCESSOR -DPERF
                                 -DINPUT_FILE_NAME=${INPUT_FILE_NAME}
                                 -DOUTPUT_FILE_NAME=${OUTPUT_FILE_NAME}
                                 -DOUTPUT_BIN_FILE_NAME=${OUTPUT_BIN_FILE_NAME}
+                                -DTEST_INPUT_FILE_NAME=${TEST_INPUT_FILE_NAME}
+                                -DTEST_OUTPUT_FILE_NAME=${TEST_OUTPUT_FILE_NAME}
 )
 
 project(${TARGET_NAME} C ASM)
