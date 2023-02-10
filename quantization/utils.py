@@ -96,11 +96,10 @@ class CostomCOCODaset():
     def preproc_bayer(img, input_size, input_channels, swap=(2, 0, 1)):
         #BGR image
         h, w, c = img.shape 
-
         # get correct size 
-        if h > input_size[0]: 
+        if h > 2 * input_size[0]: 
             img = img[:2 * input_size[0], :, :]
-        if w > input_size[1]: 
+        if w > 2 * input_size[1]: 
             img = img[:, :2 * input_size[1], :] 
 
         # reszie by demosaicing
@@ -168,13 +167,12 @@ class GvsocInputGeneratorCOCO(CostomCOCODaset):
             "model_type must be 'bayer' or 'rgb'"
         self.model_type = model_type.lower()
 
-        if model_type.lower() == "bayer" and input_channels != 1:
-            logger.warning("Input_channels must be 1 for bayer model. Changing to 1")
-            input_channels = 1
-
-        elif model_type.lower() == "rgb" and input_channels != 3:
+        if model_type.lower() == "rgb" and input_channels != 3:
             logger.warning("Input_channels must be 3 for rgb model. Changing to 3")
             input_channels = 3
+
+        logger.info("Image type is {}".format(self.model_type))
+        logger.info("Input channels is {}".format(input_channels))
 
         self.gvsoc_inputs_folder = gvsoc_inputs_folder
         if not os.path.exists(self.gvsoc_inputs_folder):
@@ -196,22 +194,27 @@ class GvsocInputGeneratorCOCO(CostomCOCODaset):
 
         filename = self.annotations[self._idx]["file_name"]
 
-        if self.input_channels != 3:
+        if self.model_type == "bayer":
             filename = filename.replace("jpg", "png")
 
         img_file = os.path.join(self.data_dir, filename)
-        image = cv2.imread(
-            img_file, 
-            cv2.IMREAD_COLOR if self.input_channels == 3 else cv2.IMREAD_UNCHANGED)
+        image = cv2.imread(img_file, cv2.IMREAD_UNCHANGED)
 
         if len(image.shape) == 2:
             image = np.expand_dims(image, axis=2)
 
-        image = self.preproc(
-            image, 
-            self.input_size, 
-            input_channels=self.input_channels
-        )
+        if self.model_type == "bayer" and self.input_channels == 3:
+            image = self.preproc_bayer(
+                image, 
+                self.input_size, 
+                input_channels=self.input_channels
+            )
+        else: 
+            image = self.preproc(
+                image, 
+                self.input_size, 
+                input_channels=self.input_channels
+            )
         image = image.transpose(1, 2, 0)
 
         self._idx += 1
@@ -222,7 +225,7 @@ class GvsocInputGeneratorCOCO(CostomCOCODaset):
         for image, filename in tqdm(self):
             save_path = os.path.join(
                 self.gvsoc_inputs_folder,
-                filename + (".ppm" if self.model_type == "rgb" else ".pgm")
+                filename + (".ppm" if self.input_channels == 3 else ".pgm")
             ) 
             cv2.imwrite(save_path, image)
 
