@@ -288,7 +288,7 @@ int test_main(void)
     //turn on camera
     pi_camera_control(&camera, PI_CAMERA_CMD_ON, 0);
 
-    uint8_t* cam_image = pi_l2_malloc(H_CAM*W_CAM*BYTES_CAM);
+    uint8_t * cam_image = (uint8_t *) Input_1; // Input_1 is the buffer that is sent to the cluster
     if(cam_image==NULL){
         printf("Error allocating image");
         return -1;
@@ -322,9 +322,11 @@ int test_main(void)
     slicing_cycles = gap_fc_readhwtimer();
 
     #ifdef DEMO
-    slicing_hwc_channel(
+
+    char * cam_image = (char *) cam_image; //TODO: check if pointer points to Input_1 
+    slicing_hwc_channel_less_buffer(
         cam_image, 
-        Input_1, 
+        main_L2_Memory_Dyn + (H_INP * W_INP * CHANNELS),  // buffer used for slicing 
         H_INP, 
         W_INP,
         CHANNELS
@@ -409,20 +411,7 @@ int test_main(void)
     #ifdef DEMO 
 
     //Draw rectangles and send trought UART
-    for (int i=0; i < final_valid_boxes; i++){
-
-        int x1 = (int) Output_1[i*7 + 0];
-        int y1 = (int) Output_1[i*7 + 1];
-        int x2 = (int) Output_1[i*7 + 2];
-        int y2 = (int) Output_1[i*7 + 3];
-    
-
-        float score = Output_1[i*7 + 4] * Output_1[i*7 + 5];
-        int cls = (int) Output_1[i*7 + 6];
-
-        draw_rectangle(cam_image, W_INP, H_INP, x1, y1, x2, y2, 255);
-    }
-
+    draw_boxes(cam_image, Output_1, final_valid_boxes, H_INP, W_INP, CHANNELS);
     send_image_to_uart(&uart_dev,cam_image,W_CAM,H_CAM,1);
 
     } //end of while 1
@@ -431,7 +420,7 @@ int test_main(void)
     #ifdef INFERENCE
         /* ------ DRAW REATANGLES ------*/
         PRINTF("\t\t***Start draw reactangles ***\n");
-        draw_boxes(
+        draw_boxes_save(
             main_L2_Memory_Dyn_casted,
             Output_1,
             final_valid_boxes,

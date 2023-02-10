@@ -18,7 +18,7 @@ void draw_rectangle(
     unsigned char ColorValue);
 
 
-void draw_boxes(
+void draw_boxes_save(
     float * model_L2_Memory_Dyn_casted,
     float * Output_1,
     int final_valid_boxes,
@@ -26,3 +26,10 @@ void draw_boxes(
     int width,
     int channels);
 
+void draw_boxes(
+    unsigned char * image,
+    float * Output_1,
+    int final_valid_boxes,
+    int height,
+    int width,
+    int channels);

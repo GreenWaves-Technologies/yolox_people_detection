@@ -51,7 +51,7 @@ void draw_rectangle(
 }
 
 
-void draw_boxes(
+void draw_boxes_save(
     float * model_L2_Memory_Dyn_casted,
     float * Output_1,
     int final_valid_boxes,
@@ -98,7 +98,26 @@ void draw_boxes(
     ); 
 }
 
+void draw_boxes(
+    unsigned char * image,
+    float * Output_1,
+    int final_valid_boxes,
+    int height,
+    int width, 
+    int channels
+    ){
 
+    for (int i=0; i < final_valid_boxes; i++){
+        // get box
+        int x1 = (int) Output_1[i*7 + 0];
+        int y1 = (int) Output_1[i*7 + 1];
+        int x2 = (int) Output_1[i*7 + 2];
+        int y2 = (int) Output_1[i*7 + 3];
 
+        // get score and class 
+        float score =       Output_1[i*7 + 4] * Output_1[i*7 + 5];
+        int   cls   = (int) Output_1[i*7 + 6];
 
-
+        draw_rectangle(image, width, height, x1, y1, x2, y2, channels, 255);
+    }
+}
