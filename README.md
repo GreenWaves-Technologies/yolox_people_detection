@@ -65,12 +65,12 @@ pip install -r requirements.txt
 
 | Input Image Description   |          |
 |---------------------------|----------|
-| extension                 | .pgm     |
+| extension                 | .ppm     |
 | data type                 | uint8    |
 | image height              | 240      |
 | image width               | 320      |
-| number of image channels  | 1        |
-| channel order             | RAW BAYER|
+| number of image channels  | 3        |
+| channel order             | RAW BAYER demosaiced|
 
 ## Output
 
@@ -110,8 +110,11 @@ Following rusult are obtained using GVSOC inference and are validated on the RGB
 To run GVSOC inference on default image run the following command:
 
 ```bash
-cd inference_gvsoc
-make all run platform=gvsoc mode=DEMO
+cd inference_gvsoc_240x320_int
+rm -rf build weigths_tensors model.c modelInfos.h
+cmake -B build -DMODE=<mode-name>
+cd build
+make make run -j  
 ```
 
 To run GVSOC inference on a different image, replace the image in 'inference_gvsoc_240x320_int/input.ppm' with the desired image. The image should be in `.ppm` format as described in the [table](#input-output-data-format) above. Then then rerun the command [above](#gvsoc-inference). 
@@ -120,11 +123,21 @@ To run GVSOC inference on a different image, replace the image in 'inference_gvs
 To run GVSOC inference on default image run the following command:
 
 ```bash
-cd inference_gvsoc
-make all run platform=gvsoc mode=DEMO
+cd inference_gvsoc_<model input size: 240x320 or 360x480>_bayer
+rm -rf build weigths_tensors model.c modelInfos.h
+cmake -B build -DMODE=<mode-name>
+cd build
+make make run -j  
 ```
 
-To run GVSOC inference on a different image, replace the image in 'inference_gvsoc_240x320_int_bayer/input.pgm' with the desired image. The image should be in `.pgm` format as described in the [table](#input-output-data-format) above. Then then rerun the command [above](#gvsoc-inference). 
+### MODEs: 
+  `CI` - Test mode, checks if the model is working correctly. It runs the model on a single image and compares the output with the expected output.
+
+  `DEMO` - Run the model in images coming from a camera.
+
+  `INFERENCE` - Run the model on a single image and save the output in a file and visualized bounding boxes on the image. 
+
+To run GVSOC inference on a different image, replace the image in 'inference_gvsoc_240x320_int_bayer/input_rgb.ppm' with the desired image. The image should be in `.ppm` format as described in the [table](#input-output-data-format) above. Then then rerun the command [above](#gvsoc-inference). 
 
 
 
