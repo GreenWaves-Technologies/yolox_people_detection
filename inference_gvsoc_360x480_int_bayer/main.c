@@ -18,6 +18,7 @@
 #include "../custom_layers/decoding.h"
 #include "../custom_layers/postprocessing.h"
 #include "../custom_layers/draw.h"
+#include "../custom_layers/camera.h"
 #include "bsp/camera/ov5647.h"
 
 #if SILENT
@@ -300,13 +301,9 @@ int test_main(void)
         pi_camera_capture_async(&camera, cam_image, H_CAM*W_CAM*BYTES_CAM, pi_evt_sig_init(&cam_task));
         pi_evt_wait(&cam_task);
         pi_camera_control(&camera, PI_CAMERA_CMD_STOP, 0);
-        
-        for (int i = 0; i < H_CAM; i++) { // Put pixels on 8 bits instead of 10 to go on 1 byte encoding only
-            for (int j = 0; j < W_CAM; j++) {
-                // Shifts bits to delete the 2 LSB, on the 10 useful bits
-                cam_image[i * W_CAM + j] = (cam_image[(i * W_CAM + j) *2 +1] << 6) | (cam_image[(i * W_CAM + j) *2] >> 2);
-            }
-        }
+
+        // shift image bit by LSB to make 8 bit image from 10 bit 
+        shift_bits(cam_image, H_CAM, W_CAM);
 
     #endif
 
