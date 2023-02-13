@@ -13,13 +13,13 @@ def make_parser():
     parser.add_argument(
         "--onnx_path", 
         type=str, 
-        default="./weights/yolox-QVGA-bayer-BGR.onnx", 
+        default="./weights/yolox_nano_MVGA_less_chan.onnx", 
         help="path to onnx model"
     )
     parser.add_argument(
         "--coco_path", 
         type=str, 
-    default="~/data/coco/val2017_VGA_v2", 
+        default="~/data/coco/train2017_MVGA_v2", 
         help="path to coco dataset images"
     ) 
     parser.add_argument(
@@ -27,33 +27,31 @@ def make_parser():
         type=str, 
         choices=["rgb", "bayer"],
         default="bayer",
-        # default="rgb",
         help="type of images to quantize with"
     ) 
     parser.add_argument(
         "--coco_annotations_path", 
         type=str, 
-        default="~/data/coco/annotations/instances_val2017_VGA.json", 
+        default="~/data/coco/annotations/instances_train2017_MVGA.json", 
         help="path to coco dataset annotations"
     ) 
     parser.add_argument(
         "--quant_dataset_size", 
         type=int, 
         default=1000, 
-        help="size of dataset for quantization"
+        help="size f dataset for quantization"
     )
     parser.add_argument(
         "--input_size", 
         type=int, 
         nargs='+',
-        default=(480, 640), 
+        default=(360, 480), 
         help="input size"
     )
     parser.add_argument(
         "--input_channels",
         type=int,
         default=3,
-        # default=1,
         help="input channels"
     )
     parser.add_argument(
@@ -68,7 +66,6 @@ def make_parser():
         default=None, 
         help="value with which to clip the statistics"
     )
-
     return parser
 
 

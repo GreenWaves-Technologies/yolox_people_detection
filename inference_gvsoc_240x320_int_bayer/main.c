@@ -76,9 +76,7 @@ void copy_inputs() {
         IMGIO_OUTPUT_CHAR,
         0
     );
-
-#endif 
-
+#else
     PRINTF("\n\t\t*** READING INPUT FROM PPM FILE ***\n");
     status = ReadImageFromFile(
         STR(INPUT_FILE_NAME),
@@ -95,7 +93,7 @@ void copy_inputs() {
         PRINTF("Error reading image from file %s (error: %d) \n", STR(INPUT_FILE_NAME), status);
         exit(-1);
     } 
-
+#endif 
 }
 
 
