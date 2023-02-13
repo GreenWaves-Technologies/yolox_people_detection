@@ -1,14 +1,14 @@
 #include <pmsis.h>
 #include "gaplib/jpeg_encoder.h"
 #include "gaplib/ImgIO.h"
-#include "main.h"
+// #include "main.h"
 
 PI_L2 char jpeg_image[2048*50]; // how to set the size of the jpeg image? how to get this buffer the main.c file?
 
-char * compress(uint8_t * image, int * size){
+char * compress(uint8_t * image, int * size, int height, int width, int channels){
 
     jpeg_encoder_t enc;
-    unsigned int image_size = W_INP * H_INP * CHANNELS;
+    unsigned int image_size = height * width * channels; 
 
         // Open JPEG encoder
     printf("Start JPEG encoding\n");
@@ -24,8 +24,8 @@ char * compress(uint8_t * image, int * size){
 
     //For color Jpeg this flag can be added
     enc_conf.flags |= JPEG_ENCODER_FLAGS_COLOR;
-    enc_conf.width  = W_INP;
-    enc_conf.height = H_INP;
+    enc_conf.width  = width;
+    enc_conf.height = height;
 
     if (jpeg_encoder_open(&enc, &enc_conf)){
         printf("Error opening JPEG encoder\n");
@@ -52,8 +52,8 @@ char * compress(uint8_t * image, int * size){
     pi_buffer_t buffer;
     buffer.data    = image;
     buffer.size    = image_size;
-    buffer.width   = W_INP;
-    buffer.height  = H_INP;
+    buffer.width   = width;
+    buffer.height  = height;
     bitstream.data = &jpeg_image[header_size];
 
     pi_perf_conf(1<<PI_PERF_CYCLES);
@@ -66,7 +66,7 @@ char * compress(uint8_t * image, int * size){
     }
 
     pi_perf_stop();
-    printf("Jpeg encoding done! Performance: %d Cycles\n", pi_perf_read(PI_PERF_CYCLES));    
+    // printf("Jpeg encoding done! Performance: %d Cycles\n", pi_perf_read(PI_PERF_CYCLES));    
 
     // An finally get the footer
     bitstream.data = &jpeg_image[body_size + header_size];
@@ -78,8 +78,6 @@ char * compress(uint8_t * image, int * size){
     // calculate the total size and return it 
     int bitstream_size = body_size + header_size + footer_size;
     *size = bitstream_size;
-
-    printf("Encoding done at addr %p size %d bytes\n", jpeg_image, bitstream_size);
 
     // close the endoer 
     jpeg_encoder_stop(&enc);

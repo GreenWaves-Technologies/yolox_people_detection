@@ -10,18 +10,18 @@
 
 
 /* Autotiler includes. */
-#include "bsp/camera/ov5647.h"
 #include "main.h"
 #include "mainKernels.h"
-#include "gaplib/fs_switch.h"
 #include "gaplib/ImgIO.h"
-#include "slicing.h"
-#include "decoding.h"
-#include "postprocessing.h"
-#include "draw.h"
-#include "jpeg_compress.h"
-#include "img_flush.h"
+#include "gaplib/fs_switch.h"
 #include "bsp/camera/ov5647.h"
+#include "../custom_layers/draw.h"
+#include "../custom_layers/slicing.h"
+#include "../custom_layers/decoding.h"
+#include "../custom_layers/postprocessing.h"
+#include "../custom_layers/camera.h"
+#include "../custom_layers/jpeg_compress.h"
+#include "../custom_layers/img_flush.h"
 
 #if SILENT
 #define PRINTF(...) ((void) 0)
@@ -133,7 +133,7 @@ void write_outputs() {
 
 #ifdef CI
     PRINTF("\t\t***Start CI output test***\n");
-    char GT_file[] =STR(TEST_OUTPUT_FILE_NAME);
+    char GT_file[] = STR(TEST_OUTPUT_FILE_NAME); 
     ci_output_test(Output_1, GT_file, (float *) main_L2_Memory_Dyn);
 
 #else
@@ -288,7 +288,7 @@ int test_main(void)
     //turn on camera
     pi_camera_control(&camera, PI_CAMERA_CMD_ON, 0);
 
-    uint8_t* cam_image = pi_l2_malloc(H_CAM*W_CAM*BYTES_CAM);
+    uint8_t * cam_image = (uint8_t *) Input_1; // Input_1 is the buffer that is sent to the cluster
     if(cam_image==NULL){
         printf("Error allocating image");
         return -1;
@@ -300,13 +300,9 @@ int test_main(void)
         pi_camera_capture_async(&camera, cam_image, H_CAM*W_CAM*BYTES_CAM, pi_evt_sig_init(&cam_task));
         pi_evt_wait(&cam_task);
         pi_camera_control(&camera, PI_CAMERA_CMD_STOP, 0);
-        
-        for (int i = 0; i < H_CAM; i++) { // Put pixels on 8 bits instead of 10 to go on 1 byte encoding only
-            for (int j = 0; j < W_CAM; j++) {
-                // Shifts bits to delete the 2 LSB, on the 10 useful bits
-                cam_image[i * W_CAM + j] = (cam_image[(i * W_CAM + j) *2 +1] << 6) | (cam_image[(i * W_CAM + j) *2] >> 2);
-            }
-        }
+
+        // shift image bit by LSB to make 8 bit image from 10 bit 
+        shift_bits(cam_image, H_CAM, W_CAM);
 
     #endif
 
@@ -386,7 +382,8 @@ int test_main(void)
     to_bboxes(
         (main_L2_Memory_Dyn_casted + (RAWS * 6)), 
         bboxes, 
-        *num_val_boxes
+        *num_val_boxes,
+        top_k_boxes
         );
     bbox_cycles = gap_fc_readhwtimer() - bbox_cycles;
     
@@ -399,41 +396,43 @@ int test_main(void)
         Output_1,
         NMS_THRESH, 
         *num_val_boxes, 
-        &final_valid_boxes
+        &final_valid_boxes,
+        top_k_boxes
         );
     nms_cycles = gap_fc_readhwtimer() - nms_cycles;
 
     #ifdef DEMO 
 
     //Draw rectangles and send trought UART
-    for (int i=0; i < final_valid_boxes; i++){
-
-        int x1 = (int) Output_1[i*7 + 0];
-        int y1 = (int) Output_1[i*7 + 1];
-        int x2 = (int) Output_1[i*7 + 2];
-        int y2 = (int) Output_1[i*7 + 3];
-    
-
-        float score = Output_1[i*7 + 4] * Output_1[i*7 + 5];
-        int cls = (int) Output_1[i*7 + 6];
-
-        draw_rectangle(cam_image, W_INP, H_INP, x1, y1, x2, y2, 255);
-    }
-
+    draw_boxes(cam_image, Output_1, final_valid_boxes, H_INP, W_INP, CHANNELS);
     send_image_to_uart(&uart_dev,cam_image,W_CAM,H_CAM,1);
 
     } //end of while 1
     #endif
 
     #ifdef INFERENCE
-
         /* ------ DRAW REATANGLES ------*/
+        // first read image
+        if (ReadImageFromFile(
+            STR(INPUT_FILE_NAME),
+            W_INP, 
+            H_INP, 
+            CHANNELS, 
+            (unsigned char *) main_L2_Memory_Dyn_casted,
+            W_INP * H_INP * CHANNELS * sizeof(char), 
+            IMGIO_OUTPUT_CHAR,
+            0) != 0){ 
+            PRINTF("Error reading image\n");
+            }
+
         PRINTF("\t\t***Start draw reactangles ***\n");
         draw_boxes(
-            main_L2_Memory_Dyn_casted,
+            (unsigned char *) main_L2_Memory_Dyn_casted,
             Output_1,
-            final_valid_boxes
-        );    
+            final_valid_boxes,
+            H_INP,
+            W_INP,
+            CHANNELS);
 
         #ifdef COMPRESS 
         /* ------ JPEG COMPRESSION ------ */
@@ -441,7 +440,12 @@ int test_main(void)
 
         int bitstream_size;
         char * jpeg_image;
-        jpeg_image = compress((uint8_t *) main_L2_Memory_Dyn_casted, &bitstream_size);
+        jpeg_image = compress(
+            (uint8_t *) main_L2_Memory_Dyn_casted, 
+            &bitstream_size,
+            H_INP,
+            W_INP,
+            CHANNELS);
         
         /* ------ FLUSH COMPRESSED IMAGE  ------ */
         PRINTF("\t\t***Start flushing compressed image ***\n");

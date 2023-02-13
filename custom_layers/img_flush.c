@@ -13,7 +13,7 @@ int flush_iamge(char * image, int bitstream_size){
     if (pi_fs_mount(&host_fs))
         return -1;
 
-    void *File = pi_fs_open(&host_fs, "../imgTest.jpg", PI_FS_FLAGS_WRITE);
+    void *File = pi_fs_open(&host_fs, STR(OUTPUT_JPEG_FILE_NAME), PI_FS_FLAGS_WRITE);
 
     pi_fs_write(File, image, bitstream_size);        
 
