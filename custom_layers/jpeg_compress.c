@@ -3,7 +3,7 @@
 #include "gaplib/ImgIO.h"
 // #include "main.h"
 
-PI_L2 char jpeg_image[2048*50]; // how to set the size of the jpeg image? how to get this buffer the main.c file?
+PI_L2 char jpeg_image[2048*25]; // how to set the size of the jpeg image? how to get this buffer the main.c file?
 
 char * compress(uint8_t * image, int * size, int height, int width, int channels){
 
@@ -66,7 +66,7 @@ char * compress(uint8_t * image, int * size, int height, int width, int channels
     }
 
     pi_perf_stop();
-    // printf("Jpeg encoding done! Performance: %d Cycles\n", pi_perf_read(PI_PERF_CYCLES));    
+    printf("Jpeg encoding done! Performance: %d Cycles\n", pi_perf_read(PI_PERF_CYCLES));    
 
     // An finally get the footer
     bitstream.data = &jpeg_image[body_size + header_size];
