@@ -1,0 +1,1 @@
+char * compress(uint8_t * l2_mem, int * size, int height, int width, int channesl);

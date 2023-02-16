@@ -23,8 +23,9 @@ def make_parser():
     ) 
     parser.add_argument(
         "--input_size", 
-        type=tuple, 
-        default=(240,320), 
+        nargs='+',
+        type=int, 
+        default=(360, 480),
         help="input size"
     )
     parser.add_argument(
@@ -48,9 +49,9 @@ def main():
 
     gvsoc_input_generator = GvsocInputGeneratorCOCO(
         image_folder = args.image_folder,
-        annotations = args.annotations,
+        annotations  = args.annotations,
         gvsoc_inputs_folder = args.gvsoc_inputs,
-        input_size = args.input_size,
+        input_size = tuple(args.input_size),
         model_type = args.model_type,
         input_channels = args.input_channels,
     )

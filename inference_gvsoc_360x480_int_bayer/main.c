@@ -12,14 +12,16 @@
 /* Autotiler includes. */
 #include "main.h"
 #include "mainKernels.h"
-#include "gaplib/fs_switch.h"
 #include "gaplib/ImgIO.h"
+#include "gaplib/fs_switch.h"
+#include "bsp/camera/ov5647.h"
+#include "../custom_layers/draw.h"
 #include "../custom_layers/slicing.h"
 #include "../custom_layers/decoding.h"
 #include "../custom_layers/postprocessing.h"
-#include "../custom_layers/draw.h"
 #include "../custom_layers/camera.h"
-#include "bsp/camera/ov5647.h"
+#include "../custom_layers/jpeg_compress.h"
+#include "../custom_layers/img_flush.h"
 
 #if SILENT
 #define PRINTF(...) ((void) 0)
@@ -74,7 +76,6 @@ void copy_inputs() {
         IMGIO_OUTPUT_CHAR,
         0
     );
-
 #else
     PRINTF("\n\t\t*** READING INPUT FROM PPM FILE ***\n");
     status = ReadImageFromFile(
@@ -87,13 +88,12 @@ void copy_inputs() {
         IMGIO_OUTPUT_CHAR,
         0 // transpose from HWC to CHW 
     );
-#endif 
 
     if (status != 0) {
         PRINTF("Error reading image from file %s (error: %d) \n", STR(INPUT_FILE_NAME), status);
         exit(-1);
     } 
-
+#endif 
 }
 
 
@@ -146,7 +146,6 @@ void write_outputs() {
     void *File_Output_1;
     int ret_Output_1 = 0;
 
-    printf("final_valid_boxes = %d \n", final_valid_boxes);
     File_Output_1 = __OPEN_WRITE(fs, STR(OUTPUT_BIN_FILE_NAME));
     ret_Output_1 = __WRITE(File_Output_1, Output_1, final_valid_boxes * 7 * sizeof(float));
 
@@ -416,14 +415,61 @@ int test_main(void)
 
     #ifdef INFERENCE
         /* ------ DRAW REATANGLES ------*/
+        // first read image
+        if (ReadImageFromFile(
+            STR(INPUT_FILE_NAME),
+            W_INP, 
+            H_INP, 
+            CHANNELS, 
+            (unsigned char *) main_L2_Memory_Dyn_casted,
+            W_INP * H_INP * CHANNELS * sizeof(char), 
+            IMGIO_OUTPUT_CHAR,
+            0) != 0){ 
+            PRINTF("Error reading image\n");
+            }
+
         PRINTF("\t\t***Start draw reactangles ***\n");
-        draw_boxes_save(
-            main_L2_Memory_Dyn_casted,
+        draw_boxes(
+            (unsigned char *) main_L2_Memory_Dyn_casted,
             Output_1,
             final_valid_boxes,
             H_INP,
             W_INP,
             CHANNELS);
+
+        #ifdef COMPRESS 
+        /* ------ JPEG COMPRESSION ------ */
+        PRINTF("\t\t***Start JPEG compression ***\n");
+
+        int bitstream_size;
+        char * jpeg_image;
+        jpeg_image = compress(
+            (uint8_t *) main_L2_Memory_Dyn_casted, 
+            &bitstream_size,
+            H_INP,
+            W_INP,
+            CHANNELS);
+        
+        /* ------ FLUSH COMPRESSED IMAGE  ------ */
+        PRINTF("\t\t***Start flushing compressed image ***\n");
+
+        if (flush_iamge(jpeg_image, bitstream_size)){
+            PRINTF("Error flushing image\n");
+            return -1;
+        }
+
+        #else 
+        /* ------ WRITE IMAGE -------- */
+        int status = WriteImageToFile(
+            STR(OUTPUT_FILE_NAME),
+            W_INP, 
+            H_INP, 
+            CHANNELS, 
+            (unsigned char *) main_L2_Memory_Dyn_casted,
+            RGB888_IO // GRAY_SCALE_IO
+        ); 
+        #endif
+
     #endif
     /* ------ END ------*/
     PRINTF("\t\t***Runner completed***\n");
@@ -432,8 +478,7 @@ int test_main(void)
 
     mainCNN_Destruct();
 
-// #ifdef PERF
-#ifndef PERF
+#ifdef PERF
     {
       unsigned int TotalCycles = 0, TotalOper = 0;
       printf("\n");

@@ -19,6 +19,8 @@ set(SLICING             ../custom_layers/slicing.c)
 set(DECODING            ../custom_layers/decoding.c)
 set(POSTPROCESSING      ../custom_layers/postprocessing.c)
 set(DRAW                ../custom_layers/draw.c)  
+set(COMPRESS            ../custom_layers/jpeg_compress.c)  
+set(FLUSH               ../custom_layers/img_flush.c)  
 
 ###############################################################################
 # CMake pre initialization
@@ -45,6 +47,8 @@ list(APPEND TARGET_SRCS ${MAIN}
                         ${DECODING}
                         ${POSTPROCESSING}
                         ${DRAW}
+                        ${COMPRESS}
+                        ${FLUSH}
 )
 
 list(APPEND TARGET_INCS -I.
@@ -82,6 +86,7 @@ set(TEST_OUTPUT_FILE_NAME     ${CMAKE_CURRENT_SOURCE_DIR}/test_data/gt_boxes.bin
 set(INPUT_FILE_NAME           ${CMAKE_CURRENT_SOURCE_DIR}/input_rgb.ppm)
 set(OUTPUT_FILE_NAME          ${CMAKE_CURRENT_SOURCE_DIR}/output.ppm)
 set(OUTPUT_BIN_FILE_NAME      ${CMAKE_CURRENT_SOURCE_DIR}/output.bin)
+set(OUTPUT_JPEG_FILE_NAME      ${CMAKE_CURRENT_SOURCE_DIR}/output_compressed.jpg)
 
 
 if(NOT DEFINED MODE)
@@ -100,6 +105,7 @@ else()
 endif()
 
 list(APPEND TARGET_PREPROCESSOR -DPERF
+                                -DCOMPRESS
                                 -D${MODE}
                                 -DAT_MODEL_PREFIX=${MODEL_PREFIX}
                                 -DSTACK_SIZE=${CONFIG_CL_MASTER_CORE_STACK_SIZE}
@@ -110,6 +116,7 @@ list(APPEND TARGET_PREPROCESSOR -DPERF
                                 -DINPUT_FILE_NAME=${INPUT_FILE_NAME}
                                 -DOUTPUT_FILE_NAME=${OUTPUT_FILE_NAME}
                                 -DOUTPUT_BIN_FILE_NAME=${OUTPUT_BIN_FILE_NAME}
+                                -DOUTPUT_JPEG_FILE_NAME=${OUTPUT_JPEG_FILE_NAME}
                                 -DTEST_INPUT_FILE_NAME=${TEST_INPUT_FILE_NAME}
                                 -DTEST_OUTPUT_FILE_NAME=${TEST_OUTPUT_FILE_NAME}
 )

@@ -1,1 +1,0 @@
-int flush_iamge(char * image, int bitstream_size);

@@ -16,12 +16,12 @@ set(MODEL_EXPRESSIONS   ${CMAKE_CURRENT_SOURCE_DIR}/Expression_Kernels.c)
 set(AT_MODEL_PATH       ${CMAKE_CURRENT_SOURCE_DIR}/./model.c)
 set(AT_TENSORS_DIR      ${CMAKE_CURRENT_SOURCE_DIR}/./weights_tensors)
 
-set(SLICING             ${CMAKE_CURRENT_SOURCE_DIR}/slicing.c)
-set(DECODING            ${CMAKE_CURRENT_SOURCE_DIR}/decoding.c)
-set(POSTPROCESSING      ${CMAKE_CURRENT_SOURCE_DIR}/postprocessing.c)
-set(DRAW                ${CMAKE_CURRENT_SOURCE_DIR}/draw.c)  
-set(COMPRESS            ${CMAKE_CURRENT_SOURCE_DIR}/jpeg_compress.c)  
-set(FLUSH               ${CMAKE_CURRENT_SOURCE_DIR}/img_flush.c)  
+set(SLICING             ../custom_layers/slicing.c)
+set(DECODING            ../custom_layers/decoding.c)
+set(POSTPROCESSING      ../custom_layers/postprocessing.c)
+set(DRAW                ../custom_layers/draw.c)  
+set(COMPRESS            ../custom_layers/jpeg_compress.c)  
+set(FLUSH               ../custom_layers/img_flush.c)  
 
 ###############################################################################
 # CMake pre initialization
@@ -87,6 +87,7 @@ set(TEST_OUTPUT_FILE_NAME     ${CMAKE_CURRENT_SOURCE_DIR}/test_data/gt_boxes.bin
 set(INPUT_FILE_NAME           ${CMAKE_CURRENT_SOURCE_DIR}/input_rgb.ppm)
 set(OUTPUT_FILE_NAME          ${CMAKE_CURRENT_SOURCE_DIR}/output.ppm)
 set(OUTPUT_BIN_FILE_NAME      ${CMAKE_CURRENT_SOURCE_DIR}/output.bin)
+set(OUTPUT_JPEG_FILE_NAME      ${CMAKE_CURRENT_SOURCE_DIR}/output_compressed.jpg)
 
 
 if(NOT DEFINED MODE)
@@ -116,6 +117,7 @@ list(APPEND TARGET_PREPROCESSOR -DPERF
                                 -DINPUT_FILE_NAME=${INPUT_FILE_NAME}
                                 -DOUTPUT_FILE_NAME=${OUTPUT_FILE_NAME}
                                 -DOUTPUT_BIN_FILE_NAME=${OUTPUT_BIN_FILE_NAME}
+                                -DOUTPUT_JPEG_FILE_NAME=${OUTPUT_JPEG_FILE_NAME}
                                 -DTEST_INPUT_FILE_NAME=${TEST_INPUT_FILE_NAME}
                                 -DTEST_OUTPUT_FILE_NAME=${TEST_OUTPUT_FILE_NAME}
 )
