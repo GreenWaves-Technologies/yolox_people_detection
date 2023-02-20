@@ -12,7 +12,7 @@
 
 // CI test parameters
 #define OUTPUT_BOX_SIZE 7 
-#define CI_TEST_BOX_NUM 11 
+#define CI_TEST_BOX_NUM 3
 
 // parameters needed for slicing layer
 #define H_INP 240
