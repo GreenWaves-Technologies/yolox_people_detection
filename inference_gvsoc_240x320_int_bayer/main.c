@@ -29,6 +29,11 @@
 #define PRINTF printf
 #endif
 
+#define PI_DEVICE_RAM OspiRam
+pi_device_t PI_DEVICE_RAM;
+static struct pi_default_ram_conf ram_conf;
+uint32_t ext_ram_buf;
+
 // parameters needed for decoding layer
 // !!! do not forget to change the stride sizes accordint to the input size !!!  
 tTuple feature_maps[STRIDE_SIZE] = {{30.0, 40.0}, {15.0, 20.0}, {8.0, 10.0}};
@@ -77,6 +82,7 @@ void copy_inputs() {
         0
     );
 #else
+#ifdef INFERENCE
     PRINTF("\n\t\t*** READING INPUT FROM PPM FILE ***\n");
     status = ReadImageFromFile(
         STR(INPUT_FILE_NAME),
@@ -92,7 +98,8 @@ void copy_inputs() {
     if (status != 0) {
         PRINTF("Error reading image from file %s (error: %d) \n", STR(INPUT_FILE_NAME), status);
         exit(-1);
-    } 
+    }
+#endif
 #endif 
 }
 
@@ -135,8 +142,8 @@ void write_outputs() {
     PRINTF("\t\t***Start CI output test***\n");
     char GT_file[] = STR(TEST_OUTPUT_FILE_NAME); 
     ci_output_test(Output_1, GT_file, (float *) main_L2_Memory_Dyn);
-
 #else
+#ifdef INFERENCE
     /* ------ SAVE ------*/
     PRINTF("\t\t***Start saving output***\n");
 
@@ -151,7 +158,7 @@ void write_outputs() {
 
     __CLOSE(File_Output_1);
     __FS_DEINIT(fs);
-
+#endif
 #endif
 
 }
@@ -189,6 +196,10 @@ uint8_t UART_START_COM[] = {0xF1,0x1F};
 void init_uart_communication(pi_device_t* uart_dev,uint32_t baudrate ){
     pi_pad_function_set(PI_PAD_065, PI_PAD_FUNC0);
     pi_pad_function_set(PI_PAD_066, PI_PAD_FUNC0);
+    pi_pad_function_set(PI_PAD_044, PI_PAD_FUNC0);
+    pi_pad_mux_group_set(PI_PAD_044, PI_PAD_MUX_GROUP_UART1_RX);
+    pi_pad_function_set(PI_PAD_045, PI_PAD_FUNC0);
+    pi_pad_mux_group_set(PI_PAD_045, PI_PAD_MUX_GROUP_UART1_TX);
 
     struct pi_uart_conf config = {0};
     /* Init & open uart. */
@@ -269,9 +280,9 @@ int test_main(void)
     /*
      * Put here Your input settings
     */
-    #if defined CI || defined INFERENCE
+#if defined CI || defined INFERENCE
     copy_inputs();
-    #elif defined DEMO
+#elif defined DEMO
 
     pi_device_t uart_dev;
     init_uart_communication(&uart_dev,3000000);
@@ -285,6 +296,7 @@ int test_main(void)
         printf("Failed to open camera\n");
         return -1;
     }
+    printf("Turning camera on...\n");
     //turn on camera
     pi_camera_control(&camera, PI_CAMERA_CMD_ON, 0);
 
@@ -294,8 +306,24 @@ int test_main(void)
         return -1;
     }
 
+    /* Init & open ram. */
+    pi_default_ram_conf_init(&ram_conf);
+    pi_open_from_conf(&PI_DEVICE_RAM, &ram_conf);
+
+    printf("open ram\n");
+    if (pi_ram_open(&PI_DEVICE_RAM)) {
+        printf("Error ram open !\n");
+        pmsis_exit(-5);
+    }
+    printf("ram opened\n");
+    if (pi_ram_alloc(&PI_DEVICE_RAM, (uint32_t *) ext_ram_buf, H_CAM*W_CAM) != 0) {
+        printf("Failed to allocate memory in external ram (%ld bytes)\n", H_CAM*W_CAM);
+        pmsis_exit(-1);
+    }
+
     //Loop through images coming from camera
     while(1){
+        // printf("Running loop\n");
         pi_camera_control(&camera, PI_CAMERA_CMD_START, 0);
         pi_camera_capture_async(&camera, cam_image, H_CAM*W_CAM*BYTES_CAM, pi_evt_sig_init(&cam_task));
         pi_evt_wait(&cam_task);
@@ -303,112 +331,113 @@ int test_main(void)
 
         // shift image bit by LSB to make 8 bit image from 10 bit 
         shift_bits(cam_image, H_CAM, W_CAM);
+        pi_ram_write(&PI_DEVICE_RAM, (uint32_t *) ext_ram_buf,  (uint32_t) cam_image, (uint32_t) H_CAM*W_CAM);
 
-    #endif
+#endif
 
 
-    #ifdef PERF
-    PRINTF("\t\t***Start FC timer***\n");
-    gap_fc_starttimer();
-    gap_fc_resethwtimer();
-    #endif
+        #ifdef PERF
+        PRINTF("\t\t***Start FC timer***\n");
+        gap_fc_starttimer();
+        gap_fc_resethwtimer();
+        #endif
 
-    /* ------ SLICING ------*/
-    PRINTF("\t\t***Start slicing***\n");
-    slicing_cycles = gap_fc_readhwtimer();
+        /* ------ SLICING ------*/
+        PRINTF("\t\t***Start slicing***\n");
+        slicing_cycles = gap_fc_readhwtimer();
 
-    #ifdef DEMO
-    slicing_hwc_channel(
-        cam_image, 
-        Input_1, 
-        H_INP, 
-        W_INP,
-        CHANNELS
+        #ifdef DEMO
+        slicing_hwc_channel(
+            cam_image, 
+            Input_1, 
+            H_INP, 
+            W_INP,
+            CHANNELS
+            );
+        #else
+        slicing_hwc_channel(
+            main_L2_Memory_Dyn + (H_INP * W_INP * CHANNELS), 
+            Input_1, 
+            H_INP, 
+            W_INP,
+            CHANNELS
+            );
+        #endif
+
+        slicing_cycles = gap_fc_readhwtimer() - slicing_cycles;
+
+
+        /* ------ INFERENCE ------*/
+        PRINTF("\t\t***Call CLUSTER***\n");
+        pi_cluster_send_task_to_cl(&cluster_dev, &task);
+
+        /* ------ DECODING ------*/
+        PRINTF("\t\t***Start decoding***\n");
+        decoding_cycles = gap_fc_readhwtimer();
+        decoding(
+            Output_1,
+            feature_maps, 
+            strides, 
+            STRIDE_SIZE
         );
-    #else
-    slicing_hwc_channel(
-        main_L2_Memory_Dyn + (H_INP * W_INP * CHANNELS), 
-        Input_1, 
-        H_INP, 
-        W_INP,
-        CHANNELS
-        );
-    #endif
-
-    slicing_cycles = gap_fc_readhwtimer() - slicing_cycles;
+        decoding_cycles = gap_fc_readhwtimer() - decoding_cycles;
 
 
-    /* ------ INFERENCE ------*/
-    PRINTF("\t\t***Call CLUSTER***\n");
-    pi_cluster_send_task_to_cl(&cluster_dev, &task);
+        /* ------ POST PROCESSING ------*/
+        /* ------ xywh2xyxy ------*/
+        PRINTF("\t\t***Start xywh2xyxy***\n");
+        xywh2xyxy_cycles = gap_fc_readhwtimer();
+        xywh2xyxy(Output_1, (int) (RAWS));
+        xywh2xyxy_cycles = gap_fc_readhwtimer() - xywh2xyxy_cycles;
 
-    /* ------ DECODING ------*/
-    PRINTF("\t\t***Start decoding***\n");
-    decoding_cycles = gap_fc_readhwtimer();
-    decoding(
-        Output_1,
-        feature_maps, 
-        strides, 
-        STRIDE_SIZE
-    );
-    decoding_cycles = gap_fc_readhwtimer() - decoding_cycles;
+        /* ------ filter boxes ------*/
+        PRINTF("\t\t***Start filter boxes ***\n");
+        //cast model_L2_Memory_Dyn to float16
+        float * main_L2_Memory_Dyn_casted = (float *) main_L2_Memory_Dyn;
+        *num_val_boxes = 0;
+        filter_boxes_cycles = gap_fc_readhwtimer();
+        filter_boxes(
+            Output_1, 
+            (main_L2_Memory_Dyn_casted + (RAWS * 6)), 
+            CONF_THRESH, 
+            RAWS, 
+            num_val_boxes
+            );
+        filter_boxes_cycles = gap_fc_readhwtimer() - filter_boxes_cycles;
 
+        /* ------ conver boxes ------*/
+        PRINTF("\t\t***Start conver boxes ***\n");
+        bbox_cycles = gap_fc_readhwtimer();
+        to_bboxes(
+            (main_L2_Memory_Dyn_casted + (RAWS * 6)), 
+            bboxes, 
+            *num_val_boxes,
+            top_k_boxes
+            );
+        bbox_cycles = gap_fc_readhwtimer() - bbox_cycles;
 
-    /* ------ POST PROCESSING ------*/
-    /* ------ xywh2xyxy ------*/
-    PRINTF("\t\t***Start xywh2xyxy***\n");
-    xywh2xyxy_cycles = gap_fc_readhwtimer();
-    xywh2xyxy(Output_1, (int) (RAWS));
-    xywh2xyxy_cycles = gap_fc_readhwtimer() - xywh2xyxy_cycles;
+        /* ------ nms ------*/
+        PRINTF("\t\t***Start nms ***\n");
+        final_valid_boxes = 0;
+        nms_cycles = gap_fc_readhwtimer();
+        nms(
+            bboxes, 
+            Output_1,
+            NMS_THRESH, 
+            *num_val_boxes, 
+            &final_valid_boxes,
+            top_k_boxes
+            );
+        nms_cycles = gap_fc_readhwtimer() - nms_cycles;
 
-    /* ------ filter boxes ------*/
-    PRINTF("\t\t***Start filter boxes ***\n");
-    //cast model_L2_Memory_Dyn to float16
-    float * main_L2_Memory_Dyn_casted = (float *) main_L2_Memory_Dyn;
-    *num_val_boxes = 0;
-    filter_boxes_cycles = gap_fc_readhwtimer();
-    filter_boxes(
-        Output_1, 
-        (main_L2_Memory_Dyn_casted + (RAWS * 6)), 
-        CONF_THRESH, 
-        RAWS, 
-        num_val_boxes
-        );
-    filter_boxes_cycles = gap_fc_readhwtimer() - filter_boxes_cycles;
-
-    /* ------ conver boxes ------*/
-    PRINTF("\t\t***Start conver boxes ***\n");
-    bbox_cycles = gap_fc_readhwtimer();
-    to_bboxes(
-        (main_L2_Memory_Dyn_casted + (RAWS * 6)), 
-        bboxes, 
-        *num_val_boxes,
-        top_k_boxes
-        );
-    bbox_cycles = gap_fc_readhwtimer() - bbox_cycles;
-    
-    /* ------ nms ------*/
-    PRINTF("\t\t***Start nms ***\n");
-    final_valid_boxes = 0;
-    nms_cycles = gap_fc_readhwtimer();
-    nms(
-        bboxes, 
-        Output_1,
-        NMS_THRESH, 
-        *num_val_boxes, 
-        &final_valid_boxes,
-        top_k_boxes
-        );
-    nms_cycles = gap_fc_readhwtimer() - nms_cycles;
-
-    #ifdef DEMO 
-
-    //Draw rectangles and send trought UART
-    draw_boxes(cam_image, Output_1, final_valid_boxes, H_INP, W_INP, CHANNELS);
-    send_image_to_uart(&uart_dev,cam_image,W_CAM,H_CAM,1);
+#ifdef DEMO 
+        //Draw rectangles and send trought UART
+        pi_ram_read(&PI_DEVICE_RAM, (uint32_t *) ext_ram_buf,  (uint32_t) cam_image, (uint32_t) H_CAM*W_CAM);
+        draw_boxes(cam_image, Output_1, final_valid_boxes, H_INP, W_INP, 1);
+        send_image_to_uart(&uart_dev,cam_image,W_CAM,H_CAM,1);
 
     } //end of while 1
-    #endif
+#endif
 
     #ifdef INFERENCE
         /* ------ DRAW REATANGLES ------*/
@@ -477,31 +506,32 @@ int test_main(void)
 
 #ifdef PERF
     {
-      unsigned int TotalCycles = 0, TotalOper = 0;
-      printf("\n");
-      for (unsigned int i=0; i<(sizeof(AT_GraphPerf)/sizeof(unsigned int)); i++) {
-        TotalCycles += AT_GraphPerf[i]; TotalOper += AT_GraphOperInfosNames[i];
-      }
-      TotalCycles += slicing_cycles + decoding_cycles + xywh2xyxy_cycles + filter_boxes_cycles + bbox_cycles + nms_cycles;
-      for (unsigned int i=0; i<(sizeof(AT_GraphPerf)/sizeof(unsigned int)); i++) {
-        printf("%45s: Cycles: %12u, Cyc%%: %5.1f%%, Operations: %12u, Op%%: %5.1f%%, Operations/Cycle: %f\n", AT_GraphNodeNames[i], AT_GraphPerf[i], 100*((float) (AT_GraphPerf[i]) / TotalCycles), AT_GraphOperInfosNames[i], 100*((float) (AT_GraphOperInfosNames[i]) / TotalOper), ((float) AT_GraphOperInfosNames[i])/ AT_GraphPerf[i]);
-      }
-        printf("%45s: Cycles: %12u, Cyc%%: %5.1f%%, Operations: %12u, Op%%: %5.1f%%, Operations/Cycle: %f\n", "Slicing", slicing_cycles, 100 * ((float) (slicing_cycles) / TotalCycles), NULL, NULL, NULL);
-        
+        unsigned int NNCycles = 0, TotalCycles = 0, NNOper = 0, TotalOper = 0;
+        printf("\n");
+        for (unsigned int i=0; i<(sizeof(AT_GraphPerf)/sizeof(unsigned int)); i++) {
+            NNCycles += AT_GraphPerf[i]; NNOper += AT_GraphOperInfosNames[i];
+        }
+
+        TotalOper += NNOper;
+        TotalCycles += NNCycles + slicing_cycles + decoding_cycles + xywh2xyxy_cycles + filter_boxes_cycles + bbox_cycles + nms_cycles;
+        // for (unsigned int i=0; i<(sizeof(AT_GraphPerf)/sizeof(unsigned int)); i++) {
+        //   printf("%45s: Cycles: %12u, Cyc%%: %5.1f%%, Operations: %12u, Op%%: %5.1f%%, Operations/Cycle: %f\n", AT_GraphNodeNames[i], AT_GraphPerf[i], 100*((float) (AT_GraphPerf[i]) / TotalCycles), AT_GraphOperInfosNames[i], 100*((float) (AT_GraphOperInfosNames[i]) / TotalOper), ((float) AT_GraphOperInfosNames[i])/ AT_GraphPerf[i]);
+        // }
+
+        // Slicing
+        printf("%45s: Cycles: %12u, Cyc%%: %5.1f%%, Operations: %12u, Op%%: %5.1f%%, Operations/Cycle: %f\n", "Slicing", slicing_cycles, 100 * ((float) (slicing_cycles) / TotalCycles), 0, 0, 0);
+        // NN
+        printf("%45s: Cycles: %12u, Cyc%%: %5.1f%%, Operations: %12u, Op%%: %5.1f%%, Operations/Cycle: %f\n", "NN", NNCycles, 100 * ((float) (NNCycles) / TotalCycles), NNOper, 100*((float) (NNOper) / TotalOper), ((float) NNOper)/ NNCycles);
         // decoding cycles
-        printf("%45s: Cycles: %12u, Cyc%%: %5.1f%%, Operations: %12u, Op%%: %5.1f%%, Operations/Cycle: %f\n", "Decoding", decoding_cycles, 100 * ((float) (decoding_cycles) / TotalCycles), NULL, NULL, NULL);
-
+        printf("%45s: Cycles: %12u, Cyc%%: %5.1f%%, Operations: %12u, Op%%: %5.1f%%, Operations/Cycle: %f\n", "Decoding", decoding_cycles, 100 * ((float) (decoding_cycles) / TotalCycles), 0, 0, 0);
         // xywh2xyxy cycles
-        printf("%45s: Cycles: %12u, Cyc%%: %5.1f%%, Operations: %12u, Op%%: %5.1f%%, Operations/Cycle: %f\n", "xywh2xyxy", xywh2xyxy_cycles, 100 * ((float) (xywh2xyxy_cycles) / TotalCycles), NULL, NULL, NULL);
-
+        printf("%45s: Cycles: %12u, Cyc%%: %5.1f%%, Operations: %12u, Op%%: %5.1f%%, Operations/Cycle: %f\n", "xywh2xyxy", xywh2xyxy_cycles, 100 * ((float) (xywh2xyxy_cycles) / TotalCycles), 0, 0, 0);
         // filter boxes cycles
-        printf("%45s: Cycles: %12u, Cyc%%: %5.1f%%, Operations: %12u, Op%%: %5.1f%%, Operations/Cycle: %f\n", "Filter boxes", filter_boxes_cycles, 100 * ((float) (filter_boxes_cycles) / TotalCycles), NULL, NULL, NULL);
-
+        printf("%45s: Cycles: %12u, Cyc%%: %5.1f%%, Operations: %12u, Op%%: %5.1f%%, Operations/Cycle: %f\n", "Filter boxes", filter_boxes_cycles, 100 * ((float) (filter_boxes_cycles) / TotalCycles), 0, 0, 0);
         // bbox cycles
-        printf("%45s: Cycles: %12u, Cyc%%: %5.1f%%, Operations: %12u, Op%%: %5.1f%%, Operations/Cycle: %f\n", "seq2bboxes", bbox_cycles, 100 * ((float) (bbox_cycles) / TotalCycles), NULL, NULL, NULL);
-
+        printf("%45s: Cycles: %12u, Cyc%%: %5.1f%%, Operations: %12u, Op%%: %5.1f%%, Operations/Cycle: %f\n", "seq2bboxes", bbox_cycles, 100 * ((float) (bbox_cycles) / TotalCycles), 0, 0, 0);
         // nms cycles
-        printf("%45s: Cycles: %12u, Cyc%%: %5.1f%%, Operations: %12u, Op%%: %5.1f%%, Operations/Cycle: %f\n", "NMS", nms_cycles, 100 * ((float) (nms_cycles) / TotalCycles), NULL, NULL, NULL);
+        printf("%45s: Cycles: %12u, Cyc%%: %5.1f%%, Operations: %12u, Op%%: %5.1f%%, Operations/Cycle: %f\n", "NMS", nms_cycles, 100 * ((float) (nms_cycles) / TotalCycles), 0, 0, 0);
 
         printf("\n");
         printf("%45s: Cycles: %12u, Cyc%%: 100.0%%, Operations: %12u, Op%%: 100.0%%, Operations/Cycle: %f\n", "Total Inference", TotalCycles, TotalOper, ((float) TotalOper)/ TotalCycles);

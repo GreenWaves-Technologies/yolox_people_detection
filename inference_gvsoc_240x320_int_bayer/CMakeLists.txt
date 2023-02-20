@@ -12,22 +12,31 @@ else()
 endif()
 
 set(MAIN                main.c)
-set(MODEL_EXPRESSIONS   ${CMAKE_CURRENT_SOURCE_DIR}/Expression_Kernels.c)
-set(AT_MODEL_PATH       ${CMAKE_CURRENT_SOURCE_DIR}/./model.c)
-set(AT_TENSORS_DIR      ${CMAKE_CURRENT_SOURCE_DIR}/./weights_tensors)
-
-set(SLICING             ../custom_layers/slicing.c)
-set(DECODING            ../custom_layers/decoding.c)
-set(POSTPROCESSING      ../custom_layers/postprocessing.c)
-set(DRAW                ../custom_layers/draw.c)  
-set(COMPRESS            ../custom_layers/jpeg_compress.c)  
-set(FLUSH               ../custom_layers/img_flush.c)  
 
 ###############################################################################
 # CMake pre initialization
 ###############################################################################
 
 include($ENV{GAP_SDK_HOME}/utils/cmake/setup.cmake)
+set(APP_MSG_PREFIX "[${BoldRed}YoloX${ColourReset}]")
+
+set(TEST_INPUT_FILE_NAME      ${CMAKE_CURRENT_SOURCE_DIR}/test_data/input.ppm)
+set(TEST_OUTPUT_FILE_NAME     ${CMAKE_CURRENT_SOURCE_DIR}/test_data/gt_boxes.bin)
+set(INPUT_FILE_NAME           ${CMAKE_CURRENT_SOURCE_DIR}/input_rgb.ppm)
+set(OUTPUT_FILE_NAME          ${CMAKE_CURRENT_SOURCE_DIR}/output.ppm)
+set(OUTPUT_BIN_FILE_NAME      ${CMAKE_CURRENT_SOURCE_DIR}/output.bin)
+set(OUTPUT_JPEG_FILE_NAME      ${CMAKE_CURRENT_SOURCE_DIR}/output_compressed.jpg)
+
+if(CONFIG_CI)
+  message(STATUS "${APP_MSG_PREFIX} Building App in CI Mode")
+  list(APPEND TARGET_PREPROCESSOR -DCI)
+elseif(CONFIG_INFERENCE)
+  message(STATUS "${APP_MSG_PREFIX} Building App in INFERENCE Mode")
+  list(APPEND TARGET_PREPROCESSOR -DINFERENCE)
+elseif(CONFIG_DEMO)
+  message(STATUS "${APP_MSG_PREFIX} Building App in DEMO Mode")
+  list(APPEND TARGET_PREPROCESSOR -DDEMO -DSILENT)
+endif()
 
 ###############################################################################
 # Autotiler Variables
@@ -35,6 +44,16 @@ include($ENV{GAP_SDK_HOME}/utils/cmake/setup.cmake)
 
 autotiler_define_gen_names(${TARGET_NAME})
 autotiler_setup(${TARGET_NAME})
+add_custom_command(
+  OUTPUT ${AT_MODEL_PATH} ${MODEL_EXPRESSIONS} ${AT_TENSORS_DIR}
+  COMMENT "Generating the autotiler model"
+  DEPENDS ../../model_generator/nntool_generate_model.py
+  COMMAND python3 ../../model_generator/nntool_generate_model.py ${CMAKE_CURRENT_SOURCE_DIR}/ yolox-QVGA-bayer-BGR.onnx precalculated_stats_bayer_v2_qvga_trainset_nonpadded.pickle ${AT_MODEL_PATH} ${AT_TENSORS_DIR}
+)
+add_custom_target(${NNTOOL_TARGET_PREFIX}clean_model
+  COMMENT "clean_model: removing ${COMMON_MODEL_BUILDDIR}/${MODEL_GEN}"
+  COMMAND rm -rf ${AT_MODEL_PATH}
+)
 
 ###############################################################################
 # Application dependencies
@@ -44,12 +63,13 @@ list(APPEND TARGET_SRCS ${MAIN}
                         ${CNN_LIB}
                         ${CONFIG_MODEL_BUILDDIR}/${KERNEL_C}
                         ${MODEL_EXPRESSIONS}
-                        ${SLICING}
-                        ${DECODING}
-                        ${POSTPROCESSING}
-                        ${DRAW}
-                        ${COMPRESS}
-                        ${FLUSH}
+                        ../custom_layers/slicing.c
+                        ../custom_layers/decoding.c
+                        ../custom_layers/postprocessing.c
+                        ../custom_layers/draw.c
+                        ../custom_layers/jpeg_compress.c
+                        ../custom_layers/img_flush.c
+                        ../custom_layers/camera.c
 )
 
 list(APPEND TARGET_INCS -I.
@@ -82,32 +102,8 @@ message(STATUS "Clock speeds - Cluster ${FREQ_CL} FC ${FREQ_FC} Peripheral ${FRE
 # math(EXPR FREQ_FC ${CONFIG_FREQUENCY_FC}/1000000 OUTPUT_FORMAT DECIMAL)
 # math(EXPR FREQ_PE ${CONFIG_FREQUENCY_PERIPH}/1000000 OUTPUT_FORMAT DECIMAL)
 
-set(TEST_INPUT_FILE_NAME      ${CMAKE_CURRENT_SOURCE_DIR}/test_data/input.ppm)
-set(TEST_OUTPUT_FILE_NAME     ${CMAKE_CURRENT_SOURCE_DIR}/test_data/gt_boxes.bin)
-set(INPUT_FILE_NAME           ${CMAKE_CURRENT_SOURCE_DIR}/input_rgb.ppm)
-set(OUTPUT_FILE_NAME          ${CMAKE_CURRENT_SOURCE_DIR}/output.ppm)
-set(OUTPUT_BIN_FILE_NAME      ${CMAKE_CURRENT_SOURCE_DIR}/output.bin)
-set(OUTPUT_JPEG_FILE_NAME      ${CMAKE_CURRENT_SOURCE_DIR}/output_compressed.jpg)
-
-
-if(NOT DEFINED MODE)
-  set(MODE "CI")
-  message(STATUS "Mode not defined, defaulting to ${MODE}")
-endif()
-
-if(MODE STREQUAL "CI")
-  message(STATUS "Mode: ${MODE}")
-elseif(MODE STREQUAL "INFERENCE")
-  message(STATUS "Mode: ${MODE}")
-elseif(MODE STREQUAL "DEMO")
-  message(STATUS "Mode: ${MODE}")
-else()
-  message(FATAL_ERROR "Mode: ${MODE} not supported")
-endif()
-
 list(APPEND TARGET_PREPROCESSOR -DPERF
                                 -DCOMPRESS
-                                -D${MODE}
                                 -DAT_MODEL_PREFIX=${MODEL_PREFIX}
                                 -DSTACK_SIZE=${CONFIG_CL_MASTER_CORE_STACK_SIZE}
                                 -DSLAVE_STACK_SIZE=${CONFIG_CL_SLAVE_CORE_STACK_SIZE}
@@ -150,18 +146,6 @@ endif()
 target_compile_options(${TARGET_NAME} PUBLIC   ${TARGET_CFLAGS}
                                                 ${TARGET_INCS}
                                                 ${TARGET_PREPROCESSOR})
-
-###############################################################################
-# Commands added for specific application
-###############################################################################
-
-message(STATUS "Generating model")
-add_custom_command(
-  OUTPUT ${AT_MODEL_PATH} ${MODEL_EXPRESSIONS} ${AT_TENSORS_DIR}
-  COMMENT "Generating the autotiler model"
-  DEPENDS ../../model_generator/nntool_generate_model.py
-  COMMAND python3 ../../model_generator/nntool_generate_model.py ${CMAKE_CURRENT_SOURCE_DIR}/ yolox-QVGA-bayer-BGR.onnx precalculated_stats_bayer_v2_qvga_trainset_nonpadded.pickle ${AT_MODEL_PATH}
-)
 
 ###############################################################################
 # CMake post initialization
