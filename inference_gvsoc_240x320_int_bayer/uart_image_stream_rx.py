@@ -41,6 +41,8 @@ def main():
                 im = Image.frombuffer('L',(INPUT_W,INPUT_H),out,'raw','L',0,1)
             elif PIXEL_SIZE == 2:
                 im = Image.frombuffer('I;16',(INPUT_W,INPUT_H),out,'raw','L',0,1)
+            elif PIXEL_SIZE == 3:
+                im = Image.frombuffer('RGB', (INPUT_W,INPUT_H), out,'raw','RGB',0,1)
             #im.save("received_img/img_"+str(count)+".png")
             open_cv_image = numpy.array(im)
             if DEBAYER:

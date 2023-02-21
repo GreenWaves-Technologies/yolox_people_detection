@@ -100,9 +100,10 @@ static void handle_transfer_end(void *arg) {
         #else
         uint16_t px = (img[a*2+1+(640*2)] << 6) | (img[a*2+(640*2)] >> 2);
         px += (img[a*2+1+2] << 6) | (img[a*2+2] >> 2);
-        img[rgb_idx++] = (img[a*2+1+(640*2)+2] << 6) | (img[a*2+(640*2)+2] >> 2);
-        img[rgb_idx++] = px/2;
+
         img[rgb_idx++] = (img[a*2+1] << 6) | (img[a*2] >> 2);
+        img[rgb_idx++] = px/2;
+        img[rgb_idx++] = (img[a*2+1+(640*2)+2] << 6) | (img[a*2+(640*2)+2] >> 2);
         #endif
 
     }
@@ -392,6 +393,7 @@ int test_main(void)
     pi_default_ram_conf_init(&ram_conf);
     pi_open_from_conf(&Ram, &ram_conf);
 
+    pi_evt_sig_init(&proc_task);
     printf("open ram\n");
     if (pi_ram_open(&Ram)) {
         printf("Error ram open !\n");
@@ -514,6 +516,7 @@ int test_main(void)
         pi_ram_read(&Ram, (uint32_t *) ext_ram_buf,  (uint32_t) main_L2_Memory_Dyn, (uint32_t) H_CAM*W_CAM);
         draw_boxes(main_L2_Memory_Dyn, Output_1, final_valid_boxes, H_INP, W_INP, 3);
         send_image_to_uart(&uart_dev,main_L2_Memory_Dyn,W_CAM,H_CAM,3);
+        pi_evt_sig_init(&proc_task);
 
     } //end of while 1
     pi_l2_free(iter_buff[0], ITER_SIZE);
