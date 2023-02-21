@@ -38,6 +38,7 @@ cur_dir = sys.argv[1]
 model_name = sys.argv[2]
 stats_name = sys.argv[3]
 at_model_path = sys.argv[4]
+weights_path = sys.argv[5]
 
 at_model_file = os.path.split(at_model_path)[-1]
 at_model_dir = os.path.split(at_model_path)[0]
@@ -86,7 +87,7 @@ G[0].allocate = True
 G.generate(
     write_constants=True,
     settings={
-        "tensor_directory": f"{at_model_dir}/weights_tensors",
+        "tensor_directory": weights_path,
         "model_directory": at_model_dir,
         "model_file": at_model_file,
 
