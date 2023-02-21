@@ -43,6 +43,7 @@ endif()
 ###############################################################################
 
 autotiler_define_gen_names(${TARGET_NAME})
+set(AT_TENSORS_DIR BUILD_MODEL/weights_tensors)
 autotiler_setup(${TARGET_NAME})
 add_custom_command(
   OUTPUT ${AT_MODEL_PATH} ${MODEL_EXPRESSIONS} ${AT_TENSORS_DIR}
