@@ -29,10 +29,95 @@
 #define PRINTF printf
 #endif
 
-#define PI_DEVICE_RAM OspiRam
-pi_device_t PI_DEVICE_RAM;
+pi_device_t Ram;
 static struct pi_default_ram_conf ram_conf;
-uint32_t ext_ram_buf;
+uint8_t ext_ram_buf;
+
+static pi_task_t ctrl_tasks[2];
+static pi_task_t ram_tasks[2];
+static int remaining_size;
+static int saved_size = 0;
+static volatile int done = 0;
+static int nb_transfers = 0;
+static int count_transfers = 0;
+static unsigned char current_buff = 0;
+static int current_task = 0;
+static int current_size[2];
+static void handle_transfer_end(void *arg);
+static void handle_ram_end(void *arg);
+PI_L2 unsigned char *iter_buff[2];
+
+// 2 Rows
+#define ITER_SIZE (W_CAM*2*2)
+#define RAW_SIZE (W_CAM*H_CAM*2) // For now only 10 bits config works
+
+static pi_event_t proc_task;
+
+static struct pi_device camera;
+PI_L2 unsigned char *buff[2];
+
+// This is called to enqueue new transfers
+static void enqueue_transfer() {
+    // We can enqueue new transfers if there are still a part of the image to
+    // capture and less than 2 transfers are pending (the dma supports up to 2 transfers
+    // at the same time)
+
+    while (remaining_size > 0 && nb_transfers < 2) {
+        int iter_size = (remaining_size < ITER_SIZE) ? remaining_size : ITER_SIZE;
+        pi_task_t *task = &ctrl_tasks[current_task];
+
+        // Enqueue a transfer. The callback will be called once the transfer is finished
+        // so that  a new one is enqueued while another one is already running
+        pi_camera_capture_async(&camera, iter_buff[current_task], iter_size, pi_evt_callback_no_irq_init(task, handle_transfer_end, (void *)current_task));
+
+        current_size[current_task] = iter_size;
+        remaining_size -= iter_size;
+        nb_transfers++;
+        current_task ^= 1;
+    }
+
+}
+
+static void handle_transfer_end(void *arg) {
+    nb_transfers--;
+    unsigned char current_buff = (unsigned char) arg;
+
+    enqueue_transfer();
+    pi_task_t *task = &ram_tasks[current_buff];
+    char * img = iter_buff[current_buff];
+    int rgb_idx=0;
+    for (int a = 0; a < 640; a+=2) {
+        // Shifts bits to delete the 2 LSB, on the 10 useful bits
+        
+        #if 0 //This is using grayscale
+        uint16_t px = (img[a*2+1] << 6) | (img[a*2] >> 2);
+        px += (img[a*2+1+2] << 6) | (img[a*2+2] >> 2);
+        px += (img[a*2+1+(640*2)] << 6) | (img[a*2+(640*2)] >> 2);
+        px += (img[a*2+1+(640*2)+2] << 6) | (img[a*2+(640*2)+2] >> 2);
+        img[rgb_idx++] = px/4;
+        img[rgb_idx++] = px/4;
+        img[rgb_idx++] = px/4;
+        #else
+        uint16_t px = (img[a*2+1+(640*2)] << 6) | (img[a*2+(640*2)] >> 2);
+        px += (img[a*2+1+2] << 6) | (img[a*2+2] >> 2);
+        img[rgb_idx++] = (img[a*2+1+(640*2)+2] << 6) | (img[a*2+(640*2)+2] >> 2);
+        img[rgb_idx++] = px/2;
+        img[rgb_idx++] = (img[a*2+1] << 6) | (img[a*2] >> 2);
+        #endif
+
+    }
+    pi_ram_write_async(&Ram, (ext_ram_buf + count_transfers*320*3), img, (uint32_t) 320*3, pi_evt_callback_no_irq_init(&ram_tasks[current_buff], handle_ram_end, NULL));
+
+    count_transfers++;
+}
+
+static void handle_ram_end(void *arg) {
+    saved_size += 320*3;
+    if (nb_transfers == 0 && saved_size == H_INP*W_INP*CHANNELS) {
+        pi_evt_push(&proc_task);
+    }
+}
+
 
 // parameters needed for decoding layer
 // !!! do not forget to change the stride sizes accordint to the input size !!!  
@@ -49,12 +134,13 @@ Box bboxes[top_k_boxes];
 int final_valid_boxes;
 
 // cycles count variables
-unsigned int slicing_cycles;
-unsigned int decoding_cycles;
-unsigned int xywh2xyxy_cycles;
-unsigned int filter_boxes_cycles;
-unsigned int bbox_cycles;
-unsigned int nms_cycles;
+unsigned int slicing_cycles      = 0;
+unsigned int jpeg_cycles         = 0;
+unsigned int decoding_cycles     = 0;
+unsigned int xywh2xyxy_cycles    = 0;
+unsigned int filter_boxes_cycles = 0;
+unsigned int bbox_cycles         = 0;
+unsigned int nms_cycles          = 0;
 
 
 AT_DEFAULTFLASH_EXT_ADDR_TYPE main_L3_Flash = 0;
@@ -183,7 +269,7 @@ static int open_camera(struct pi_device *device)
     struct pi_ov5647_conf cam_conf;
     pi_ov5647_conf_init(&cam_conf);
 
-    cam_conf.format=PI_CAMERA_QVGA;
+    cam_conf.format=PI_CAMERA_VGA;
     pi_open_from_conf(device, &cam_conf);
     if (pi_camera_open(device))
         return -1;
@@ -253,13 +339,13 @@ int test_main(void)
     /* Frequency Settings: defined in the Makefile */
     int cur_fc_freq = pi_freq_set(PI_FREQ_DOMAIN_FC, FREQ_FC*1000*1000);
     int cur_cl_freq = pi_freq_set(PI_FREQ_DOMAIN_CL, FREQ_CL*1000*1000);
-    int cur_pe_freq = pi_freq_set(PI_FREQ_DOMAIN_PERIPH, FREQ_PE*1000*1000);
+    int cur_pe_freq = pi_freq_set(PI_FREQ_DOMAIN_PERIPH, 360*1000*1000);
     if (cur_fc_freq == -1 || cur_cl_freq == -1 || cur_pe_freq == -1)
     {
         PRINTF("Error changing frequency !\nTest failed...\n");
         pmsis_exit(-4);
     }
-	PRINTF("FC Frequency as %d Hz, CL Frequency = %d Hz, PERIIPH Frequency = %d Hz\n", 
+	printf("FC Frequency as %d Hz, CL Frequency = %d Hz, PERIIPH Frequency = %d Hz\n", 
             pi_freq_get(PI_FREQ_DOMAIN_FC), pi_freq_get(PI_FREQ_DOMAIN_CL), pi_freq_get(PI_FREQ_DOMAIN_PERIPH));
 
     
@@ -288,9 +374,6 @@ int test_main(void)
     init_uart_communication(&uart_dev,3000000);
     
     //Open camera
-    struct pi_device camera;
-    pi_evt_t cam_task;
-
     if (open_camera(&camera))
     {
         printf("Failed to open camera\n");
@@ -299,39 +382,45 @@ int test_main(void)
     printf("Turning camera on...\n");
     //turn on camera
     pi_camera_control(&camera, PI_CAMERA_CMD_ON, 0);
-
-    uint8_t * cam_image = (uint8_t *) Input_1; // Input_1 is the buffer that is sent to the cluster
-    if(cam_image==NULL){
-        printf("Error allocating image");
-        return -1;
-    }
+    // Allocate ping pong buffers for Camera read
+    iter_buff[0] = pi_l2_malloc(ITER_SIZE);
+    if (iter_buff[0] == NULL) return -1;
+    iter_buff[1] = pi_l2_malloc(ITER_SIZE);
+    if (iter_buff[1] == NULL) return -1;
 
     /* Init & open ram. */
     pi_default_ram_conf_init(&ram_conf);
-    pi_open_from_conf(&PI_DEVICE_RAM, &ram_conf);
+    pi_open_from_conf(&Ram, &ram_conf);
 
     printf("open ram\n");
-    if (pi_ram_open(&PI_DEVICE_RAM)) {
+    if (pi_ram_open(&Ram)) {
         printf("Error ram open !\n");
         pmsis_exit(-5);
     }
     printf("ram opened\n");
-    if (pi_ram_alloc(&PI_DEVICE_RAM, (uint32_t *) ext_ram_buf, H_CAM*W_CAM) != 0) {
-        printf("Failed to allocate memory in external ram (%ld bytes)\n", H_CAM*W_CAM);
+    if (pi_ram_alloc(&Ram, (uint32_t *) ext_ram_buf, H_INP * W_INP * CHANNELS) != 0) {
+        printf("Failed to allocate memory in external ram (%ld bytes)\n", H_INP * W_INP * CHANNELS);
         pmsis_exit(-1);
     }
 
-    //Loop through images coming from camera
+    int iter=0;    
     while(1){
-        // printf("Running loop\n");
-        pi_camera_control(&camera, PI_CAMERA_CMD_START, 0);
-        pi_camera_capture_async(&camera, cam_image, H_CAM*W_CAM*BYTES_CAM, pi_evt_sig_init(&cam_task));
-        pi_evt_wait(&cam_task);
-        pi_camera_control(&camera, PI_CAMERA_CMD_STOP, 0);
+        remaining_size = RAW_SIZE;
+        saved_size=0;
+        nb_transfers=0;
+        count_transfers=0;
+        current_buff=0;
+        done=0;
+        current_task = 0;
 
-        // shift image bit by LSB to make 8 bit image from 10 bit 
-        shift_bits(cam_image, H_CAM, W_CAM);
-        pi_ram_write(&PI_DEVICE_RAM, (uint32_t *) ext_ram_buf,  (uint32_t) cam_image, (uint32_t) H_CAM*W_CAM);
+        enqueue_transfer();
+        pi_camera_control(&camera, PI_CAMERA_CMD_START, 0);
+        pi_evt_wait(&proc_task);
+        pi_camera_control(&camera, PI_CAMERA_CMD_STOP, 0);
+        
+        //Copy from ram to: main_L2_Memory_Dyn + (H_INP * W_INP * CHANNELS)
+        //The image is saved onto External
+        pi_ram_read(&Ram, ext_ram_buf, main_L2_Memory_Dyn + (H_INP * W_INP * CHANNELS), (uint32_t)(H_INP * W_INP * CHANNELS));
 
 #endif
 
@@ -346,15 +435,6 @@ int test_main(void)
         PRINTF("\t\t***Start slicing***\n");
         slicing_cycles = gap_fc_readhwtimer();
 
-        #ifdef DEMO
-        slicing_hwc_channel(
-            cam_image, 
-            Input_1, 
-            H_INP, 
-            W_INP,
-            CHANNELS
-            );
-        #else
         slicing_hwc_channel(
             main_L2_Memory_Dyn + (H_INP * W_INP * CHANNELS), 
             Input_1, 
@@ -362,7 +442,6 @@ int test_main(void)
             W_INP,
             CHANNELS
             );
-        #endif
 
         slicing_cycles = gap_fc_readhwtimer() - slicing_cycles;
 
@@ -432,11 +511,13 @@ int test_main(void)
 
 #ifdef DEMO 
         //Draw rectangles and send trought UART
-        pi_ram_read(&PI_DEVICE_RAM, (uint32_t *) ext_ram_buf,  (uint32_t) cam_image, (uint32_t) H_CAM*W_CAM);
-        draw_boxes(cam_image, Output_1, final_valid_boxes, H_INP, W_INP, 1);
-        send_image_to_uart(&uart_dev,cam_image,W_CAM,H_CAM,1);
+        pi_ram_read(&Ram, (uint32_t *) ext_ram_buf,  (uint32_t) main_L2_Memory_Dyn, (uint32_t) H_CAM*W_CAM);
+        draw_boxes(main_L2_Memory_Dyn, Output_1, final_valid_boxes, H_INP, W_INP, 3);
+        send_image_to_uart(&uart_dev,main_L2_Memory_Dyn,W_CAM,H_CAM,3);
 
     } //end of while 1
+    pi_l2_free(iter_buff[0], ITER_SIZE);
+    pi_l2_free(iter_buff[1], ITER_SIZE);
 #endif
 
     #ifdef INFERENCE
@@ -467,6 +548,7 @@ int test_main(void)
         /* ------ JPEG COMPRESSION ------ */
         PRINTF("\t\t***Start JPEG compression ***\n");
 
+        jpeg_cycles = gap_fc_readhwtimer();
         int bitstream_size;
         char * jpeg_image;
         jpeg_image = compress(
@@ -475,6 +557,7 @@ int test_main(void)
             H_INP,
             W_INP,
             CHANNELS);
+        jpeg_cycles = gap_fc_readhwtimer() - jpeg_cycles;
         
         /* ------ FLUSH COMPRESSED IMAGE  ------ */
         PRINTF("\t\t***Start flushing compressed image ***\n");
@@ -513,25 +596,28 @@ int test_main(void)
         }
 
         TotalOper += NNOper;
-        TotalCycles += NNCycles + slicing_cycles + decoding_cycles + xywh2xyxy_cycles + filter_boxes_cycles + bbox_cycles + nms_cycles;
+        TotalCycles += NNCycles + slicing_cycles + decoding_cycles + xywh2xyxy_cycles + filter_boxes_cycles + bbox_cycles + nms_cycles + jpeg_cycles;
         // for (unsigned int i=0; i<(sizeof(AT_GraphPerf)/sizeof(unsigned int)); i++) {
         //   printf("%45s: Cycles: %12u, Cyc%%: %5.1f%%, Operations: %12u, Op%%: %5.1f%%, Operations/Cycle: %f\n", AT_GraphNodeNames[i], AT_GraphPerf[i], 100*((float) (AT_GraphPerf[i]) / TotalCycles), AT_GraphOperInfosNames[i], 100*((float) (AT_GraphOperInfosNames[i]) / TotalOper), ((float) AT_GraphOperInfosNames[i])/ AT_GraphPerf[i]);
         // }
 
         // Slicing
-        printf("%45s: Cycles: %12u, Cyc%%: %5.1f%%, Operations: %12u, Op%%: %5.1f%%, Operations/Cycle: %f\n", "Slicing", slicing_cycles, 100 * ((float) (slicing_cycles) / TotalCycles), 0, 0, 0);
+        printf("%45s: Cycles: %12u, Cyc%%: %5.1f%%, Operations: %12u, Op%%: %5.1f%%, Operations/Cycle: %f\n", "Slicing", slicing_cycles, 100 * ((float) (slicing_cycles) / TotalCycles), 0, 0.0f, 0.0f, 0, 0.0f, 0.0f, 0, 0.0f, 0.0f);
         // NN
         printf("%45s: Cycles: %12u, Cyc%%: %5.1f%%, Operations: %12u, Op%%: %5.1f%%, Operations/Cycle: %f\n", "NN", NNCycles, 100 * ((float) (NNCycles) / TotalCycles), NNOper, 100*((float) (NNOper) / TotalOper), ((float) NNOper)/ NNCycles);
         // decoding cycles
-        printf("%45s: Cycles: %12u, Cyc%%: %5.1f%%, Operations: %12u, Op%%: %5.1f%%, Operations/Cycle: %f\n", "Decoding", decoding_cycles, 100 * ((float) (decoding_cycles) / TotalCycles), 0, 0, 0);
+        printf("%45s: Cycles: %12u, Cyc%%: %5.1f%%, Operations: %12u, Op%%: %5.1f%%, Operations/Cycle: %f\n", "Decoding", decoding_cycles, 100 * ((float) (decoding_cycles) / TotalCycles), 0, 0.0f, 0.0f, 0, 0.0f, 0.0f, 0, 0.0f, 0.0f);
         // xywh2xyxy cycles
-        printf("%45s: Cycles: %12u, Cyc%%: %5.1f%%, Operations: %12u, Op%%: %5.1f%%, Operations/Cycle: %f\n", "xywh2xyxy", xywh2xyxy_cycles, 100 * ((float) (xywh2xyxy_cycles) / TotalCycles), 0, 0, 0);
+        printf("%45s: Cycles: %12u, Cyc%%: %5.1f%%, Operations: %12u, Op%%: %5.1f%%, Operations/Cycle: %f\n", "xywh2xyxy", xywh2xyxy_cycles, 100 * ((float) (xywh2xyxy_cycles) / TotalCycles), 0, 0.0f, 0.0f, 0, 0.0f, 0.0f, 0, 0.0f, 0.0f);
         // filter boxes cycles
-        printf("%45s: Cycles: %12u, Cyc%%: %5.1f%%, Operations: %12u, Op%%: %5.1f%%, Operations/Cycle: %f\n", "Filter boxes", filter_boxes_cycles, 100 * ((float) (filter_boxes_cycles) / TotalCycles), 0, 0, 0);
+        printf("%45s: Cycles: %12u, Cyc%%: %5.1f%%, Operations: %12u, Op%%: %5.1f%%, Operations/Cycle: %f\n", "Filter boxes", filter_boxes_cycles, 100 * ((float) (filter_boxes_cycles) / TotalCycles), 0, 0.0f, 0.0f, 0, 0.0f, 0.0f, 0, 0.0f, 0.0f);
         // bbox cycles
-        printf("%45s: Cycles: %12u, Cyc%%: %5.1f%%, Operations: %12u, Op%%: %5.1f%%, Operations/Cycle: %f\n", "seq2bboxes", bbox_cycles, 100 * ((float) (bbox_cycles) / TotalCycles), 0, 0, 0);
+        printf("%45s: Cycles: %12u, Cyc%%: %5.1f%%, Operations: %12u, Op%%: %5.1f%%, Operations/Cycle: %f\n", "seq2bboxes", bbox_cycles, 100 * ((float) (bbox_cycles) / TotalCycles), 0, 0.0f, 0.0f, 0, 0.0f, 0.0f, 0, 0.0f, 0.0f);
         // nms cycles
-        printf("%45s: Cycles: %12u, Cyc%%: %5.1f%%, Operations: %12u, Op%%: %5.1f%%, Operations/Cycle: %f\n", "NMS", nms_cycles, 100 * ((float) (nms_cycles) / TotalCycles), 0, 0, 0);
+        printf("%45s: Cycles: %12u, Cyc%%: %5.1f%%, Operations: %12u, Op%%: %5.1f%%, Operations/Cycle: %f\n", "NMS", nms_cycles, 100 * ((float) (nms_cycles) / TotalCycles), 0, 0.0f, 0.0f, 0, 0.0f, 0.0f, 0, 0.0f, 0.0f);
+        if (jpeg_cycles)
+            printf("%45s: Cycles: %12u, Cyc%%: %5.1f%%, Operations: %12u, Op%%: %5.1f%%, Operations/Cycle: %f\n", "JPEG Compress", jpeg_cycles, 100 * ((float) (jpeg_cycles) / TotalCycles), 0, 0.0f, 0.0f, 0, 0.0f, 0.0f, 0, 0.0f, 0.0f);
+
 
         printf("\n");
         printf("%45s: Cycles: %12u, Cyc%%: 100.0%%, Operations: %12u, Op%%: 100.0%%, Operations/Cycle: %f\n", "Total Inference", TotalCycles, TotalOper, ((float) TotalOper)/ TotalCycles);

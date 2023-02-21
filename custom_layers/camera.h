@@ -1,1 +1,1 @@
-void shift_bits(uint8_t *cam_image, int height, int width);
+void shift_bits(unsigned char *cam_image, int height, int width);

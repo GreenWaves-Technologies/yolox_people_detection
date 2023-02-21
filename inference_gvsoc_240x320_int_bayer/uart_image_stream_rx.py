@@ -8,11 +8,11 @@ import cv2, numpy
 
 INPUT_W=320
 INPUT_H=240
-PIXEL_SIZE=1
+PIXEL_SIZE=3
 
 UART_START_COM=b'\xF1\x1F'
 
-DEBAYER=True
+DEBAYER=False
 
 def main():
     #Init the window otherwise the protocol get screwed
@@ -45,7 +45,7 @@ def main():
             open_cv_image = numpy.array(im)
             if DEBAYER:
                 #cv2.imwrite("saved_images/"+str(count)+".pgm",open_cv_image)
-                bgr = cv2.cvtColor(open_cv_image, cv2.COLOR_BAYER_GB2BGR)
+                bgr = cv2.cvtColor(open_cv_image, cv2.COLOR_BAYER_RG2BGR)
                 resized = cv2.resize(bgr, (INPUT_W*2,INPUT_H*2), interpolation = cv2.INTER_AREA)
             else:
                 resized = cv2.resize(open_cv_image, (INPUT_W,INPUT_H), interpolation = cv2.INTER_AREA)

@@ -11,7 +11,7 @@ char * compress(uint8_t * image, int * size, int height, int width, int channels
     unsigned int image_size = height * width * channels; 
 
         // Open JPEG encoder
-    printf("Start JPEG encoding\n");
+//    printf("Start JPEG encoding\n");
 
     struct jpeg_encoder_conf enc_conf;
     jpeg_encoder_conf_init(&enc_conf);
@@ -56,17 +56,17 @@ char * compress(uint8_t * image, int * size, int height, int width, int channels
     buffer.height  = height;
     bitstream.data = &jpeg_image[header_size];
 
-    pi_perf_conf(1<<PI_PERF_CYCLES);
-    pi_perf_start();
-    pi_perf_reset();
+    // pi_perf_conf(1<<PI_PERF_CYCLES);
+    // pi_perf_start();
+    // pi_perf_reset();
 
     if (jpeg_encoder_process(&enc, &buffer, &bitstream, &body_size)){
         printf("Error encoding JPEG image\n");
         // return -1;
     }
 
-    pi_perf_stop();
-    printf("Jpeg encoding done! Performance: %d Cycles\n", pi_perf_read(PI_PERF_CYCLES));    
+    // pi_perf_stop();
+    // printf("Jpeg encoding done! Performance: %d Cycles\n", pi_perf_read(PI_PERF_CYCLES));    
 
     // An finally get the footer
     bitstream.data = &jpeg_image[body_size + header_size];

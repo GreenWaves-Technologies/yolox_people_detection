@@ -19,8 +19,8 @@
 #define W_INP 320
 #define CHANNELS 3
 
-#define H_CAM 240
-#define W_CAM 320
+#define H_CAM 480
+#define W_CAM 640
 #define BYTES_CAM 2
 
 
@@ -31,7 +31,7 @@
 #define RAWS 1580
 
 // parameters needed for postprocessing layer
-#define CONF_THRESH 0.01
+#define CONF_THRESH 0.4
 
 // parameters needed for function to_boxes
 #define top_k_boxes 400 
