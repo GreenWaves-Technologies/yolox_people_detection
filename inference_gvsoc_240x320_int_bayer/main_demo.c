@@ -135,13 +135,7 @@ Box bboxes[top_k_boxes];
 int final_valid_boxes;
 
 // cycles count variables
-unsigned int slicing_cycles      = 0;
-unsigned int jpeg_cycles         = 0;
-unsigned int decoding_cycles     = 0;
-unsigned int xywh2xyxy_cycles    = 0;
-unsigned int filter_boxes_cycles = 0;
-unsigned int bbox_cycles         = 0;
-unsigned int nms_cycles          = 0;
+unsigned int performances[8];
 
 
 AT_DEFAULTFLASH_EXT_ADDR_TYPE main_L3_Flash = 0;
@@ -151,114 +145,9 @@ AT_DEFAULTFLASH_EXT_ADDR_TYPE main_L3_Flash = 0;
 /* Outputs */
 L2_MEM float Output_1[9480];
 
-/* Copy inputs function */
-void copy_inputs() {
-    int status;
-#ifdef CI
-    /* ------------------- reading data for test ----------------------*/
-
-    PRINTF("\n\t\t*** READING TEST INPUT ***\n");
-    status = ReadImageFromFile(
-        STR(TEST_INPUT_FILE_NAME),
-        W_INP, 
-        H_INP, 
-        CHANNELS, 
-        main_L2_Memory_Dyn + (H_INP * W_INP * CHANNELS),
-        W_INP * H_INP * CHANNELS * sizeof(char), 
-        IMGIO_OUTPUT_CHAR,
-        0
-    );
-#else
-#ifdef INFERENCE
-    PRINTF("\n\t\t*** READING INPUT FROM PPM FILE ***\n");
-    status = ReadImageFromFile(
-        STR(INPUT_FILE_NAME),
-        W_INP, 
-        H_INP, 
-        CHANNELS, 
-        main_L2_Memory_Dyn + (H_INP * W_INP * CHANNELS),
-        W_INP * H_INP * CHANNELS * sizeof(char), 
-        IMGIO_OUTPUT_CHAR,
-        0 // transpose from HWC to CHW 
-    );
-
-    if (status != 0) {
-        PRINTF("Error reading image from file %s (error: %d) \n", STR(INPUT_FILE_NAME), status);
-        exit(-1);
-    }
-#endif
-#endif 
-}
-
-
-void ci_output_test(float * model_output, char * GT_file_name, float * GT_buffer){
-
-    switch_fs_t fs;
-    __FS_INIT(fs); 
-
-    void *File_GT;
-    int ret_GT = 0;
-
-    File_GT = __OPEN_READ(fs, GT_file_name);
-    ret_GT = __READ(File_GT, GT_buffer, CI_TEST_BOX_NUM * OUTPUT_BOX_SIZE * sizeof(float));
-
-    __CLOSE(File_GT);
-    __FS_DEINIT(fs);
-
-    //check the difference between the model output and the ground truth
-    float diff = 0;
-    for (int i = 0; i < CI_TEST_BOX_NUM * OUTPUT_BOX_SIZE; i++){
-        diff += Abs(model_output[i] - GT_buffer[i]);
-    }
-
-    if (diff > 0.01){
-        PRINTF("CI test failed, the difference between the model output and the ground truth is %f\n", diff);
-        exit(-1);
-    }
-    else{
-        PRINTF("CI test passed, the difference between the model output and the ground truth is %f\n", diff);
-    }
-}
-
-
-
-/* Copy inputs function */
-void write_outputs() {
-
-#ifdef CI
-    PRINTF("\t\t***Start CI output test***\n");
-    char GT_file[] = STR(TEST_OUTPUT_FILE_NAME); 
-    ci_output_test(Output_1, GT_file, (float *) main_L2_Memory_Dyn);
-#else
-#ifdef INFERENCE
-    /* ------ SAVE ------*/
-    PRINTF("\t\t***Start saving output***\n");
-
-    switch_fs_t fs;
-    __FS_INIT(fs);
-
-    void *File_Output_1;
-    int ret_Output_1 = 0;
-
-    File_Output_1 = __OPEN_WRITE(fs, STR(OUTPUT_BIN_FILE_NAME));
-    ret_Output_1 = __WRITE(File_Output_1, Output_1, final_valid_boxes * 7 * sizeof(float));
-
-    __CLOSE(File_Output_1);
-    __FS_DEINIT(fs);
-#endif
-#endif
-
-}
-
-
 static void cluster()
 {
-    #ifdef PERF
-    PRINTF("\t\t***Start CLUSTER timer***\n");
-    gap_cl_starttimer();
-    gap_cl_resethwtimer();
-    #endif
-
+    PRINTF("\t\t***Start CLUSTER ***\n");
     mainCNN(Output_1);
 }
 
@@ -305,17 +194,18 @@ void init_uart_communication(pi_device_t* uart_dev,uint32_t baudrate ){
     }
 }
 
-void send_image_to_uart(pi_device_t* uart_dev,uint8_t* img,int img_w,int img_h,int pixel_size){
+void send_image_to_uart(pi_device_t* uart_dev,uint8_t* img,int img_w,int img_h,int pixel_size, unsigned int *perf_array){
 
     pi_uart_write(uart_dev,UART_START_COM,2);
     //Write Image row by row
     for(int i=0;i<img_h;i++) pi_uart_write(uart_dev,&(img[i*img_w*pixel_size]),img_w*pixel_size);
 }
 
-void send_jpeg_to_uart(pi_device_t* uart_dev, uint8_t* img, int img_size){
+void send_jpeg_to_uart(pi_device_t* uart_dev, uint8_t* img, int img_size, unsigned int *perf_array){
 
     pi_uart_write(uart_dev, UART_START_JPEG, 2);
     pi_uart_write(uart_dev, &img_size, 4);
+    pi_uart_write(uart_dev, &perf_array[0], 4*8);
     //Write Image row by row
     int size = img_size;
     int idx = 0;
@@ -379,13 +269,6 @@ int test_main(void)
     pi_cluster_task(&task, (void (*)(void *))cluster, NULL);
     pi_cluster_task_stacks(&task, NULL, SLAVE_STACK_SIZE);
 
-    /*
-     * Put here Your input settings
-    */
-#if defined CI || defined INFERENCE
-    copy_inputs();
-#elif defined DEMO
-
     pi_device_t uart_dev;
     init_uart_communication(&uart_dev,3000000);
     
@@ -420,6 +303,10 @@ int test_main(void)
         pmsis_exit(-1);
     }
 
+    /* Init and opend jpeg encoder */
+    jpeg_encoder_t enc;
+    jpeg_init(&enc, H_INP, W_INP, cluster_dev, main_L1_Memory);
+
     int iter=0;    
     while(1){
         remaining_size = RAW_SIZE;
@@ -439,19 +326,14 @@ int test_main(void)
         //The image is saved onto External
         pi_ram_read(&Ram, ext_ram_buf, main_L2_Memory_Dyn + (H_INP * W_INP * CHANNELS), (uint32_t)(H_INP * W_INP * CHANNELS));
 
-#endif
-
-
-        #ifdef PERF
         PRINTF("\t\t***Start FC timer***\n");
         gap_fc_starttimer();
         gap_fc_resethwtimer();
-        #endif
+        int perf_idx = 0;
 
         /* ------ SLICING ------*/
         PRINTF("\t\t***Start slicing***\n");
-        slicing_cycles = gap_fc_readhwtimer();
-
+        performances[perf_idx] = pi_time_get_us();
         slicing_hwc_channel(
             main_L2_Memory_Dyn + (H_INP * W_INP * CHANNELS), 
             Input_1, 
@@ -459,39 +341,38 @@ int test_main(void)
             W_INP,
             CHANNELS
             );
-
-        slicing_cycles = gap_fc_readhwtimer() - slicing_cycles;
-
+        performances[perf_idx] = pi_time_get_us() - performances[perf_idx]; perf_idx++;
 
         /* ------ INFERENCE ------*/
         PRINTF("\t\t***Call CLUSTER***\n");
+        performances[perf_idx] = pi_time_get_us();
         pi_cluster_send_task_to_cl(&cluster_dev, &task);
+        performances[perf_idx] = pi_time_get_us() - performances[perf_idx]; perf_idx++;
 
         /* ------ DECODING ------*/
         PRINTF("\t\t***Start decoding***\n");
-        decoding_cycles = gap_fc_readhwtimer();
+        performances[perf_idx] = pi_time_get_us();
         decoding(
             Output_1,
             feature_maps, 
             strides, 
             STRIDE_SIZE
         );
-        decoding_cycles = gap_fc_readhwtimer() - decoding_cycles;
-
+        performances[perf_idx] = pi_time_get_us() - performances[perf_idx]; perf_idx++;
 
         /* ------ POST PROCESSING ------*/
         /* ------ xywh2xyxy ------*/
         PRINTF("\t\t***Start xywh2xyxy***\n");
-        xywh2xyxy_cycles = gap_fc_readhwtimer();
+        performances[perf_idx] = pi_time_get_us();
         xywh2xyxy(Output_1, (int) (RAWS));
-        xywh2xyxy_cycles = gap_fc_readhwtimer() - xywh2xyxy_cycles;
+        performances[perf_idx] = pi_time_get_us() - performances[perf_idx]; perf_idx++;
 
         /* ------ filter boxes ------*/
         PRINTF("\t\t***Start filter boxes ***\n");
         //cast model_L2_Memory_Dyn to float16
         float * main_L2_Memory_Dyn_casted = (float *) main_L2_Memory_Dyn;
         *num_val_boxes = 0;
-        filter_boxes_cycles = gap_fc_readhwtimer();
+        performances[perf_idx] = pi_time_get_us();
         filter_boxes(
             Output_1, 
             (main_L2_Memory_Dyn_casted + (RAWS * 6)), 
@@ -499,23 +380,23 @@ int test_main(void)
             RAWS, 
             num_val_boxes
             );
-        filter_boxes_cycles = gap_fc_readhwtimer() - filter_boxes_cycles;
+        performances[perf_idx] = pi_time_get_us() - performances[perf_idx]; perf_idx++;
 
         /* ------ conver boxes ------*/
         PRINTF("\t\t***Start conver boxes ***\n");
-        bbox_cycles = gap_fc_readhwtimer();
+        performances[perf_idx] = pi_time_get_us();
         to_bboxes(
             (main_L2_Memory_Dyn_casted + (RAWS * 6)), 
             bboxes, 
             *num_val_boxes,
             top_k_boxes
             );
-        bbox_cycles = gap_fc_readhwtimer() - bbox_cycles;
+        performances[perf_idx] = pi_time_get_us() - performances[perf_idx]; perf_idx++;
 
         /* ------ nms ------*/
         PRINTF("\t\t***Start nms ***\n");
         final_valid_boxes = 0;
-        nms_cycles = gap_fc_readhwtimer();
+        performances[perf_idx] = pi_time_get_us();
         nms(
             bboxes, 
             Output_1,
@@ -524,31 +405,32 @@ int test_main(void)
             &final_valid_boxes,
             top_k_boxes
             );
-        nms_cycles = gap_fc_readhwtimer() - nms_cycles;
+        performances[perf_idx] = pi_time_get_us() - performances[perf_idx]; perf_idx++;
 
-#ifdef DEMO 
         //Draw rectangles and send trought UART
         pi_ram_read(&Ram, (uint32_t *) ext_ram_buf,  (uint32_t) main_L2_Memory_Dyn, (uint32_t) H_INP*W_INP*3);
         draw_boxes(main_L2_Memory_Dyn, Output_1, final_valid_boxes, H_INP, W_INP, 3);
 
         /* ------ JPEG COMPRESSION ------ */
         PRINTF("\t\t***Start JPEG compression ***\n");
-        jpeg_cycles = gap_fc_readhwtimer();
         int bitstream_size;
         uint8_t * jpeg_image = (uint8_t *) pi_l2_malloc(30*2048);
         if (jpeg_image == 0) {
             printf("Error allocating jpeg buffer\n");
             return -1;
         }
-        compress(
+        performances[perf_idx] = pi_time_get_us();
+        int jpeg_ret = compress(
+            &enc,
             (uint8_t *) main_L2_Memory_Dyn,
             jpeg_image,
             &bitstream_size,
             H_INP,
             W_INP,
             CHANNELS);
-        jpeg_cycles = gap_fc_readhwtimer() - jpeg_cycles;
-        send_jpeg_to_uart(&uart_dev, jpeg_image, bitstream_size);
+        performances[perf_idx] = pi_time_get_us() - performances[perf_idx]; perf_idx++;
+
+        send_jpeg_to_uart(&uart_dev, jpeg_image, bitstream_size, performances);
         pi_l2_free(jpeg_image, 30*2048);
 
         pi_evt_sig_init(&proc_task);
@@ -556,112 +438,12 @@ int test_main(void)
     } //end of while 1
     pi_l2_free(iter_buff[0], ITER_SIZE);
     pi_l2_free(iter_buff[1], ITER_SIZE);
-#endif
+    jpeg_deinit(&enc);
 
-    #ifdef INFERENCE
-        /* ------ DRAW REATANGLES ------*/
-        // first read image
-        if (ReadImageFromFile(
-            STR(INPUT_FILE_NAME),
-            W_INP, 
-            H_INP, 
-            CHANNELS, 
-            (unsigned char *) main_L2_Memory_Dyn_casted,
-            W_INP * H_INP * CHANNELS * sizeof(char), 
-            IMGIO_OUTPUT_CHAR,
-            0) != 0){ 
-            PRINTF("Error reading image\n");
-            }
-
-        PRINTF("\t\t***Start draw reactangles ***\n");
-        draw_boxes(
-            (unsigned char *) main_L2_Memory_Dyn_casted,
-            Output_1,
-            final_valid_boxes,
-            H_INP,
-            W_INP,
-            CHANNELS);
-
-        #ifdef COMPRESS 
-        /* ------ JPEG COMPRESSION ------ */
-        PRINTF("\t\t***Start JPEG compression ***\n");
-
-        jpeg_cycles = gap_fc_readhwtimer();
-        int bitstream_size;
-        char * jpeg_image;
-        jpeg_image = compress(
-            (uint8_t *) main_L2_Memory_Dyn_casted, 
-            &bitstream_size,
-            H_INP,
-            W_INP,
-            CHANNELS);
-        jpeg_cycles = gap_fc_readhwtimer() - jpeg_cycles;
-        
-        /* ------ FLUSH COMPRESSED IMAGE  ------ */
-        PRINTF("\t\t***Start flushing compressed image ***\n");
-
-        if (flush_iamge(jpeg_image, bitstream_size)){
-            PRINTF("Error flushing image\n");
-            return -1;
-        }
-
-        #else 
-        /* ------ WRITE IMAGE -------- */
-        int status = WriteImageToFile(
-            STR(OUTPUT_FILE_NAME),
-            W_INP, 
-            H_INP, 
-            CHANNELS, 
-            (unsigned char *) main_L2_Memory_Dyn_casted,
-            RGB888_IO // GRAY_SCALE_IO
-        ); 
-        #endif
-
-    #endif
     /* ------ END ------*/
     PRINTF("\t\t***Runner completed***\n");
 
-    write_outputs();
-
     mainCNN_Destruct();
-
-#ifdef PERF
-    {
-        unsigned int NNCycles = 0, TotalCycles = 0, NNOper = 0, TotalOper = 0;
-        printf("\n");
-        for (unsigned int i=0; i<(sizeof(AT_GraphPerf)/sizeof(unsigned int)); i++) {
-            NNCycles += AT_GraphPerf[i]; NNOper += AT_GraphOperInfosNames[i];
-        }
-
-        TotalOper += NNOper;
-        TotalCycles += NNCycles + slicing_cycles + decoding_cycles + xywh2xyxy_cycles + filter_boxes_cycles + bbox_cycles + nms_cycles + jpeg_cycles;
-        // for (unsigned int i=0; i<(sizeof(AT_GraphPerf)/sizeof(unsigned int)); i++) {
-        //   printf("%45s: Cycles: %12u, Cyc%%: %5.1f%%, Operations: %12u, Op%%: %5.1f%%, Operations/Cycle: %f\n", AT_GraphNodeNames[i], AT_GraphPerf[i], 100*((float) (AT_GraphPerf[i]) / TotalCycles), AT_GraphOperInfosNames[i], 100*((float) (AT_GraphOperInfosNames[i]) / TotalOper), ((float) AT_GraphOperInfosNames[i])/ AT_GraphPerf[i]);
-        // }
-
-        // Slicing
-        printf("%45s: Cycles: %12u, Cyc%%: %5.1f%%, Operations: %12u, Op%%: %5.1f%%, Operations/Cycle: %f\n", "Slicing", slicing_cycles, 100 * ((float) (slicing_cycles) / TotalCycles), 0, 0.0f, 0.0f, 0, 0.0f, 0.0f, 0, 0.0f, 0.0f);
-        // NN
-        printf("%45s: Cycles: %12u, Cyc%%: %5.1f%%, Operations: %12u, Op%%: %5.1f%%, Operations/Cycle: %f\n", "NN", NNCycles, 100 * ((float) (NNCycles) / TotalCycles), NNOper, 100*((float) (NNOper) / TotalOper), ((float) NNOper)/ NNCycles);
-        // decoding cycles
-        printf("%45s: Cycles: %12u, Cyc%%: %5.1f%%, Operations: %12u, Op%%: %5.1f%%, Operations/Cycle: %f\n", "Decoding", decoding_cycles, 100 * ((float) (decoding_cycles) / TotalCycles), 0, 0.0f, 0.0f, 0, 0.0f, 0.0f, 0, 0.0f, 0.0f);
-        // xywh2xyxy cycles
-        printf("%45s: Cycles: %12u, Cyc%%: %5.1f%%, Operations: %12u, Op%%: %5.1f%%, Operations/Cycle: %f\n", "xywh2xyxy", xywh2xyxy_cycles, 100 * ((float) (xywh2xyxy_cycles) / TotalCycles), 0, 0.0f, 0.0f, 0, 0.0f, 0.0f, 0, 0.0f, 0.0f);
-        // filter boxes cycles
-        printf("%45s: Cycles: %12u, Cyc%%: %5.1f%%, Operations: %12u, Op%%: %5.1f%%, Operations/Cycle: %f\n", "Filter boxes", filter_boxes_cycles, 100 * ((float) (filter_boxes_cycles) / TotalCycles), 0, 0.0f, 0.0f, 0, 0.0f, 0.0f, 0, 0.0f, 0.0f);
-        // bbox cycles
-        printf("%45s: Cycles: %12u, Cyc%%: %5.1f%%, Operations: %12u, Op%%: %5.1f%%, Operations/Cycle: %f\n", "seq2bboxes", bbox_cycles, 100 * ((float) (bbox_cycles) / TotalCycles), 0, 0.0f, 0.0f, 0, 0.0f, 0.0f, 0, 0.0f, 0.0f);
-        // nms cycles
-        printf("%45s: Cycles: %12u, Cyc%%: %5.1f%%, Operations: %12u, Op%%: %5.1f%%, Operations/Cycle: %f\n", "NMS", nms_cycles, 100 * ((float) (nms_cycles) / TotalCycles), 0, 0.0f, 0.0f, 0, 0.0f, 0.0f, 0, 0.0f, 0.0f);
-        if (jpeg_cycles)
-            printf("%45s: Cycles: %12u, Cyc%%: %5.1f%%, Operations: %12u, Op%%: %5.1f%%, Operations/Cycle: %f\n", "JPEG Compress", jpeg_cycles, 100 * ((float) (jpeg_cycles) / TotalCycles), 0, 0.0f, 0.0f, 0, 0.0f, 0.0f, 0, 0.0f, 0.0f);
-
-
-        printf("\n");
-        printf("%45s: Cycles: %12u, Cyc%%: 100.0%%, Operations: %12u, Op%%: 100.0%%, Operations/Cycle: %f\n", "Total Inference", TotalCycles, TotalOper, ((float) TotalOper)/ TotalCycles);
-        printf("\n");
-    }
-#endif
 
     PRINTF("Ended\n");
     pmsis_exit(0);

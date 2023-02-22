@@ -1,7 +1,7 @@
 import sys, serial, os, io
 import PIL.Image as Image
 import cv2, numpy
-
+from time import time
 
 #INPUT_W=640
 #INPUT_H=480
@@ -28,6 +28,7 @@ def main():
             timeout=0.01)
     print("connected to: " + ser.portstr)
     count=0
+    start = time()
 
     while True:
         read_bytes = ser.read(2)
@@ -43,10 +44,10 @@ def main():
                 im = Image.frombuffer('I;16',(INPUT_W,INPUT_H),out,'raw','L',0,1)
             elif PIXEL_SIZE == 3:
                 im = Image.frombuffer('RGB', (INPUT_W,INPUT_H), out,'raw','RGB',0,1)
-            #im.save("received_img/img_"+str(count)+".png")
+
+            elapsed = time() - start
             open_cv_image = numpy.array(im)
             if DEBAYER:
-                #cv2.imwrite("saved_images/"+str(count)+".pgm",open_cv_image)
                 bgr = cv2.cvtColor(open_cv_image, cv2.COLOR_BAYER_RG2BGR)
                 resized = cv2.resize(bgr, (INPUT_W*2,INPUT_H*2), interpolation = cv2.INTER_AREA)
             else:

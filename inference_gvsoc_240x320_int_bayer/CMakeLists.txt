@@ -1,17 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-
-###############################################################################
-# Application related definitions
-###############################################################################
-
-if (CONFIG_MODEL_EMUL)
-  set(TARGET_NAME         main_emul)
-else()
-  set(TARGET_NAME         main)
-endif()
-
-set(MAIN                main.c)
+set(TARGET_NAME         main)
 
 ###############################################################################
 # CMake pre initialization
@@ -30,12 +19,18 @@ set(OUTPUT_JPEG_FILE_NAME      ${CMAKE_CURRENT_SOURCE_DIR}/output_compressed.jpg
 if(CONFIG_CI)
   message(STATUS "${APP_MSG_PREFIX} Building App in CI Mode")
   list(APPEND TARGET_PREPROCESSOR -DCI)
+  set(MAIN                main_inference.c)
+
 elseif(CONFIG_INFERENCE)
   message(STATUS "${APP_MSG_PREFIX} Building App in INFERENCE Mode")
   list(APPEND TARGET_PREPROCESSOR -DINFERENCE)
+  set(MAIN                main_inference.c)
+
 elseif(CONFIG_DEMO)
   message(STATUS "${APP_MSG_PREFIX} Building App in DEMO Mode")
   list(APPEND TARGET_PREPROCESSOR -DDEMO -DSILENT)
+  set(MAIN                main_demo.c)
+
 endif()
 
 ###############################################################################

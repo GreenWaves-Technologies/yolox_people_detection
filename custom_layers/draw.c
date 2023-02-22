@@ -50,6 +50,54 @@ void draw_rectangle(
     }
 }
 
+void draw_rectangle_new(
+    unsigned char *Img, 
+    int W, 
+    int H, 
+    int x, 
+    int y, 
+    int w, 
+    int h, 
+    int channels,
+    unsigned char ColorValue
+    )
+{
+    int line_width = 2;
+    unsigned char color[3] = {0, 255, 255};
+    //int color = 0xF800;
+    /* top */
+    for (int j=y; (j<H) && (j<(y+line_width)); j++) {
+        for (int i=x; (i<W) && (i<(x+w)); i++) {
+            Img[j*W*3 + i*3 + 0] = color[0];
+            Img[j*W*3 + i*3 + 1] = color[1];
+            Img[j*W*3 + i*3 + 2] = color[2];
+        }
+    }
+    /* bottom */
+    for (int j=y+h; (j<H) && (j<(y+h+line_width)); j++) {
+        for (int i=x; (i<W) && (i<(x+w+line_width)); i++) {
+            Img[j*W*3 + i*3 + 0] = color[0];
+            Img[j*W*3 + i*3 + 1] = color[1];
+            Img[j*W*3 + i*3 + 2] = color[2];
+        }
+    }
+    /* left */
+    for (int j=y; (j<H) && (j<(y+h)); j++) {
+        for (int i=x; (i<W) && (i<(x+line_width)); i++) {
+            Img[j*W*3 + i*3 + 0] = color[0];
+            Img[j*W*3 + i*3 + 1] = color[1];
+            Img[j*W*3 + i*3 + 2] = color[2];
+        }
+    }
+    /* right */
+    for (int j=y; (j<H) && (j<(y+h+line_width)); j++) {
+        for (int i=x+w; (i<W) && (i<(x+w+line_width)); i++) {
+            Img[j*W*3 + i*3 + 0] = color[0];
+            Img[j*W*3 + i*3 + 1] = color[1];
+            Img[j*W*3 + i*3 + 2] = color[2];
+        }
+    }
+}
 
 void draw_boxes_save(
     float * model_L2_Memory_Dyn_casted,
@@ -118,6 +166,6 @@ void draw_boxes(
         float score =       Output_1[i*7 + 4] * Output_1[i*7 + 5];
         int   cls   = (int) Output_1[i*7 + 6];
 
-        draw_rectangle(image, width, height, x1, y1, x2, y2, channels, 255);
+        draw_rectangle_new(image, width, height, x1, y1, x2, y2, channels, 255);
     }
 }
