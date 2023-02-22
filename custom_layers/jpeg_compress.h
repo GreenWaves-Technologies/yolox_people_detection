@@ -1,1 +1,1 @@
-char * compress(uint8_t * l2_mem, int * size, int height, int width, int channesl);
+void compress(uint8_t * image, uint8_t * jpeg_image, int * size, int height, int width, int channels);

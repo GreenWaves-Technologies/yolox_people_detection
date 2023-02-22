@@ -3,9 +3,7 @@
 #include "gaplib/ImgIO.h"
 // #include "main.h"
 
-PI_L2 char jpeg_image[2048*25]; // how to set the size of the jpeg image? how to get this buffer the main.c file?
-
-char * compress(uint8_t * image, int * size, int height, int width, int channels){
+void compress(uint8_t * image, uint8_t * jpeg_image, int * size, int height, int width, int channels){
 
     jpeg_encoder_t enc;
     unsigned int image_size = height * width * channels; 
@@ -16,11 +14,11 @@ char * compress(uint8_t * image, int * size, int height, int width, int channels
     struct jpeg_encoder_conf enc_conf;
     jpeg_encoder_conf_init(&enc_conf);
 
-#ifdef RUN_ENCODER_ON_CLUSTER
-    enc_conf.flags = JPEG_ENCODER_FLAGS_CLUSTER_OFFLOAD;
-#else
+// #ifdef RUN_ENCODER_ON_CLUSTER
+//     enc_conf.flags = JPEG_ENCODER_FLAGS_CLUSTER_OFFLOAD;
+// #else
     enc_conf.flags = 0x0;
-#endif
+// #endif
 
     //For color Jpeg this flag can be added
     enc_conf.flags |= JPEG_ENCODER_FLAGS_COLOR;
@@ -39,7 +37,7 @@ char * compress(uint8_t * image, int * size, int height, int width, int channels
 
     // Get the header so that we can produce full JPEG image
     pi_buffer_t bitstream;
-    bitstream.data = &jpeg_image;
+    bitstream.data = jpeg_image;
     bitstream.size = image_size;
     uint32_t header_size, footer_size, body_size;
 
@@ -81,8 +79,7 @@ char * compress(uint8_t * image, int * size, int height, int width, int channels
 
     // close the endoer 
     jpeg_encoder_stop(&enc);
-    jpeg_encoder_close(&enc);
 
-    return jpeg_image;
+    jpeg_encoder_close(&enc);
 
 }

@@ -279,6 +279,7 @@ static int open_camera(struct pi_device *device)
 }
 
 uint8_t UART_START_COM[] = {0xF1,0x1F};
+uint8_t UART_START_JPEG[] = {0xAB,0xBA};
 
 void init_uart_communication(pi_device_t* uart_dev,uint32_t baudrate ){
     pi_pad_function_set(PI_PAD_065, PI_PAD_FUNC0);
@@ -311,6 +312,20 @@ void send_image_to_uart(pi_device_t* uart_dev,uint8_t* img,int img_w,int img_h,i
     for(int i=0;i<img_h;i++) pi_uart_write(uart_dev,&(img[i*img_w*pixel_size]),img_w*pixel_size);
 }
 
+void send_jpeg_to_uart(pi_device_t* uart_dev, uint8_t* img, int img_size){
+
+    pi_uart_write(uart_dev, UART_START_JPEG, 2);
+    pi_uart_write(uart_dev, &img_size, 4);
+    //Write Image row by row
+    int size = img_size;
+    int idx = 0;
+    while (size > 0) {
+        int size_to_write = (size > 256) ? 256 : size;
+        pi_uart_write(uart_dev, &(img[idx]), size_to_write);
+        size -= size_to_write;
+        idx += size_to_write;
+    }
+}
 
 int test_main(void)
 {
@@ -346,7 +361,7 @@ int test_main(void)
         PRINTF("Error changing frequency !\nTest failed...\n");
         pmsis_exit(-4);
     }
-	printf("FC Frequency as %d Hz, CL Frequency = %d Hz, PERIIPH Frequency = %d Hz\n", 
+    printf("FC Frequency as %d Hz, CL Frequency = %d Hz, PERIIPH Frequency = %d Hz\n", 
             pi_freq_get(PI_FREQ_DOMAIN_FC), pi_freq_get(PI_FREQ_DOMAIN_CL), pi_freq_get(PI_FREQ_DOMAIN_PERIPH));
 
     
@@ -513,9 +528,29 @@ int test_main(void)
 
 #ifdef DEMO 
         //Draw rectangles and send trought UART
-        pi_ram_read(&Ram, (uint32_t *) ext_ram_buf,  (uint32_t) main_L2_Memory_Dyn, (uint32_t) H_CAM*W_CAM);
+        pi_ram_read(&Ram, (uint32_t *) ext_ram_buf,  (uint32_t) main_L2_Memory_Dyn, (uint32_t) H_INP*W_INP*3);
         draw_boxes(main_L2_Memory_Dyn, Output_1, final_valid_boxes, H_INP, W_INP, 3);
-        send_image_to_uart(&uart_dev,main_L2_Memory_Dyn,W_CAM,H_CAM,3);
+
+        /* ------ JPEG COMPRESSION ------ */
+        PRINTF("\t\t***Start JPEG compression ***\n");
+        jpeg_cycles = gap_fc_readhwtimer();
+        int bitstream_size;
+        uint8_t * jpeg_image = (uint8_t *) pi_l2_malloc(30*2048);
+        if (jpeg_image == 0) {
+            printf("Error allocating jpeg buffer\n");
+            return -1;
+        }
+        compress(
+            (uint8_t *) main_L2_Memory_Dyn,
+            jpeg_image,
+            &bitstream_size,
+            H_INP,
+            W_INP,
+            CHANNELS);
+        jpeg_cycles = gap_fc_readhwtimer() - jpeg_cycles;
+        send_jpeg_to_uart(&uart_dev, jpeg_image, bitstream_size);
+        pi_l2_free(jpeg_image, 30*2048);
+
         pi_evt_sig_init(&proc_task);
 
     } //end of while 1
