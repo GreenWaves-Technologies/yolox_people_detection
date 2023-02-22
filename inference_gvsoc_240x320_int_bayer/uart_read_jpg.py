@@ -31,6 +31,7 @@ def main():
     print("connected to: " + ser.portstr)
 
     start = time()
+    count = 0
     while True:
         read_bytes = ser.read(2)
         if read_bytes == UART_START_JPEG:
@@ -52,7 +53,6 @@ def main():
                img_from_uart += ser.read(256)
             #print(len(img_from_uart))
 
-
             nparr = np.frombuffer(img_from_uart, np.uint8)
             try:
                 img = cv2.imdecode(nparr, cv2.IMREAD_COLOR) # cv2.IMREAD_COLOR in OpenCV 3.1
@@ -60,17 +60,16 @@ def main():
 
                 resized = cv2.resize(img, (640, 480), interpolation = cv2.INTER_AREA)
 
-                cv2.putText(resized,
-                            f'Performance [{1/elapsed:.2f}fps ({1e6/perf_array.sum():.2f}, {1e6/perf_array[:-1].sum():.2f})]',
-                            (50, 50),
-                            cv2.FONT_HERSHEY_SIMPLEX, 1,
-                            (0, 0, 255),
-                            2,
-                            cv2.LINE_4)
+                #cv2.putText(resized, f'Performance {count}', (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, cv2.LINE_4)
+                cv2.putText(resized, f'NN: {perf_array[:-1].sum()}us JPEG: {perf_array[-1]}us',
+                            (50, 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, cv2.LINE_4)
+                cv2.putText(resized, f'[{1/elapsed:.2f}fps ({1e6/perf_array.sum():.2f}, {1e6/perf_array[:-1].sum():.2f})]',
+                            (50, 80), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, cv2.LINE_4)
                 cv2.imshow('Image from GAP', resized)
                 cv2.waitKey(1)
             except:
                 print("Something went wrong with this image...")
+            count += 1
             start = time()
        
     ser.close()

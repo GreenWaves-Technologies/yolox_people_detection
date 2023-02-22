@@ -1,6 +1,6 @@
 #include "slicing.h"
 
-void slicing_chw_channel(char * Input, unsigned char * Output, int h, int w, int chnls){
+void slicing_chw_channel(unsigned char * Input, unsigned char * Output, int h, int w, int chnls){
 
     unsigned int count = 0;
     unsigned int k = 0; 
@@ -51,7 +51,7 @@ void slicing_chw_channel(char * Input, unsigned char * Output, int h, int w, int
 }
 
 
-void slicing_hwc_channel(char * Input, unsigned char * Output, int h, int w, int channels){
+void slicing_hwc_channel(unsigned char * Input, unsigned char * Output, int h, int w, int channels){
 
     unsigned int o_h = h / 2, o_w  =  w / 2; 
     unsigned int o_c = channels * 4; 
@@ -81,7 +81,7 @@ void slicing_hwc_channel(char * Input, unsigned char * Output, int h, int w, int
 }
 
 
-void slicing_hwc_channel_less_buffer(char * Input, char * Output, int h, int w, int channels){
+void slicing_hwc_channel_less_buffer(unsigned char * Input, unsigned char * Output, int h, int w, int channels){
     
     int str_idx, end_idx, num_element = w * channels * 2;
     for(int r = 0; r < h / 2; r++){
@@ -99,7 +99,7 @@ void slicing_hwc_channel_less_buffer(char * Input, char * Output, int h, int w, 
 
 
 
-void slicing_hw_channel(char * Input, unsigned char * Output, int h, int w, int channels){
+void slicing_hw_channel(unsigned char * Input, unsigned char * Output, int h, int w, int channels){
 
     unsigned int o_h = h / 2, o_w  =  w / 2; 
     unsigned int o_c = channels * 4; 

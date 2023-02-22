@@ -10,43 +10,59 @@ void draw_rectangle(
     int w, 
     int h, 
     int channels,
-    unsigned char ColorValue
+    unsigned char ColorValueR,
+    unsigned char ColorValueG,
+    unsigned char ColorValueB
     ){
 
+    int line_width = 2;
     int x0, x1, y0, y1;
 
+    x0 = MAX(MIN(x, W - 1), 0);
+    x1 = MAX(MIN(x + w - 1, W - 1), 0);
     y0 = MAX(MIN(y, H - 1), 0);
     y1 = MAX(MIN(y + h - 1, H - 1), 0);
 
-    x0 = x;
-    y1 = h - 1;
-    if (x0 >= 0 && x0 < W) {
-        for (int i = y0; i <= y1; i++)
-            for(int c = 0; c < channels; c++)
-                Img[channels * (i * W + x0) + c] = ColorValue;
+    // left
+    for (int i = y0; i < y1; i++) {
+        for (int j = x0; j<(x0+line_width); j++) {
+            Img[3 * (i * W + j) + 0] = ColorValueR;
+            Img[3 * (i * W + j) + 1] = ColorValueG;
+            Img[3 * (i * W + j) + 2] = ColorValueB;
+        }
     }
 
-    x1 = w - 1;
-    if (x1 >= 0 && x1 < W) {
-        for (int i = y0; i <= y1; i++)
-            for(int c = 0; c < channels ; c++)
-                Img[channels * (i * W + x1) + c] = ColorValue;
+    // right
+    for (int i = y0; i < y1; i++) {
+        for (int j = x1-line_width; j<x1; j++) {
+            Img[3 * (i * W + j) + 0] = ColorValueR;
+            Img[3 * (i * W + j) + 1] = ColorValueG;
+            Img[3 * (i * W + j) + 2] = ColorValueB;
+            // for(int c = 0; c < channels ; c++)
+            //     Img[channels * (i * W + x1) + c] = ColorValueR;
+        }
     }
 
-    x0 = MAX(MIN(x, W - 1), 0);
-    x1 = w - 1;
-
-    y0 = y;
-    if (y0 >= 0 && y0 < H) {
-        for (int i = x0; i <= x1; i++)
-            for(int c = 0; c < channels; c++)
-                Img[channels * (y0 * W + i) + c] = ColorValue;
+    // top
+    for (int i = y0; i < y0+line_width; i++) {
+        for (int j = x0; j < x1; j++) {
+            Img[3 * (i * W + j) + 0] = ColorValueR;
+            Img[3 * (i * W + j) + 1] = ColorValueG;
+            Img[3 * (i * W + j) + 2] = ColorValueB;
+            // for(int c = 0; c < channels; c++)
+            //     Img[channels * (y0 * W + i) + c] = ColorValueR;
+        }
     }
 
-    if (y1 >= 0 && y1 < H) {
-        for (int i = x0; i <= x1; i++)
-            for(int c = 0; c < channels; c++)
-                Img[channels * (y1 * W + i) + c] = ColorValue;
+    // bottom
+    for (int i = y1-line_width; i < y1; i++) {
+        for (int j = x0; j < x1; j++) {
+            Img[3 * (i * W + j) + 0] = ColorValueR;
+            Img[3 * (i * W + j) + 1] = ColorValueG;
+            Img[3 * (i * W + j) + 2] = ColorValueB;
+            // for(int c = 0; c < channels; c++)
+            //     Img[channels * (y1 * W + i) + c] = ColorValueR;
+        }
     }
 }
 
@@ -132,7 +148,7 @@ void draw_boxes_save(
         float score = Output_1[i*7 + 4] * Output_1[i*7 + 5];
         int cls = (int) Output_1[i*7 + 6];
 
-        draw_rectangle(image, width, height, x1, y1, x2, y2, channels, 255);
+        draw_rectangle(image, width, height, x1, y1, x2, y2, channels, 255, 255, 0);
     }
 
     /* ----------------------- SAVE IMAGE --------------------- */
@@ -166,6 +182,6 @@ void draw_boxes(
         float score =       Output_1[i*7 + 4] * Output_1[i*7 + 5];
         int   cls   = (int) Output_1[i*7 + 6];
 
-        draw_rectangle_new(image, width, height, x1, y1, x2, y2, channels, 255);
+        draw_rectangle(image, width, height, x1, y1, x2, y2, channels, 255, 255, 0);
     }
 }

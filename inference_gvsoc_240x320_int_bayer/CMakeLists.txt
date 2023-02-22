@@ -43,8 +43,13 @@ autotiler_setup(${TARGET_NAME})
 add_custom_command(
   OUTPUT ${AT_MODEL_PATH} ${MODEL_EXPRESSIONS} ${AT_TENSORS_DIR}
   COMMENT "Generating the autotiler model"
-  DEPENDS ../../model_generator/nntool_generate_model.py
-  COMMAND python3 ../../model_generator/nntool_generate_model.py ${CMAKE_CURRENT_SOURCE_DIR}/ yolox-QVGA-bayer-BGR.onnx precalculated_stats_bayer_v2_qvga_trainset_nonpadded.pickle ${AT_MODEL_PATH} ${AT_TENSORS_DIR}
+  DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/../model_generator/nntool_generate_model.py
+  COMMAND python3 ${CMAKE_CURRENT_SOURCE_DIR}/../model_generator/nntool_generate_model.py --at_model_path=${AT_MODEL_PATH}
+                                                                 --tensors_dir=${AT_TENSORS_DIR}
+                                                                 --trained_model=${CMAKE_CURRENT_SOURCE_DIR}/../weights/yolox-QVGA-bayer-BGR.onnx
+                                                                 --stats_path=${CMAKE_CURRENT_SOURCE_DIR}/../weights/precalculated_stats_bayer_v2_qvga_trainset_nonpadded.pickle
+                                                                 --flash_type=${MODEL_L3_FLASH}
+                                                                 --ram_type=${MODEL_L3_RAM}
 )
 add_custom_target(${NNTOOL_TARGET_PREFIX}clean_model
   COMMENT "clean_model: removing ${COMMON_MODEL_BUILDDIR}/${MODEL_GEN}"

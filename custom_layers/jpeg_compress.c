@@ -5,7 +5,7 @@ void jpeg_init(jpeg_encoder_t *enc, int height, int width, pi_device_t cluster_d
     struct jpeg_encoder_conf enc_conf;
     jpeg_encoder_conf_init(&enc_conf);
 
-    enc_conf.flags = 0x0;
+    // enc_conf.flags = 0x0;
 
     //For color Jpeg this flag can be added
     enc_conf.flags |= JPEG_ENCODER_FLAGS_COLOR;
@@ -22,9 +22,10 @@ void jpeg_init(jpeg_encoder_t *enc, int height, int width, pi_device_t cluster_d
     //     // return -1;
     // }
     // I don't need the start since I want to manually set cluster and l1 pointers:
-    // enc->cluster_dev = cluster_dev;
-    // enc->l1_constants = l1_memory;
-    // enc->cl_blocks = l1_memory + sizeof(JpegConstants);
+    enc->cluster_dev = cluster_dev;
+    enc->l1_constants = l1_memory;
+    enc->cl_blocks = l1_memory + sizeof(JpegConstants);
+    jpeg_copy_constants_to_l1(enc);
 }
 
 void jpeg_deinit(jpeg_encoder_t *enc){

@@ -84,7 +84,7 @@ static void handle_transfer_end(void *arg) {
 
     enqueue_transfer();
     pi_task_t *task = &ram_tasks[current_buff];
-    char * img = iter_buff[current_buff];
+    unsigned char * img = iter_buff[current_buff];
     int rgb_idx=0;
     for (int a = 0; a < 640; a+=2) {
         // Shifts bits to delete the 2 LSB, on the 10 useful bits
@@ -251,7 +251,7 @@ int test_main(void)
         PRINTF("Error changing frequency !\nTest failed...\n");
         pmsis_exit(-4);
     }
-    printf("FC Frequency as %d Hz, CL Frequency = %d Hz, PERIIPH Frequency = %d Hz\n", 
+    PRINTF("FC Frequency as %d Hz, CL Frequency = %d Hz, PERIIPH Frequency = %d Hz\n", 
             pi_freq_get(PI_FREQ_DOMAIN_FC), pi_freq_get(PI_FREQ_DOMAIN_CL), pi_freq_get(PI_FREQ_DOMAIN_PERIPH));
 
     
@@ -275,10 +275,10 @@ int test_main(void)
     //Open camera
     if (open_camera(&camera))
     {
-        printf("Failed to open camera\n");
+        PRINTF("Failed to open camera\n");
         return -1;
     }
-    printf("Turning camera on...\n");
+    PRINTF("Turning camera on...\n");
     //turn on camera
     pi_camera_control(&camera, PI_CAMERA_CMD_ON, 0);
     // Allocate ping pong buffers for Camera read
@@ -292,12 +292,12 @@ int test_main(void)
     pi_open_from_conf(&Ram, &ram_conf);
 
     pi_evt_sig_init(&proc_task);
-    printf("open ram\n");
+    PRINTF("open ram\n");
     if (pi_ram_open(&Ram)) {
         printf("Error ram open !\n");
         pmsis_exit(-5);
     }
-    printf("ram opened\n");
+    PRINTF("ram opened\n");
     if (pi_ram_alloc(&Ram, (uint32_t *) ext_ram_buf, H_INP * W_INP * CHANNELS) != 0) {
         printf("Failed to allocate memory in external ram (%ld bytes)\n", H_INP * W_INP * CHANNELS);
         pmsis_exit(-1);
@@ -305,7 +305,6 @@ int test_main(void)
 
     /* Init and opend jpeg encoder */
     jpeg_encoder_t enc;
-    jpeg_init(&enc, H_INP, W_INP, cluster_dev, main_L1_Memory);
 
     int iter=0;    
     while(1){
@@ -336,7 +335,7 @@ int test_main(void)
         performances[perf_idx] = pi_time_get_us();
         slicing_hwc_channel(
             main_L2_Memory_Dyn + (H_INP * W_INP * CHANNELS), 
-            Input_1, 
+            (unsigned char *) Input_1, 
             H_INP, 
             W_INP,
             CHANNELS
@@ -408,8 +407,8 @@ int test_main(void)
         performances[perf_idx] = pi_time_get_us() - performances[perf_idx]; perf_idx++;
 
         //Draw rectangles and send trought UART
-        pi_ram_read(&Ram, (uint32_t *) ext_ram_buf,  (uint32_t) main_L2_Memory_Dyn, (uint32_t) H_INP*W_INP*3);
-        draw_boxes(main_L2_Memory_Dyn, Output_1, final_valid_boxes, H_INP, W_INP, 3);
+        pi_ram_read(&Ram, ext_ram_buf, main_L2_Memory_Dyn, (uint32_t) H_INP*W_INP*3);
+        draw_boxes((unsigned char *) main_L2_Memory_Dyn, Output_1, final_valid_boxes, H_INP, W_INP, 3);
 
         /* ------ JPEG COMPRESSION ------ */
         PRINTF("\t\t***Start JPEG compression ***\n");
@@ -420,6 +419,7 @@ int test_main(void)
             return -1;
         }
         performances[perf_idx] = pi_time_get_us();
+        jpeg_init(&enc, H_INP, W_INP, cluster_dev, main_L1_Memory);
         int jpeg_ret = compress(
             &enc,
             (uint8_t *) main_L2_Memory_Dyn,
@@ -431,6 +431,7 @@ int test_main(void)
         performances[perf_idx] = pi_time_get_us() - performances[perf_idx]; perf_idx++;
 
         send_jpeg_to_uart(&uart_dev, jpeg_image, bitstream_size, performances);
+        iter++;
         pi_l2_free(jpeg_image, 30*2048);
 
         pi_evt_sig_init(&proc_task);
