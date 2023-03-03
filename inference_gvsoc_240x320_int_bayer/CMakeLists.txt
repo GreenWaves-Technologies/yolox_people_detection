@@ -41,7 +41,7 @@ autotiler_define_gen_names(${TARGET_NAME})
 set(AT_TENSORS_DIR BUILD_MODEL/weights_tensors)
 autotiler_setup(${TARGET_NAME})
 add_custom_command(
-  OUTPUT ${AT_MODEL_PATH} ${MODEL_EXPRESSIONS} ${AT_TENSORS_DIR}
+  OUTPUT ${AT_MODEL_PATH} ${AT_TENSORS_DIR}
   COMMENT "Generating the autotiler model"
   DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/../model_generator/nntool_generate_model.py
   COMMAND python3 ${CMAKE_CURRENT_SOURCE_DIR}/../model_generator/nntool_generate_model.py --at_model_path=${AT_MODEL_PATH}
@@ -63,7 +63,6 @@ add_custom_target(${NNTOOL_TARGET_PREFIX}clean_model
 list(APPEND TARGET_SRCS ${MAIN}
                         ${CNN_LIB}
                         ${CONFIG_MODEL_BUILDDIR}/${KERNEL_C}
-                        ${MODEL_EXPRESSIONS}
                         ../custom_layers/slicing.c
                         ../custom_layers/decoding.c
                         ../custom_layers/postprocessing.c

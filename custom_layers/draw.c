@@ -19,9 +19,9 @@ void draw_rectangle(
     int x0, x1, y0, y1;
 
     x0 = MAX(MIN(x, W - 1), 0);
-    x1 = MAX(MIN(x + w - 1, W - 1), 0);
+    x1 = MAX(MIN(w - 1, W - 1), 0);
     y0 = MAX(MIN(y, H - 1), 0);
-    y1 = MAX(MIN(y + h - 1, H - 1), 0);
+    y1 = MAX(MIN(h - 1, H - 1), 0);
 
     // left
     for (int i = y0; i < y1; i++) {

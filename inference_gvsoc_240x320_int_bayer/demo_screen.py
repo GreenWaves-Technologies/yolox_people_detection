@@ -27,46 +27,47 @@ def receive_image(ser,l,t):
     while True:
         read_bytes = ser.read(2)
         if read_bytes == UART_START_JPEG:
-            size_payload = ser.read(1)
-            while len(size_payload) < 4:
-                size_payload += ser.read(1)
-            data_size = int.from_bytes(size_payload, "little")
-            #print(data_size)
-
-            perf_array = ser.read(4*8)
-            while len(perf_array) < 4*8:
-                perf_array += ser.read(1)
-            perf_array = np.frombuffer(perf_array, np.uint32)
-            #print(perf_array)
-
-            img_from_uart = ser.read(256)
-            while len(img_from_uart) < data_size:
-               img_from_uart += ser.read(256)
-            #print(len(img_from_uart))
-
-            nparr = np.frombuffer(img_from_uart, np.uint8)
-            elapsed = time() - start
             try: 
+                size_payload = ser.read(1)
+                while len(size_payload) < 4:
+                    size_payload += ser.read(1)
+                data_size = int.from_bytes(size_payload, "little")
+                #print(data_size)
+
+                perf_array = ser.read(4*8)
+                while len(perf_array) < 4*8:
+                    perf_array += ser.read(1)
+                perf_array = np.frombuffer(perf_array, np.uint32)
+                #print(perf_array)
+
+                img_from_uart = ser.read(256)
+                while len(img_from_uart) < data_size:
+                   img_from_uart += ser.read(256)
+                #print(len(img_from_uart))
+
+                nparr = np.frombuffer(img_from_uart, np.uint8)
+                elapsed = time() - start
                 img = cv2.imdecode(nparr, cv2.IMREAD_COLOR) # cv2.IMREAD_COLOR in OpenCV 3.1
                 #img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
-                resized = cv2.resize(img, (2*640, 2*480), interpolation = cv2.INTER_AREA)
+                resized = cv2.resize(img, (4*640, 4*480), interpolation = cv2.INTER_AREA)
 
                 cv2.putText(resized, f'NN: {perf_array[:-1].sum()}us ({1e6/perf_array[:-1].sum():.2f}fps)',
-                           (30, 40), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 255), 2, cv2.LINE_4)
+                           (30, 40), cv2.FONT_HERSHEY_DUPLEX, 1, (255, 0, 0), 2, cv2.LINE_4)
                 #cv2.putText(resized, f'[{1/elapsed:.2f}fps ({1e6/perf_array.sum():.2f}, {1e6/perf_array[:-1].sum():.2f})]',
                 #           (50, 80), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 255), 2, cv2.LINE_4)
                 cv2.putText(resized, f'NN+JPEG: {perf_array.sum()}us ({1e6/perf_array.sum():.2f}fps)',
-                            (30, 80), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 255), 2, cv2.LINE_4)
+                            (30, 80), cv2.FONT_HERSHEY_DUPLEX, 1, (255, 0, 0), 2, cv2.LINE_4)
                 #cv2.imshow('Image from GAP', resized)
                 #cv2.waitKey(1)
+                resized_pil =Image.fromarray(resized)
+                imgtk = ImageTk.PhotoImage(image=resized_pil)
+                l.imgtk = imgtk
+                l.configure(image=imgtk)
+
             except:
                 print("Something went wrong with this image...")
-
-            resized_pil =Image.fromarray(resized)
-            imgtk = ImageTk.PhotoImage(image=resized_pil)
-            l.imgtk = imgtk
-            l.configure(image=imgtk)
+                continue
 
             count += 1
             start = time()
