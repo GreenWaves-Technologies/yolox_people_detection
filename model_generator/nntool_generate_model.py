@@ -7,6 +7,13 @@ import pickle
 from pathlib import Path
 from loguru import logger
 from nntool.api import NNGraph
+from nntool.utils.stats_funcs import qsnr
+from PIL import Image
+import numpy as np
+print(os.path.join(os.path.dirname(__file__), "../"))
+sys.path.append(os.path.join(os.path.dirname(__file__), "../"))
+from quantization.utils import hwc_slice
+from decoding_layer.decoding import decode_C_style
 
 def create_parser():
     # create the top-level parser
@@ -14,16 +21,28 @@ def create_parser():
 
     parser.add_argument('--trained_model', default=None, required=True,
                         help='Output - Trained model in tflite format')
+    parser.add_argument('--mode', default="generate", choices=['generate', 'inference'],
+                        help="generate: generate at model, inference: run inference with image provided and save gt file")
+    parser.add_argument('--stats_path', default=None, required=True,
+                        help="Path to pickle file for statistics")
+
+    # Generate mode options
     parser.add_argument('--tensors_dir', default="tensors",
                         help="Where nntool stores the weights/bias tensors dir (only used in generate and performance mode)")
     parser.add_argument('--at_model_path', default=None,
                         help="Path to the C autotiler model file to generate (only used in generate mode)")
-    parser.add_argument('--stats_path', default=None,
-                        help="Path to pickle file for statistics")
     parser.add_argument('--ram_type', default="AT_MEM_L3_DEFAULTRAM", choices=['AT_MEM_L3_HRAM', 'AT_MEM_L3_QSPIRAM', 'AT_MEM_L3_OSPIRAM', 'AT_MEM_L3_DEFAULTRAM'],
                         help="Ram type to use during inference on platform (only used in generate and performance mode)")
     parser.add_argument('--flash_type', default="AT_MEM_L3_DEFAULTFLASH", choices=['AT_MEM_L3_HFLASH', 'AT_MEM_L3_QSPIFLASH', 'AT_MEM_L3_OSPIFLASH', 'AT_MEM_L3_MRAMFLASH', 'AT_MEM_L3_DEFAULTFLASH'],
                         help="Flash type to use during inference (only used in generate and performance mode)")
+    # inference mode options
+    parser.add_argument('--input_image', default=None,
+                        help="Image to run inference on")
+    parser.add_argument('--gt_file', default=None,
+                        help="File to save ground truth output")
+    parser.add_argument('--conf_thresh', default=0.01,
+                        help="Confidence threshold")
+
     return parser
 
 def build_graph(onnx_path):
@@ -93,25 +112,53 @@ if __name__ == '__main__':
     )
 
     G.name = "main"
+    print(G.show([G[0]]))
     print(G.qshow([G[0]]))
-    G[0].allocate = True
 
-    G.generate(
-        write_constants=True,
-        settings={
-            "tensor_directory": args.tensors_dir,
-            "model_directory": os.path.split(args.at_model_path)[0] if args.at_model_path else "",
-            "model_file": os.path.split(args.at_model_path)[1] if args.at_model_path else "ATmodel.c",
+    if args.mode == "inference":
+        #G.draw(filepath="draw")
+        input_tensor = hwc_slice(np.array(Image.open(args.input_image)))
+        print(input_tensor.shape)
+        flout = G.execute([input_tensor])
+        dqout = G.execute([input_tensor], dequantize=True)
+        qqout = G.execute([input_tensor], dequantize=False, quantize=True)
 
-            "l1_size": 128000,
-            "l2_size": 1000000,
 
-            "graph_monitor_cycles": True,
-            "graph_produce_node_names": True,
-            "graph_produce_operinfos": True,
-            "graph_const_exec_from_flash": True,
+        onode = G["output_1"]
 
-            "l3_ram_device": args.ram_type,
-            "l3_flash_device": args.flash_type, #"AT_MEM_L3_DEFAULTFLASH",
-        }
-    )
+        float_boxes = flout[onode.step_idx][0]
+        quant_boxes = dqout[onode.step_idx][0]
+        strides = [8, 16, 32]
+        feature_map_sizes = [(30, 40), (15, 20), (8, 10)]
+        decoded_float_boxes = decode_C_style(float_boxes.flatten(), feature_map_sizes, strides)
+        decoded_quant_boxes = decode_C_style(quant_boxes.flatten(), feature_map_sizes, strides)
+
+        print(G.show([G[onode.step_idx]]))
+        print(G.qshow([G[onode.step_idx]]))
+        print(decoded_float_boxes)
+        print(decoded_quant_boxes)
+        print(qsnr(float_boxes, quant_boxes))
+        print(qsnr(decoded_float_boxes, decoded_quant_boxes))
+
+    else:
+        G[0].allocate = True
+
+        G.generate(
+            write_constants=True,
+            settings={
+                "tensor_directory": args.tensors_dir,
+                "model_directory": os.path.split(args.at_model_path)[0] if args.at_model_path else "",
+                "model_file": os.path.split(args.at_model_path)[1] if args.at_model_path else "ATmodel.c",
+
+                "l1_size": 128000,
+                "l2_size": 1000000,
+
+                "graph_monitor_cycles": True,
+                "graph_produce_node_names": True,
+                "graph_produce_operinfos": True,
+                "graph_const_exec_from_flash": True,
+
+                "l3_ram_device": args.ram_type,
+                "l3_flash_device": args.flash_type, #"AT_MEM_L3_DEFAULTFLASH",
+            }
+        )

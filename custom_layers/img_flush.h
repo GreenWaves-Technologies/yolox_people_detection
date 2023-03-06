@@ -1,4 +1,1 @@
-#define QUOTE(name) #name
-#define STR(macro) QUOTE(macro)
-
-int flush_iamge(char * image, int bitstream_size);
+int write_jpeg_to_file(char * image, char * output_file, int bitstream_size);
