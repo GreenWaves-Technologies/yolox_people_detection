@@ -46,22 +46,6 @@ L2_MEM float Output_1[9480];
 /* Copy inputs function */
 void copy_inputs() {
     int status;
-#ifdef CI
-    /* ------------------- reading data for test ----------------------*/
-
-    PRINTF("\n\t\t*** READING TEST INPUT ***\n");
-    status = ReadImageFromFile(
-        STR(TEST_INPUT_FILE_NAME),
-        W_INP, 
-        H_INP, 
-        CHANNELS, 
-        main_L2_Memory_Dyn + (H_INP * W_INP * CHANNELS),
-        W_INP * H_INP * CHANNELS * sizeof(char), 
-        IMGIO_OUTPUT_CHAR,
-        0
-    );
-#else
-#ifdef INFERENCE
     PRINTF("\n\t\t*** READING INPUT FROM PPM FILE ***\n");
     status = ReadImageFromFile(
         STR(INPUT_FILE_NAME),
@@ -78,8 +62,6 @@ void copy_inputs() {
         PRINTF("Error reading image from file %s (error: %d) \n", STR(INPUT_FILE_NAME), status);
         exit(-1);
     }
-#endif
-#endif 
 }
 
 
@@ -124,8 +106,7 @@ void write_outputs() {
     PRINTF("\t\t***Start CI output test***\n");
     char GT_file[] = STR(TEST_OUTPUT_FILE_NAME); 
     ci_output_test(Output_1, GT_file, (float *) main_L2_Memory_Dyn);
-#else
-#ifdef INFERENCE
+#endif
     /* ------ SAVE ------*/
     PRINTF("\t\t***Start saving output***\n");
 
@@ -140,9 +121,6 @@ void write_outputs() {
 
     __CLOSE(File_Output_1);
     __FS_DEINIT(fs);
-#endif
-#endif
-
 }
 
 
@@ -185,7 +163,7 @@ int test_main(void)
     /* Frequency Settings: defined in the Makefile */
     int cur_fc_freq = pi_freq_set(PI_FREQ_DOMAIN_FC, FREQ_FC*1000*1000);
     int cur_cl_freq = pi_freq_set(PI_FREQ_DOMAIN_CL, FREQ_CL*1000*1000);
-    int cur_pe_freq = pi_freq_set(PI_FREQ_DOMAIN_PERIPH, 360*1000*1000);
+    int cur_pe_freq = pi_freq_set(PI_FREQ_DOMAIN_PERIPH, FREQ_PE*1000*1000);
     if (cur_fc_freq == -1 || cur_cl_freq == -1 || cur_pe_freq == -1)
     {
         PRINTF("Error changing frequency !\nTest failed...\n");

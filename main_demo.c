@@ -227,7 +227,7 @@ int test_main(void)
     /* Frequency Settings: defined in the Makefile */
     int cur_fc_freq = pi_freq_set(PI_FREQ_DOMAIN_FC, FREQ_FC*1000*1000);
     int cur_cl_freq = pi_freq_set(PI_FREQ_DOMAIN_CL, FREQ_CL*1000*1000);
-    int cur_pe_freq = pi_freq_set(PI_FREQ_DOMAIN_PERIPH, 360*1000*1000);
+    int cur_pe_freq = pi_freq_set(PI_FREQ_DOMAIN_PERIPH, FREQ_PE*1000*1000);
     if (cur_fc_freq == -1 || cur_cl_freq == -1 || cur_pe_freq == -1)
     {
         PRINTF("Error changing frequency !\nTest failed...\n");

@@ -9,22 +9,22 @@ set(TARGET_NAME         main)
 include($ENV{GAP_SDK_HOME}/utils/cmake/setup.cmake)
 set(APP_MSG_PREFIX "[${BoldRed}YoloX${ColourReset}]")
 
-set(TEST_INPUT_FILE_NAME      ${CMAKE_CURRENT_SOURCE_DIR}/test_data/input.ppm)
 set(TEST_OUTPUT_FILE_NAME     ${CMAKE_CURRENT_SOURCE_DIR}/test_data/gt_boxes.bin)
-set(INPUT_FILE_NAME           ${CMAKE_CURRENT_SOURCE_DIR}/input_rgb.ppm)
 set(OUTPUT_FILE_NAME          ${CMAKE_CURRENT_SOURCE_DIR}/output.ppm)
 set(OUTPUT_BIN_FILE_NAME      ${CMAKE_CURRENT_SOURCE_DIR}/output.bin)
-set(OUTPUT_JPEG_FILE_NAME      ${CMAKE_CURRENT_SOURCE_DIR}/output_compressed.jpg)
+set(OUTPUT_JPEG_FILE_NAME     ${CMAKE_CURRENT_SOURCE_DIR}/output_compressed.jpg)
 
 if(CONFIG_CI)
   message(STATUS "${APP_MSG_PREFIX} Building App in CI Mode")
   set(CONF_THRESH 0.01)
+  set(INPUT_FILE_NAME           ${CMAKE_CURRENT_SOURCE_DIR}/test_data/input.ppm)
   list(APPEND TARGET_PREPROCESSOR -DCI)
   set(MAIN                main_inference.c)
 
 elseif(CONFIG_INFERENCE)
   message(STATUS "${APP_MSG_PREFIX} Building App in INFERENCE Mode")
   set(CONF_THRESH 0.01)
+  set(INPUT_FILE_NAME           ${CMAKE_CURRENT_SOURCE_DIR}/input_rgb.ppm)
   list(APPEND TARGET_PREPROCESSOR -DINFERENCE)
   set(MAIN                main_inference.c)
 
@@ -63,26 +63,26 @@ add_custom_target(${NNTOOL_TARGET_PREFIX}clean_model
   COMMAND rm -rf ${AT_MODEL_PATH}
 )
 
-add_custom_command(
-  OUTPUT ${TEST_OUTPUT_FILE_NAME}
-  COMMENT "Generating the ground truth bounding boxes"
-  DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/model_generator/nntool_generate_model.py
-  COMMAND python3 ${CMAKE_CURRENT_SOURCE_DIR}/model_generator/nntool_generate_model.py
-           --trained_model=${CMAKE_CURRENT_SOURCE_DIR}/weights/yolox-QVGA-bayer-BGR.onnx
-           --stats_path=${CMAKE_CURRENT_SOURCE_DIR}/weights/precalculated_stats_bayer_v2_qvga_trainset_nonpadded.pickle
-           --mode="inference"
-           --input_image=${TEST_INPUT_FILE_NAME}
-           --gt_file=${TEST_OUTPUT_FILE_NAME}
-           --conf_thresh=${CONF_THRESH}
-)
-add_custom_target(gen_gt_file
-  COMMENT "gen_gt_file: ${TEST_OUTPUT_FILE_NAME}"
-  DEPENDS ${TEST_OUTPUT_FILE_NAME}
-)
-add_custom_target(clean_gt_file
-  COMMENT "clean_gt_file: removing ${TEST_OUTPUT_FILE_NAME}"
-  COMMAND rm -rf ${TEST_OUTPUT_FILE_NAME}
-)
+# add_custom_command(
+#   OUTPUT ${TEST_OUTPUT_FILE_NAME}
+#   COMMENT "Generating the ground truth bounding boxes"
+#   DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/model_generator/nntool_generate_model.py
+#   COMMAND python3 ${CMAKE_CURRENT_SOURCE_DIR}/model_generator/nntool_generate_model.py
+#            --trained_model=${CMAKE_CURRENT_SOURCE_DIR}/weights/yolox-QVGA-bayer-BGR.onnx
+#            --stats_path=${CMAKE_CURRENT_SOURCE_DIR}/weights/precalculated_stats_bayer_v2_qvga_trainset_nonpadded.pickle
+#            --mode="inference"
+#            --input_image=${TEST_INPUT_FILE_NAME}
+#            --gt_file=${TEST_OUTPUT_FILE_NAME}
+#            --conf_thresh=${CONF_THRESH}
+# )
+# add_custom_target(gen_gt_file
+#   COMMENT "gen_gt_file: ${TEST_OUTPUT_FILE_NAME}"
+#   DEPENDS ${TEST_OUTPUT_FILE_NAME}
+# )
+# add_custom_target(clean_gt_file
+#   COMMENT "clean_gt_file: removing ${TEST_OUTPUT_FILE_NAME}"
+#   COMMAND rm -rf ${TEST_OUTPUT_FILE_NAME}
+# )
 ###############################################################################
 # Application dependencies
 ###############################################################################
@@ -90,13 +90,13 @@ add_custom_target(clean_gt_file
 list(APPEND TARGET_SRCS ${MAIN}
                         ${CNN_LIB}
                         ${CONFIG_MODEL_BUILDDIR}/${KERNEL_C}
-                        ../custom_layers/slicing.c
-                        ../custom_layers/decoding.c
-                        ../custom_layers/postprocessing.c
-                        ../custom_layers/draw.c
-                        ../custom_layers/jpeg_compress.c
-                        ../custom_layers/img_flush.c
-                        ../custom_layers/camera.c
+                        ${CMAKE_CURRENT_SOURCE_DIR}/custom_layers/slicing.c
+                        ${CMAKE_CURRENT_SOURCE_DIR}/custom_layers/decoding.c
+                        ${CMAKE_CURRENT_SOURCE_DIR}/custom_layers/postprocessing.c
+                        ${CMAKE_CURRENT_SOURCE_DIR}/custom_layers/draw.c
+                        ${CMAKE_CURRENT_SOURCE_DIR}/custom_layers/jpeg_compress.c
+                        ${CMAKE_CURRENT_SOURCE_DIR}/custom_layers/img_flush.c
+                        ${CMAKE_CURRENT_SOURCE_DIR}/custom_layers/camera.c
 )
 
 list(APPEND TARGET_INCS -I.
@@ -107,22 +107,11 @@ list(APPEND TARGET_INCS -I.
                         -I${CMAKE_CURRENT_BINARY_DIR}/${CONFIG_MODEL_BUILDDIR}
                         -I${CMAKE_CURRENT_SOURCE_DIR})
 
-if (CONFIG_MODEL_EMUL)
-list(REMOVE_ITEM TARGET_CFLAGS
-  -mno-memcpy)
-list(APPEND TARGET_CFLAGS
-  -g
-  -m32
-  -O0
-  -fcommon
-  -D__EMUL__)
-else()
 list(APPEND TARGET_CFLAGS   -O3)
-endif()
 
 set(FREQ_CL 370)
 set(FREQ_FC 370)
-set(FREQ_PE 370)
+set(FREQ_PE 360)
 
 message(STATUS "Clock speeds - Cluster ${FREQ_CL} FC ${FREQ_FC} Peripheral ${FREQ_PE}")
 # math(EXPR FREQ_CL ${CONFIG_FREQUENCY_CLUSTER}/1000000 OUTPUT_FORMAT DECIMAL)
@@ -141,7 +130,6 @@ list(APPEND TARGET_PREPROCESSOR -DPERF
                                 -DOUTPUT_FILE_NAME=${OUTPUT_FILE_NAME}
                                 -DOUTPUT_BIN_FILE_NAME=${OUTPUT_BIN_FILE_NAME}
                                 -DOUTPUT_JPEG_FILE_NAME=${OUTPUT_JPEG_FILE_NAME}
-                                -DTEST_INPUT_FILE_NAME=${TEST_INPUT_FILE_NAME}
                                 -DTEST_OUTPUT_FILE_NAME=${TEST_OUTPUT_FILE_NAME}
                                 -DCONF_THRESH=${CONF_THRESH}
 )
