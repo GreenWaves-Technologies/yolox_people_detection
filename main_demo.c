@@ -439,6 +439,6 @@ int test_main(void)
 
 int main(int argc, char *argv[])
 {
-    PRINTF("\n\n\t *** NNTOOL main Example ***\n\n");
+    PRINTF("\n\n\t *** NNTOOL main_demo ***\n\n");
     return test_main();
 }

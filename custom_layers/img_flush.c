@@ -1,7 +1,7 @@
 #include "gaplib/fs_switch.h"
 #include "img_flush.h"
 
-int write_jpeg_to_file(char * image, char * output_file, int bitstream_size){
+int write_jpeg_to_file(unsigned char * image, char * output_file, int bitstream_size){
 
     struct pi_fs_conf host_fs_conf;
     pi_fs_conf_init(&host_fs_conf);

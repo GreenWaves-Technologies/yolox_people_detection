@@ -5,7 +5,7 @@ import os
 import copy
 import pickle
 from pathlib import Path
-from loguru import logger
+#from loguru import logger
 from nntool.api import NNGraph
 from nntool.utils.stats_funcs import qsnr
 from PIL import Image
@@ -57,7 +57,7 @@ def build_graph(onnx_path):
     graph.fusions('scaled_match_group')
     graph.fusions('expression_matcher')
     
-    logger.info("LAST LAYER ORDER", graph[-1].fixed_order)
+    print("LAST LAYER ORDER", graph[-1].fixed_order)
     return graph
 
 def clip_stats(stats, n_std):
@@ -77,23 +77,23 @@ if __name__ == '__main__':
     argcomplete.autocomplete(parser)
     args = parser.parse_args()
 
-    logger.info(f"Model path: {str(args.trained_model)}")
-    logger.info(f"Calibration path: {str(args.stats_path)}")
-    logger.info(f"AT model path: {args.at_model_path}")
+    print(f"Model path: {str(args.trained_model)}")
+    print(f"Calibration path: {str(args.stats_path)}")
+    print(f"AT model path: {args.at_model_path}")
 
-    logger.info("Building graph")
+    print("Building graph")
     G = build_graph(str(args.trained_model))
 
     # reate stats from pickle file 
-    logger.info(f"Loading stats from {str(args.stats_path)}")
+    print(f"Loading stats from {str(args.stats_path)}")
     with open(str(args.stats_path), "rb") as f:
         stats = pickle.load(f)
 
     # clipping stats. std = 3 worked the best 
-    logger.info(f"Clipping stats with std {3}")
+    print(f"Clipping stats with std {3}")
     stats = clip_stats(stats, n_std = 3)
 
-    logger.info("Quantizing graph")
+    print("Quantizing graph")
     G.quantize(
         stats,
         graph_options={

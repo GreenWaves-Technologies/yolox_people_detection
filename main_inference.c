@@ -203,7 +203,7 @@ int test_main(void)
     slicing_cycles = gap_fc_readhwtimer();
 
     slicing_hwc_channel(
-        main_L2_Memory_Dyn + (H_INP * W_INP * CHANNELS), 
+        (unsigned char *) main_L2_Memory_Dyn + (H_INP * W_INP * CHANNELS), 
         Input_1, 
         H_INP, 
         W_INP,
@@ -396,6 +396,6 @@ int test_main(void)
 
 int main(int argc, char *argv[])
 {
-    PRINTF("\n\n\t *** NNTOOL main Example ***\n\n");
+    PRINTF("\n\n\t *** NNTOOL main_inference ***\n\n");
     return test_main();
 }
