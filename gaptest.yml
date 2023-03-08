@@ -1,0 +1,19 @@
+name: yolox_people_detection
+builder: cmake
+boards: []
+platforms: 
+    - board
+    - gvsoc
+os: 
+#- freertos TODO: to be fixed in freeRTOS
+    - freertos
+chips: 
+    - gap9
+variants:
+    std:
+        name: std
+        tags:
+            - integration
+            - release
+        duration: standard
+        flags: CI=y
