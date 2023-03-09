@@ -1,5 +1,5 @@
 import argparse
-from utils import GvsocInputGeneratorCOCO
+from dataset_generators import GvsocInputGeneratorCOCO
 
 def make_parser():
     parser = argparse.ArgumentParser("Parser")

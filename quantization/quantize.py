@@ -3,7 +3,7 @@ import argparse
 import numpy as np
 
 from loguru import logger
-from utils import CostomCOCODaset
+from dataset_generators import CostomCOCODaset
 from nntool.utils.stats_funcs import qsnr
 from utils import build_graph, clip_stats, get_annotations, check_input_dims
 
