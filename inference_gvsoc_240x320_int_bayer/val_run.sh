@@ -1,4 +1,3 @@
-#!/bin/bash
 DIR_IN=$1
 DIR_OUT=$2
 mkdir -p DIR_IN 
