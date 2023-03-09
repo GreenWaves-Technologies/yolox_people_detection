@@ -2,8 +2,20 @@ import os
 import cv2
 import numpy as np
 from loguru import logger
-from utils import get_annotations
 from tqdm import tqdm
+
+def get_annotations(coco_annotations_path):
+
+    print("Loading annotations for class person...")
+    cocoGt = COCO(coco_annotations_path)
+    class_ids = cocoGt.getCatIds("person")
+
+    img_ids = []
+    for cls in class_ids:
+        img_ids.extend(cocoGt.getImgIds(catIds=cls))
+
+    annotations = cocoGt.loadImgs(img_ids) 
+    return annotations
 
 class CostomCOCODaset():
     def __init__(
