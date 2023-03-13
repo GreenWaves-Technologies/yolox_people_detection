@@ -3,6 +3,7 @@ import cv2
 import numpy as np
 from loguru import logger
 from tqdm import tqdm
+from pycocotools.coco import COCO
 
 def get_annotations(coco_annotations_path):
 

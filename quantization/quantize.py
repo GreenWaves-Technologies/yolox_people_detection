@@ -152,44 +152,43 @@ def main():
     for i, fp32, fp16 in zip(range(len(graph)), fout, qfout):
         print(f"Graph[{i:3}] -> {graph[i].name:>40}:\t{qsnr(fp32[0], fp16[0])}")
 
-    # make inference in gvsoc
-    logger.info("Generating GVSOC inference tamplete. This might take a couple of minutes !!!")
+    # # make inference in gvsoc
+    # logger.info("Generating GVSOC inference tamplete. This might take a couple of minutes !!!")
 
-    graph.name = "main"
-    qout = graph.execute([sample], quantize=True, dequantize=False)
+    # graph.name = "main"
+    # qout = graph.execute([sample], quantize=True, dequantize=False)
 
-    graph[0].allocate = 1
-    res = graph.execute_on_target(
-        pmsis_os='freertos',
-        directory="./GVSOC_INFERENCE_TEMPLATE",
-        pretty=True,
-        input_tensors=[qout[0][0]],
-        output_tensors=6,
-        dont_run=False,
-        do_clean=False,
-        cmake=True,
-        at_loglevel=1, 
-        platform = "gvsoc", # 'board'
-        settings={
-            'l1_size': 128000,
-            'l2_size': 1000000,
-            'tensor_directory': './weights_tensors',
-            'graph_const_exec_from_flash': True,
+    # graph[0].allocate = 1
+    # res = graph.execute_on_target(
+    #     pmsis_os='freertos',
+    #     directory="./GVSOC_INFERENCE_TEMPLATE",
+    #     input_tensors=[qout[0][0]],
+    #     output_tensors=6,
+    #     dont_run=False,
+    #     do_clean=False,
+    #     cmake=True,
+    #     at_loglevel=1, 
+    #     platform = "gvsoc", # 'board'
+    #     settings={
+    #         'l1_size': 128000,
+    #         'l2_size': 1000000,
+    #         'tensor_directory': './weights_tensors',
+    #         'graph_const_exec_from_flash': True,
 
-            'l3_ram_device': 'AT_MEM_L3_DEFAULTRAM',
-            # "l3_flash_device": "AT_MEM_L3_MRAMFLASH",
-            'l3_flash_device':  'AT_MEM_L3_DEFAULTFLASH',
-        }
-    ) 
-    logger.info("Finished generating GVSOC inference tamplete !!!")
+    #         'l3_ram_device': 'AT_MEM_L3_DEFAULTRAM',
+    #         # "l3_flash_device": "AT_MEM_L3_MRAMFLASH",
+    #         'l3_flash_device':  'AT_MEM_L3_DEFAULTFLASH',
+    #     }
+    # ) 
+    # logger.info("Finished generating GVSOC inference tamplete !!!")
     
-    qsnrs = graph.qsnrs(qout, res.output_tensors)
-    for i, el in enumerate(qsnrs):
-        print(f"QSNR {i}: {el}")
-        if el is not None:
-            print(f"graph[{i:3}] -> {graph[i].name:>25}: {el}")
+    # qsnrs = graph.qsnrs(qout, res.output_tensors)
+    # for i, el in enumerate(qsnrs):
+    #     print(f"QSNR {i}: {el}")
+    #     if el is not None:
+    #         print(f"graph[{i:3}] -> {graph[i].name:>25}: {el}")
 
-    logger.info("Finished !!!")    
+    # logger.info("Finished !!!")    
 
 
 if __name__ == "__main__":

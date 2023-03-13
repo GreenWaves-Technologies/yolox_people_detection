@@ -86,6 +86,7 @@ add_custom_target(${NNTOOL_TARGET_PREFIX}clean_model
 
 list(APPEND TARGET_SRCS ${MAIN}
                         ${CNN_LIB}
+                        ${CONFIG_MODEL_BUILDDIR}/Expression_Kernels.c
                         ${CONFIG_MODEL_BUILDDIR}/${KERNEL_C}
                         ${CMAKE_CURRENT_SOURCE_DIR}/custom_layers/slicing.c
                         ${CMAKE_CURRENT_SOURCE_DIR}/custom_layers/decoding.c

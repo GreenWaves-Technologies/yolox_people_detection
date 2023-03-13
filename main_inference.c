@@ -102,11 +102,6 @@ void ci_output_test(float * model_output, char * GT_file_name, float * GT_buffer
 /* Copy inputs function */
 void write_outputs() {
 
-#ifdef CI
-    PRINTF("\t\t***Start CI output test***\n");
-    char GT_file[] = STR(TEST_OUTPUT_FILE_NAME); 
-    ci_output_test(Output_1, GT_file, (float *) main_L2_Memory_Dyn);
-#endif
     /* ------ SAVE ------*/
     PRINTF("\t\t***Start saving output***\n");
 
@@ -121,6 +116,11 @@ void write_outputs() {
 
     __CLOSE(File_Output_1);
     __FS_DEINIT(fs);
+#ifdef CI
+    PRINTF("\t\t***Start CI output test***\n");
+    char GT_file[] = STR(TEST_OUTPUT_FILE_NAME); 
+    ci_output_test(Output_1, GT_file, (float *) main_L2_Memory_Dyn);
+#endif
 }
 
 
