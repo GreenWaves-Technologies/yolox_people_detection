@@ -130,15 +130,11 @@ cd build
 make make run -j  
 ```
 
-### MODEs: 
-  `CI` - Test mode, checks if the model is working correctly. It runs the model on a single image and compares the output with the expected output.
+### Application MODEs:
 
-  `DEMO` - Run the model in images coming from a camera.
+  `DEMO` - Run the model in images coming from a camera, compress the images to jpeg and stream them via UART (works ONLY with platform=BOARD). Use the `demo_screen.py` python script to read the UART stream with your PC and display the images with bounding boxes predicted by GAP9.
 
-  `INFERENCE` - Run the model on a single image and save the output in a file and visualized bounding boxes on the image. 
-
-To run GVSOC inference on a different image, replace the image in 'inference_gvsoc_240x320_int_bayer/input_rgb.ppm' with the desired image. The image should be in `.ppm` format as described in the [table](#input-output-data-format) above. Then then rerun the command [above](#gvsoc-inference). 
-
+  `INFERENCE` - Run the model on a single image (specified via Kconfig through the variable `CONFIG_IMAGE_REL_PATH`) and save the output in a file and visualized bounding boxes on the image. The image must be in `.ppm` format. 
 
 
 # Additional features

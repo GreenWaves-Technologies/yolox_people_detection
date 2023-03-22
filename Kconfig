@@ -40,5 +40,11 @@ menu "YoloX App Menu"
 
     endchoice
 
+
+    config IMAGE_REL_PATH
+    	depends on INFERENCE
+        string "Relative path to test image"
+        default "test_data/input.ppm"
+
 endmenu
 source "$(GAP_SDK_HOME)/utils/kconfig/Kconfig"
