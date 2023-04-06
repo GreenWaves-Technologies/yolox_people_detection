@@ -61,7 +61,7 @@ PI_L2 unsigned char *iter_buff[2];
 
 static pi_event_t proc_task;
 
-static struct pi_device camera;
+pi_device_t* camera;
 PI_L2 unsigned char *buff[2];
 
 // This is called to enqueue new transfers
@@ -76,7 +76,7 @@ static void enqueue_transfer() {
 
         // Enqueue a transfer. The callback will be called once the transfer is finished
         // so that  a new one is enqueued while another one is already running
-        pi_camera_capture_async(&camera, iter_buff[current_task], iter_size, pi_evt_callback_no_irq_init(task, handle_transfer_end, (void *)current_task));
+        pi_camera_capture_async(camera, iter_buff[current_task], iter_size, pi_evt_callback_no_irq_init(task, handle_transfer_end, (void *)current_task));
 
         current_size[current_task] = iter_size;
         remaining_size -= iter_size;
@@ -133,21 +133,6 @@ static void cluster()
     mainCNN(Output_1);
 }
 
-
-static int open_camera(struct pi_device *device)
-{
-    PRINTF("Opening CSI2 camera\n");
-
-    struct pi_ov5647_conf cam_conf;
-    pi_ov5647_conf_init(&cam_conf);
-
-    cam_conf.format=PI_CAMERA_VGA;
-    pi_open_from_conf(device, &cam_conf);
-    if (pi_camera_open(device))
-        return -1;
-
-    return 0;
-}
 
 uint8_t UART_START_COM[] = {0xF1,0x1F};
 uint8_t UART_START_JPEG[] = {0xAB,0xBA};
@@ -252,17 +237,17 @@ int test_main(void)
     pi_cluster_task_stacks(&task, NULL, SLAVE_STACK_SIZE);
 
     pi_device_t uart_dev;
-    init_uart_communication(&uart_dev,3000000);
+    init_uart_communication(&uart_dev,1000000);
     
     //Open camera
-    if (open_camera(&camera))
+    if (pi_open(PI_CAMERA_OV5647, &camera))
     {
         PRINTF("Failed to open camera\n");
         return -1;
     }
     PRINTF("Turning camera on...\n");
     //turn on camera
-    pi_camera_control(&camera, PI_CAMERA_CMD_ON, 0);
+    pi_camera_control(camera, PI_CAMERA_CMD_ON, 0);
     // Allocate ping pong buffers for Camera read
     iter_buff[0] = pi_l2_malloc(ITER_SIZE);
     if (iter_buff[0] == NULL) return -1;
@@ -303,9 +288,9 @@ int test_main(void)
         current_task = 0;
 
         enqueue_transfer();
-        pi_camera_control(&camera, PI_CAMERA_CMD_START, 0);
+        pi_camera_control(camera, PI_CAMERA_CMD_START, 0);
         pi_evt_wait(&proc_task);
-        pi_camera_control(&camera, PI_CAMERA_CMD_STOP, 0);
+        pi_camera_control(camera, PI_CAMERA_CMD_STOP, 0);
         
         //Copy from ram to: main_L2_Memory_Dyn + (H_INP * W_INP * CHANNELS)
         //The image is saved onto External

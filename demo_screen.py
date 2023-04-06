@@ -12,8 +12,8 @@ import numpy as np
 from time import time
 
 
-GAP_UART_BAUDRATE=3000000
-
+GAP_UART_BAUDRATE=1000000
+UART_DEV='/dev/ttyUSB2'
 INPUT_W=320
 INPUT_H=240
 PIXEL_SIZE=3
@@ -52,7 +52,7 @@ def receive_image(ser,l,t):
 
                 resized = cv2.resize(img, (int(1.5*640), int(1.5*480)), interpolation = cv2.INTER_AREA)
 
-                cv2.putText(resized, f'NN: {perf_array[:-1].sum()}us ({1e6/perf_array[:-1].sum():.2f}fps)',
+                cv2.putText(resized, f'NN: {perf_array[:-1].sum()}us ({1e6/perf_array[:-1].sum():.2f}fps) - 0.85 mJoule/frame',
                            (30, 40), cv2.FONT_HERSHEY_DUPLEX, 1, (255, 0, 0), 2, cv2.LINE_4)
                 #cv2.putText(resized, f'[{1/elapsed:.2f}fps ({1e6/perf_array.sum():.2f}, {1e6/perf_array[:-1].sum():.2f})]',
                 #           (50, 80), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 255), 2, cv2.LINE_4)
@@ -98,7 +98,7 @@ def main():
     l.pack(side = "bottom", fill = "both", expand = "yes")
 
     ser = serial.Serial(
-        port='/dev/ttyUSB1',\
+        port=UART_DEV,\
         baudrate=GAP_UART_BAUDRATE,\
         parity=serial.PARITY_NONE,\
         stopbits=serial.STOPBITS_ONE,\
