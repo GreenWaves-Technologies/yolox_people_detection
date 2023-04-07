@@ -13,7 +13,7 @@ from time import time
 
 
 GAP_UART_BAUDRATE=1000000
-UART_DEV='/dev/ttyUSB2'
+UART_DEV='/dev/ttyUSB3'
 INPUT_W=320
 INPUT_H=240
 PIXEL_SIZE=3
@@ -50,22 +50,27 @@ def receive_image(ser,l,t):
                 img = cv2.imdecode(nparr, cv2.IMREAD_COLOR) # cv2.IMREAD_COLOR in OpenCV 3.1
                 #img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
-                resized = cv2.resize(img, (int(1.5*640), int(1.5*480)), interpolation = cv2.INTER_AREA)
-
-                cv2.putText(resized, f'NN: {perf_array[:-1].sum()}us ({1e6/perf_array[:-1].sum():.2f}fps) - 0.85 mJoule/frame',
-                           (30, 40), cv2.FONT_HERSHEY_DUPLEX, 1, (255, 0, 0), 2, cv2.LINE_4)
+                img_resized = cv2.resize(img, (int(1.5*640), int(1.5*480)), interpolation = cv2.INTER_AREA)
+                #rect = cv2.CreateMat(int(1.5*640), int(1.5*480)+80)
+                rect = np.zeros(( 90,int(1.5*640),3),np.uint8)
+                rect[:] = 255 
+                vis = np.concatenate((rect, img_resized), axis=0)
+                #cv2.rectangle(resized, (0, 0), (960, 40), (255,255,255), 150)
+                cv2.putText(vis, f'NN: {perf_array[:-1].sum()}us ({1e6/perf_array[:-1].sum():.2f}fps) - 0.85 mJoule/frame',
+                           (30, 40), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 0), 2, cv2.LINE_4)
                 #cv2.putText(resized, f'[{1/elapsed:.2f}fps ({1e6/perf_array.sum():.2f}, {1e6/perf_array[:-1].sum():.2f})]',
                 #           (50, 80), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 255), 2, cv2.LINE_4)
-                cv2.putText(resized, f'NN+JPEG: {perf_array.sum()}us ({1e6/perf_array.sum():.2f}fps)',
-                            (30, 80), cv2.FONT_HERSHEY_DUPLEX, 1, (255, 0, 0), 2, cv2.LINE_4)
+                cv2.putText(vis, f'NN+JPEG: {perf_array.sum()}us ({1e6/perf_array.sum():.2f}fps)',
+                            (30, 80), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 0), 2, cv2.LINE_4)
                 #cv2.imshow('Image from GAP', resized)
                 #cv2.waitKey(1)
-                resized_pil =Image.fromarray(resized)
+                resized_pil =Image.fromarray(vis)
                 imgtk = ImageTk.PhotoImage(image=resized_pil)
                 l.imgtk = imgtk
                 l.configure(image=imgtk)
 
-            except:
+            except Exception as e: 
+                print(e)
                 print("Something went wrong with this image...")
                 continue
 
@@ -81,7 +86,7 @@ def main():
     #Init the window otherwise the protocol get screwed
     #create a tkinter window
     t=Tk()
-    t.geometry("1200x800")#here use alphabet 'x' not '*' this one
+    t.geometry("1200x1200")#here use alphabet 'x' not '*' this one
     #Create a label
     #app = Frame(t, bg="white")
     #app.grid()
