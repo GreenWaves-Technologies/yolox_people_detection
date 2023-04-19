@@ -17,3 +17,11 @@ variants:
             - release
         duration: standard
         flags: CI=y
+    demo_mode:
+        name: std
+        tags:
+            - integration
+            - release
+        duration: standard
+        flags: CONFIG_DEMO=y
+        compile_only: true

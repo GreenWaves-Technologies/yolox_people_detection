@@ -13,7 +13,7 @@ from time import time
 
 
 GAP_UART_BAUDRATE=1000000
-UART_DEV='/dev/ttyUSB3'
+UART_DEV='/dev/ttyUSB2'
 INPUT_W=320
 INPUT_H=240
 PIXEL_SIZE=3
@@ -56,11 +56,11 @@ def receive_image(ser,l,t):
                 rect[:] = 255 
                 vis = np.concatenate((rect, img_resized), axis=0)
                 #cv2.rectangle(resized, (0, 0), (960, 40), (255,255,255), 150)
-                cv2.putText(vis, f'NN: {perf_array[:-1].sum()}us ({1e6/perf_array[:-1].sum():.2f}fps) - 0.85 mJoule/frame',
+                cv2.putText(vis, f'NN: {round(perf_array[:-1].sum()/1000,1)}ms ({1e6/perf_array[:-1].sum():.2f}fps) - 0.85 mJoule/frame',
                            (30, 40), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 0), 2, cv2.LINE_4)
                 #cv2.putText(resized, f'[{1/elapsed:.2f}fps ({1e6/perf_array.sum():.2f}, {1e6/perf_array[:-1].sum():.2f})]',
                 #           (50, 80), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 255), 2, cv2.LINE_4)
-                cv2.putText(vis, f'NN+JPEG: {perf_array.sum()}us ({1e6/perf_array.sum():.2f}fps)',
+                cv2.putText(vis, f'NN+JPEG: {round(perf_array.sum()/1000,1)}ms ({1e6/perf_array.sum():.2f}fps)',
                             (30, 80), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 0), 2, cv2.LINE_4)
                 #cv2.imshow('Image from GAP', resized)
                 #cv2.waitKey(1)

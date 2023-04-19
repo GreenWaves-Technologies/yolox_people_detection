@@ -88,7 +88,7 @@ static void enqueue_transfer() {
 
 static void handle_transfer_end(void *arg) {
     nb_transfers--;
-    unsigned char current_buff = (unsigned char) arg;
+    int current_buff = (int) arg;
 
     enqueue_transfer();
     pi_task_t *task = &ram_tasks[current_buff];
@@ -265,7 +265,7 @@ int test_main(void)
         pmsis_exit(-5);
     }
     PRINTF("ram opened\n");
-    if (pi_ram_alloc(&Ram, (uint32_t *) ext_ram_buf, H_INP * W_INP * CHANNELS) != 0) {
+    if (pi_ram_alloc(&Ram, (uint32_t *)(uint32_t ) ext_ram_buf, H_INP * W_INP * CHANNELS) != 0) {
         printf("Failed to allocate memory in external ram (%ld bytes)\n", H_INP * W_INP * CHANNELS);
         pmsis_exit(-1);
     }
@@ -305,7 +305,7 @@ int test_main(void)
         PRINTF("\t\t***Start slicing***\n");
         performances[perf_idx] = pi_time_get_us();
         slicing_hwc_channel(
-            main_L2_Memory_Dyn + (H_INP * W_INP * CHANNELS), 
+            ((unsigned char *)main_L2_Memory_Dyn) + (H_INP * W_INP * CHANNELS), 
             (unsigned char *) Input_1, 
             H_INP, 
             W_INP,
@@ -384,7 +384,7 @@ int test_main(void)
         /* ------ JPEG COMPRESSION ------ */
         PRINTF("\t\t***Start JPEG compression ***\n");
         int bitstream_size;
-        uint8_t * jpeg_image = (uint8_t *) pi_l2_malloc(30*2048);
+        uint8_t * jpeg_image = (uint8_t *) pi_l2_malloc(40*2048);
         if (jpeg_image == 0) {
             printf("Error allocating jpeg buffer\n");
             return -1;
@@ -403,7 +403,7 @@ int test_main(void)
 
         send_jpeg_to_uart(&uart_dev, jpeg_image, bitstream_size, performances);
         iter++;
-        pi_l2_free(jpeg_image, 30*2048);
+        pi_l2_free(jpeg_image, 40*2048);
 
         pi_evt_sig_init(&proc_task);
 

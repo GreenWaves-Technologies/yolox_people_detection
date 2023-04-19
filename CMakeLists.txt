@@ -29,7 +29,7 @@ elseif(CONFIG_DEMO)
   message(STATUS "${APP_MSG_PREFIX} Building App in DEMO Mode")
   set(CONFIG_PLATFORM_GVSOC n)
   set(CONFIG_PLATFORM_BOARD y)
-  set(CONF_THRESH 0.4)
+  set(CONF_THRESH 0.35)
   list(APPEND TARGET_PREPROCESSOR -DDEMO -DSILENT)
   set(MAIN                main_demo.c)
 
