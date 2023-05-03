@@ -413,7 +413,6 @@ int test_main(void)
         #ifdef STREAM_OVER_UART
         send_jpeg_to_uart(&uart_dev, jpeg_image, bitstream_size, performances);
         #else
-        printf("SIZE: %d\n",bitstream_size);
         send_jpeg_spi(&spi_slave,jpeg_image, bitstream_size,performances);
         #endif
         iter++;

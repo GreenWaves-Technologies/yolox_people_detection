@@ -7,11 +7,11 @@ import sys
 from timeit import default_timer as timer
 import PIL.Image as Image
 import cv2
-import numpy
+import numpy as np
 
 
 #This chunk size should be the same of the one in C application
-CHUNK_SIZE=1024
+CHUNK_SIZE=256
 
 magic_number    = b'\x47\x41'
 magic_number_h  = 0x47
@@ -96,7 +96,7 @@ def main():
             #read image size
             data_r =devA.spiMaster_SingleRead(4+1,True)
             image_size = (data_r[4] << 24) +(data_r[3] << 16) +(data_r[2] << 8) + data_r[1]
-            print(image_size)
+            #print(image_size)
             #read performance array
             data_r =devA.spiMaster_SingleRead(32+1,True)
             perf_0 = (data_r[4]  << 24) +(data_r[3]  << 16) +(data_r[2]  << 8) + data_r[1]
@@ -108,21 +108,37 @@ def main():
             perf_6 = (data_r[28] << 24) +(data_r[27] << 16) +(data_r[26] << 8) + data_r[25]
             perf_7 = (data_r[32] << 24) +(data_r[31] << 16) +(data_r[30] << 8) + data_r[29]
 
-            read_data=0
             read_size=0
-            reamining_size = image_size
-            while read_data < image_size:
-                if reamining_size > CHUNK_SIZE:
+            remaining_size = image_size
+            while remaining_size > 0:
+                if remaining_size > CHUNK_SIZE:
                     read_size = CHUNK_SIZE
                 else:
-                    read_size = reamining_size
+                    read_size = remaining_size
                 
                 tmp_data  =devA.spiMaster_SingleRead(read_size+1,True)
                 img_data +=tmp_data[1:read_size+1]
-                read_data+=read_size
+                remaining_size-=read_size
 
+            nparr = np.frombuffer(img_data, np.uint8)            
+            img = cv2.imdecode(nparr, cv2.IMREAD_COLOR) # cv2.IMREAD_COLOR in OpenCV 3.1
+
+
+            img_resized = cv2.resize(img, (int(1.5*640), int(1.5*480)), interpolation = cv2.INTER_AREA)
+            rect = np.zeros(( 90,int(1.5*640),3),np.uint8)
+            rect[:] = 255 
+            vis = np.concatenate((rect, img_resized), axis=0)
             
-            
+            nn_perf = perf_0+perf_1+perf_2+perf_3+perf_4+perf_5+perf_6
+            full_perf = nn_perf+perf_7
+            #cv2.rectangle(resized, (0, 0), (960, 40), (255,255,255), 150)
+            cv2.putText(vis, f'NN: {round(nn_perf/1000,1)}ms ({1e6/nn_perf:.2f}fps) - 0.85 mJoule/frame',
+                       (30, 40), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 0), 2, cv2.LINE_4)
+            #cv2.putText(resized, f'[{1/elapsed:.2f}fps ({1e6/perf_array.sum():.2f}, {1e6/perf_array[:-1].sum():.2f})]',
+            #           (50, 80), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 255), 2, cv2.LINE_4)
+            cv2.putText(vis, f'NN+JPEG: {round(full_perf/1000,1)}ms ({1e6/full_perf:.2f}fps)',
+                            (30, 80), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 0), 2, cv2.LINE_4)
+                
             # #im = Image.frombuffer('L',(im_width,im_height),data,'raw','L',0,1)
             # #im = Image.open(data)
             # flatNumpyArray = numpy.array(img_data,dtype=numpy.uint8)
@@ -134,8 +150,8 @@ def main():
             # if im_width == 2688:
             #     bgr = cv2.resize(bgr, (960,540), interpolation = cv2.INTER_AREA)    
             # #bgr = cv2.resize(bgr, (640,480), interpolation = cv2.INTER_AREA)
-            # cv2.imshow('Gap Output',bgr)
-            # cv2.waitKey(1)
+            cv2.imshow('Gap Output',vis)
+            cv2.waitKey(1)
             # end = timer()
             # ttime=(end - start)
             # fps=1/ttime

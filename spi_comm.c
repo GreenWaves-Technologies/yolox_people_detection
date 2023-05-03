@@ -68,7 +68,7 @@ void send_image_spi(pi_device_t* spi_slave,uint8_t*img, uint16_t img_w, uint16_t
 void send_jpeg_spi(pi_device_t* spi_slave,  uint8_t* img, int img_size, unsigned int *perf_array){
 
     uint8_t tx_buffer[4];
-    uint32_t chunk_size = 1024;
+    int32_t chunk_size = 256;
     pi_evt_t send_task, end_task;
 
 
@@ -88,12 +88,12 @@ void send_jpeg_spi(pi_device_t* spi_slave,  uint8_t* img, int img_size, unsigned
     pi_spi_send(spi_slave, img_size_b,   4 << 3, SPI_NO_OPTION);
     
     //Send performance array:
-    pi_spi_send(spi_slave, &perf_array[0],   (4*8) << 3, SPI_NO_OPTION);
+    pi_spi_send(spi_slave, perf_array,   (4*8) << 3, SPI_NO_OPTION);
 
     int size = img_size;
     int idx = 0;
     while (size > 0) {
-        int size_to_write = (size > 256) ? 256 : size;
+        int size_to_write = (size > chunk_size) ? chunk_size : size;
         pi_evt_sig_init(&end_task);
         pi_spi_send_async(spi_slave, &(img[idx]), (size_to_write) << 3, SPI_NO_OPTION, pi_evt_callback_irq_init(&send_task, &send_callback, &end_task));
         pi_evt_wait(&end_task);
