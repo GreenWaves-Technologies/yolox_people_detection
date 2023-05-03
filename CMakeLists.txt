@@ -95,6 +95,7 @@ list(APPEND TARGET_SRCS ${MAIN}
                         ${CMAKE_CURRENT_SOURCE_DIR}/custom_layers/jpeg_compress.c
                         ${CMAKE_CURRENT_SOURCE_DIR}/custom_layers/img_flush.c
                         ${CMAKE_CURRENT_SOURCE_DIR}/custom_layers/camera.c
+                        ${CMAKE_CURRENT_SOURCE_DIR}/spi_comm.c
 )
 
 list(APPEND TARGET_INCS -I.

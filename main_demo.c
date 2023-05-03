@@ -11,7 +11,7 @@
 
 /* Autotiler includes. */
 #include "main.h"
-
+#include "spi_comm.h"
 // parameters needed for decoding layer
 // !!! do not forget to change the stride sizes accordint to the input size !!!  
 tTuple feature_maps[STRIDE_SIZE] = {{30.0, 40.0}, {15.0, 20.0}, {8.0, 10.0}};
@@ -236,9 +236,18 @@ int test_main(void)
     pi_cluster_task(&task, (void (*)(void *))cluster, NULL);
     pi_cluster_task_stacks(&task, NULL, SLAVE_STACK_SIZE);
 
-    pi_device_t uart_dev;
-    init_uart_communication(&uart_dev,1000000);
     
+    #ifdef STREAM_OVER_UART
+    //pi_device_t uart_dev;
+    //init_uart_communication(&uart_dev,1000000);
+    #else
+    // Initialize SPI
+    pi_device_t spi_slave;
+    struct pi_spi_conf spi_slave_conf;
+    spi_slave_init(&spi_slave, &spi_slave_conf);
+    #endif
+
+
     //Open camera
     if (pi_open(PI_CAMERA_OV5647, &camera))
     {
@@ -401,7 +410,12 @@ int test_main(void)
             CHANNELS);
         performances[perf_idx] = pi_time_get_us() - performances[perf_idx]; perf_idx++;
 
+        #ifdef STREAM_OVER_UART
         send_jpeg_to_uart(&uart_dev, jpeg_image, bitstream_size, performances);
+        #else
+        printf("SIZE: %d\n",bitstream_size);
+        send_jpeg_spi(&spi_slave,jpeg_image, bitstream_size,performances);
+        #endif
         iter++;
         pi_l2_free(jpeg_image, 40*2048);
 
