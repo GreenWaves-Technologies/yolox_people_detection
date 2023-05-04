@@ -59,7 +59,7 @@ PI_L2 unsigned char *iter_buff[2];
 #define ITER_SIZE (W_CAM*2*2)
 #define RAW_SIZE (W_CAM*H_CAM*2) // For now only 10 bits config works
 
-static pi_event_t proc_task;
+static pi_evt_t proc_task;
 
 pi_device_t* camera;
 PI_L2 unsigned char *buff[2];
