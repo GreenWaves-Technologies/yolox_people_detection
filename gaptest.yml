@@ -18,7 +18,7 @@ variants:
         duration: standard
         flags: CI=y
     demo_mode:
-        name: std
+        name: demo_mode
         tags:
             - integration
             - release
