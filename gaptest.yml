@@ -1,27 +1,179 @@
 name: yolox_people_detection
-builder: cmake
-boards: []
-platforms: 
-    - board
-    - gvsoc
-os: 
-#- freertos TODO: to be fixed in freeRTOS
-    - freertos
-chips: 
-    - gap9
 variants:
-    std:
-        name: std
-        tags:
-            - integration
-            - release
-        duration: standard
-        flags: CI=y
-    demo_mode:
-        name: demo_mode
-        tags:
-            - integration
-            - release
-        duration: standard
-        flags: CONFIG_DEMO=y
+    gvsoc:
+        chip: gap9
+        board: gap9evk
+        platform: gvsoc
+        os: freertos
+        builder: cmake
+        flags:
+            - CI=y
+            - CONFIG_CNN_SQ8=y
+            - CONFIG_CNN_POW2=n
+            - CONFIG_CNN_FP16=y
+            - CONFIG_CNN_NE16=y
+            - CONFIG_MODEL_HAS_NO_CONSTANTS=n
+            - CONFIG_MODEL_FLASH_TYPE_DEFAULT=n
+            - CONFIG_MODEL_FLASH_TYPE_MRAM=y
+            - CONFIG_MODEL_RAM_TYPE_DEFAULT=y
+            - CONFIG_MODEL_FLOAT16_TYPE_IEEE16=n
+            - CONFIG_MODEL_FLOAT16_TYPE_BFLOAT16=y
+            - CONFIG_MODEL_L1_MEMORY=128000
+            - CONFIG_MODEL_L2_MEMORY=1200000
+            - CONFIG_MODEL_L3_MEMORY=8000000
+            - CONFIG_MODEL_LOGLEVEL=1
+            - CONFIG_CL_MASTER_CORE_STACK_SIZE=4096
+            - CONFIG_CL_SLAVE_CORE_STACK_SIZE=1024
+            - CONFIG_ENABLE_AUTOTILER=y
+            - CONFIG_GAP_LIB_IMG_IO=y
+            - CONFIG_DRIVER_HOSTFS=y
+            - CONFIG_DRIVER_READFS=y
+            - CONFIG_BOARD_GAP9MOD_V1_0_B=y
+            - CONFIG_BOARD_GAP9EVK_V2_0=y
+            - CONFIG_DRIVER_TYPE_FLASH=y
+            - CONFIG_DRIVER_TYPE_RAM=y
+            - CONFIG_FREERTOS_ENABLE_FLOAT_PRINTF=y
+            - CONFIG_FREERTOS_ENABLE_FLOAT_EXPONENT_PRINTF=y
+            - CONFIG_LIB_GAP_LIB=y
+            - CONFIG_LIB_GAP_LIB_IMG_IO=y
+            - CONFIG_LIB_GAP_LIB_JPEG=y
+            - CONFIG_IO_TYPE_SEMIHOSTING=y
+            - CONFIG_DRIVER_TYPE_CAMERA=y
+            - CONFIG_DRIVER_OV5647=y
+            - CONFIG_DRIVER_OV5647_FORMAT_VGA=y
+            - CONFIG_DRIVER_UDMAUART=y
+            - CONFIG_BOOT_DEVICE_MRAM=y
+
+    gvsoc_demo_compile_only:
+        chip: gap9
+        board: gap9evk
+        platform: gvsoc
+        os: freertos
+        builder: cmake
         compile_only: true
+        flags:
+            - CONFIG_DEMO=y
+            - CONFIG_CNN_SQ8=y
+            - CONFIG_CNN_POW2=n
+            - CONFIG_CNN_FP16=y
+            - CONFIG_CNN_NE16=y
+            - CONFIG_MODEL_HAS_NO_CONSTANTS=n
+            - CONFIG_MODEL_FLASH_TYPE_DEFAULT=n
+            - CONFIG_MODEL_FLASH_TYPE_MRAM=y
+            - CONFIG_MODEL_RAM_TYPE_DEFAULT=y
+            - CONFIG_MODEL_FLOAT16_TYPE_IEEE16=n
+            - CONFIG_MODEL_FLOAT16_TYPE_BFLOAT16=y
+            - CONFIG_MODEL_L1_MEMORY=128000
+            - CONFIG_MODEL_L2_MEMORY=1200000
+            - CONFIG_MODEL_L3_MEMORY=8000000
+            - CONFIG_MODEL_LOGLEVEL=1
+            - CONFIG_CL_MASTER_CORE_STACK_SIZE=4096
+            - CONFIG_CL_SLAVE_CORE_STACK_SIZE=1024
+            - CONFIG_ENABLE_AUTOTILER=y
+            - CONFIG_GAP_LIB_IMG_IO=y
+            - CONFIG_DRIVER_HOSTFS=y
+            - CONFIG_DRIVER_READFS=y
+            - CONFIG_BOARD_GAP9MOD_V1_0_B=y
+            - CONFIG_BOARD_GAP9EVK_V2_0=y
+            - CONFIG_DRIVER_TYPE_FLASH=y
+            - CONFIG_DRIVER_TYPE_RAM=y
+            - CONFIG_FREERTOS_ENABLE_FLOAT_PRINTF=y
+            - CONFIG_FREERTOS_ENABLE_FLOAT_EXPONENT_PRINTF=y
+            - CONFIG_LIB_GAP_LIB=y
+            - CONFIG_LIB_GAP_LIB_IMG_IO=y
+            - CONFIG_LIB_GAP_LIB_JPEG=y
+            - CONFIG_IO_TYPE_SEMIHOSTING=y
+            - CONFIG_DRIVER_TYPE_CAMERA=y
+            - CONFIG_DRIVER_OV5647=y
+            - CONFIG_DRIVER_OV5647_FORMAT_VGA=y
+            - CONFIG_DRIVER_UDMAUART=y
+            - CONFIG_BOOT_DEVICE_MRAM=y
+
+    board:
+        chip: gap9
+        board: gap9evk
+        platform: board
+        os: freertos
+        builder: cmake
+        flags:
+            - CI=y
+            - CONFIG_CNN_SQ8=y
+            - CONFIG_CNN_POW2=n
+            - CONFIG_CNN_FP16=y
+            - CONFIG_CNN_NE16=y
+            - CONFIG_MODEL_HAS_NO_CONSTANTS=n
+            - CONFIG_MODEL_FLASH_TYPE_DEFAULT=n
+            - CONFIG_MODEL_FLASH_TYPE_MRAM=y
+            - CONFIG_MODEL_RAM_TYPE_DEFAULT=y
+            - CONFIG_MODEL_FLOAT16_TYPE_IEEE16=n
+            - CONFIG_MODEL_FLOAT16_TYPE_BFLOAT16=y
+            - CONFIG_MODEL_L1_MEMORY=128000
+            - CONFIG_MODEL_L2_MEMORY=1200000
+            - CONFIG_MODEL_L3_MEMORY=8000000
+            - CONFIG_MODEL_LOGLEVEL=1
+            - CONFIG_CL_MASTER_CORE_STACK_SIZE=4096
+            - CONFIG_CL_SLAVE_CORE_STACK_SIZE=1024
+            - CONFIG_ENABLE_AUTOTILER=y
+            - CONFIG_GAP_LIB_IMG_IO=y
+            - CONFIG_DRIVER_HOSTFS=y
+            - CONFIG_DRIVER_READFS=y
+            - CONFIG_BOARD_GAP9MOD_V1_0_B=y
+            - CONFIG_BOARD_GAP9EVK_V2_0=y
+            - CONFIG_DRIVER_TYPE_FLASH=y
+            - CONFIG_DRIVER_TYPE_RAM=y
+            - CONFIG_FREERTOS_ENABLE_FLOAT_PRINTF=y
+            - CONFIG_FREERTOS_ENABLE_FLOAT_EXPONENT_PRINTF=y
+            - CONFIG_LIB_GAP_LIB=y
+            - CONFIG_LIB_GAP_LIB_IMG_IO=y
+            - CONFIG_LIB_GAP_LIB_JPEG=y
+            - CONFIG_IO_TYPE_SEMIHOSTING=y
+            - CONFIG_DRIVER_TYPE_CAMERA=y
+            - CONFIG_DRIVER_OV5647=y
+            - CONFIG_DRIVER_OV5647_FORMAT_VGA=y
+            - CONFIG_DRIVER_UDMAUART=y
+            - CONFIG_BOOT_DEVICE_MRAM=y
+
+    board_demo_compile_only:
+        chip: gap9
+        board: gap9evk
+        platform: board
+        os: freertos
+        builder: cmake
+        compile_only: true
+        flags:
+            - CONFIG_DEMO=y
+            - CONFIG_CNN_SQ8=y
+            - CONFIG_CNN_POW2=n
+            - CONFIG_CNN_FP16=y
+            - CONFIG_CNN_NE16=y
+            - CONFIG_MODEL_HAS_NO_CONSTANTS=n
+            - CONFIG_MODEL_FLASH_TYPE_DEFAULT=n
+            - CONFIG_MODEL_FLASH_TYPE_MRAM=y
+            - CONFIG_MODEL_RAM_TYPE_DEFAULT=y
+            - CONFIG_MODEL_FLOAT16_TYPE_IEEE16=n
+            - CONFIG_MODEL_FLOAT16_TYPE_BFLOAT16=y
+            - CONFIG_MODEL_L1_MEMORY=128000
+            - CONFIG_MODEL_L2_MEMORY=1200000
+            - CONFIG_MODEL_L3_MEMORY=8000000
+            - CONFIG_MODEL_LOGLEVEL=1
+            - CONFIG_CL_MASTER_CORE_STACK_SIZE=4096
+            - CONFIG_CL_SLAVE_CORE_STACK_SIZE=1024
+            - CONFIG_ENABLE_AUTOTILER=y
+            - CONFIG_GAP_LIB_IMG_IO=y
+            - CONFIG_DRIVER_HOSTFS=y
+            - CONFIG_DRIVER_READFS=y
+            - CONFIG_BOARD_GAP9MOD_V1_0_B=y
+            - CONFIG_BOARD_GAP9EVK_V2_0=y
+            - CONFIG_DRIVER_TYPE_FLASH=y
+            - CONFIG_DRIVER_TYPE_RAM=y
+            - CONFIG_FREERTOS_ENABLE_FLOAT_PRINTF=y
+            - CONFIG_FREERTOS_ENABLE_FLOAT_EXPONENT_PRINTF=y
+            - CONFIG_LIB_GAP_LIB=y
+            - CONFIG_LIB_GAP_LIB_IMG_IO=y
+            - CONFIG_LIB_GAP_LIB_JPEG=y
+            - CONFIG_IO_TYPE_SEMIHOSTING=y
+            - CONFIG_DRIVER_TYPE_CAMERA=y
+            - CONFIG_DRIVER_OV5647=y
+            - CONFIG_DRIVER_OV5647_FORMAT_VGA=y
+            - CONFIG_DRIVER_UDMAUART=y
+            - CONFIG_BOOT_DEVICE_MRAM=y
