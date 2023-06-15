@@ -4,8 +4,6 @@ variants:
         chip: gap9
         board: gap9evk
         platform: gvsoc
-        os: freertos
-        builder: cmake
         flags:
             - CI=y
             - CONFIG_CNN_SQ8=y
@@ -28,8 +26,6 @@ variants:
             - CONFIG_GAP_LIB_IMG_IO=y
             - CONFIG_DRIVER_HOSTFS=y
             - CONFIG_DRIVER_READFS=y
-            - CONFIG_BOARD_GAP9MOD_V1_0_B=y
-            - CONFIG_BOARD_GAP9EVK_V2_0=y
             - CONFIG_DRIVER_TYPE_FLASH=y
             - CONFIG_DRIVER_TYPE_RAM=y
             - CONFIG_FREERTOS_ENABLE_FLOAT_PRINTF=y
@@ -48,8 +44,6 @@ variants:
         chip: gap9
         board: gap9evk
         platform: gvsoc
-        os: freertos
-        builder: cmake
         compile_only: true
         flags:
             - CONFIG_DEMO=y
@@ -73,8 +67,6 @@ variants:
             - CONFIG_GAP_LIB_IMG_IO=y
             - CONFIG_DRIVER_HOSTFS=y
             - CONFIG_DRIVER_READFS=y
-            - CONFIG_BOARD_GAP9MOD_V1_0_B=y
-            - CONFIG_BOARD_GAP9EVK_V2_0=y
             - CONFIG_DRIVER_TYPE_FLASH=y
             - CONFIG_DRIVER_TYPE_RAM=y
             - CONFIG_FREERTOS_ENABLE_FLOAT_PRINTF=y
@@ -93,8 +85,6 @@ variants:
         chip: gap9
         board: gap9evk
         platform: board
-        os: freertos
-        builder: cmake
         flags:
             - CI=y
             - CONFIG_CNN_SQ8=y
@@ -117,8 +107,6 @@ variants:
             - CONFIG_GAP_LIB_IMG_IO=y
             - CONFIG_DRIVER_HOSTFS=y
             - CONFIG_DRIVER_READFS=y
-            - CONFIG_BOARD_GAP9MOD_V1_0_B=y
-            - CONFIG_BOARD_GAP9EVK_V2_0=y
             - CONFIG_DRIVER_TYPE_FLASH=y
             - CONFIG_DRIVER_TYPE_RAM=y
             - CONFIG_FREERTOS_ENABLE_FLOAT_PRINTF=y
@@ -137,8 +125,6 @@ variants:
         chip: gap9
         board: gap9evk
         platform: board
-        os: freertos
-        builder: cmake
         compile_only: true
         flags:
             - CONFIG_DEMO=y
@@ -162,8 +148,6 @@ variants:
             - CONFIG_GAP_LIB_IMG_IO=y
             - CONFIG_DRIVER_HOSTFS=y
             - CONFIG_DRIVER_READFS=y
-            - CONFIG_BOARD_GAP9MOD_V1_0_B=y
-            - CONFIG_BOARD_GAP9EVK_V2_0=y
             - CONFIG_DRIVER_TYPE_FLASH=y
             - CONFIG_DRIVER_TYPE_RAM=y
             - CONFIG_FREERTOS_ENABLE_FLOAT_PRINTF=y
