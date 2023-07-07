@@ -80,11 +80,38 @@ add_custom_target(${NNTOOL_TARGET_PREFIX}clean_model
 #   COMMENT "clean_gt_file: removing ${TEST_OUTPUT_FILE_NAME}"
 #   COMMAND rm -rf ${TEST_OUTPUT_FILE_NAME}
 # )
+
+set(ISP_GEN_PATH $ENV{TILER_ISP_GENERATOR_PATH})
+set(ISP_KER_PATH $ENV{TILER_ISP_KERNEL_PATH})
+set(MODEL_SRC_ISP ISP_model.c)
+set(MODEL_GEN_ISP ISP_Kernels)
+set(MODEL_GEN_ISP_C ${MODEL_GEN_ISP}.c)
+set(MODEL_GEN_ISP_H ${MODEL_GEN_ISP}.h)
+set(MODEL_GEN_ISP_CLEAN ${MODEL_GEN_ISP_C} ${MODEL_GEN_ISP_H})
+
+add_custom_target(
+    GenTileISP
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+    COMMAND           gcc -o ${CMAKE_BINARY_DIR}/GenTileISP -I$ENV{TILER_INC} -I${ISP_GEN_PATH} ${CMAKE_SOURCE_DIR}/${MODEL_SRC_ISP} ${ISP_GEN_PATH}/ISP_Generators.c $ENV{TILER_LIB}
+    SOURCES           ${CMAKE_SOURCE_DIR}/${MODEL_SRC_ISP} ${ISP_GEN_PATH}/ISP_Generators.c
+    BYPRODUCTS        ${CMAKE_BINARY_DIR}/GenTileISP
+)
+
+add_custom_target(
+    ISPmodel DEPENDS GenTileISP
+    WORKING_DIRECTORY   ${CMAKE_BINARY_DIR}
+    COMMAND             ${CMAKE_BINARY_DIR}/GenTileISP
+    SOURCES             ${CMAKE_BINARY_DIR}/GenTileISP
+    BYPRODUCTS          ${CMAKE_BINARY_DIR}/ISP_Kernels.c ${CMAKE_BINARY_DIR}/ISP_Kernels.h ${CMAKE_BINARY_DIR}/rgb_out.ppm
+    )
+
 ###############################################################################
 # Application dependencies
 ###############################################################################
 
 list(APPEND TARGET_SRCS ${MAIN}
+                        ${ISP_KER_PATH}/ISP_BasicKernels.c
+                        ${MODEL_GEN_ISP_C}
                         ${CNN_LIB}
                         ${CONFIG_MODEL_BUILDDIR}/Expression_Kernels.c
                         ${CONFIG_MODEL_BUILDDIR}/${KERNEL_C}
@@ -99,18 +126,21 @@ list(APPEND TARGET_SRCS ${MAIN}
 )
 
 list(APPEND TARGET_INCS -I.
+                        -I$ENV{GAP_SDK_HOME}/tools/autotiler_v3/Autotiler
+                        -I$ENV{GAP_SDK_HOME}/tools/autotiler_v3/ISP_Libraries/
+                        -I$ENV{GAP_SDK_HOME}/tools/autotiler_v3/ISP_Generators/
                         -I${TILER_INC}
                         -I${TILER_EMU_INC}
                         -I$ENV{GAP_SDK_HOME}/libs/gap_lib/include
-                          ${CNN_LIB_INCLUDE}
+                        -I${CNN_LIB_INCLUDE}
                         -I${CMAKE_CURRENT_BINARY_DIR}/${CONFIG_MODEL_BUILDDIR}
                         -I${CMAKE_CURRENT_SOURCE_DIR})
 
 list(APPEND TARGET_CFLAGS   -O3)
 
-set(FREQ_CL 50)
-set(FREQ_FC 240)
-set(FREQ_PE 176)
+set(FREQ_CL 370)
+set(FREQ_FC 370)
+set(FREQ_PE 360)
 
 message(STATUS "Clock speeds - Cluster ${FREQ_CL} FC ${FREQ_FC} Peripheral ${FREQ_PE}")
 # math(EXPR FREQ_CL ${CONFIG_FREQUENCY_CLUSTER}/1000000 OUTPUT_FORMAT DECIMAL)
