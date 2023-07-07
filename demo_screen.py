@@ -39,29 +39,34 @@ def receive_image(ser,l,t):
                     perf_array += ser.read(1)
                 perf_array = np.frombuffer(perf_array, np.uint32)
                 #print(perf_array)
+                if data_size:
+                    img_from_uart = ser.read(256)
+                    while len(img_from_uart) < data_size:
+                       img_from_uart += ser.read(256)
+                    #print(len(img_from_uart))
+                    nparr = np.frombuffer(img_from_uart, np.uint8)
+                    elapsed = time() - start
+                    img = cv2.imdecode(nparr, cv2.IMREAD_COLOR) # cv2.IMREAD_COLOR in OpenCV 3.1
+                    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+                    img_resized = cv2.resize(img, (int(1.5*640), int(1.5*480)), interpolation = cv2.INTER_AREA)
 
-                img_from_uart = ser.read(256)
-                while len(img_from_uart) < data_size:
-                   img_from_uart += ser.read(256)
-                #print(len(img_from_uart))
-
-                nparr = np.frombuffer(img_from_uart, np.uint8)
-                elapsed = time() - start
-                img = cv2.imdecode(nparr, cv2.IMREAD_COLOR) # cv2.IMREAD_COLOR in OpenCV 3.1
-                #img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-
-                img_resized = cv2.resize(img, (int(1.5*640), int(1.5*480)), interpolation = cv2.INTER_AREA)
+                else:
+                    img_resized = np.zeros((int(1.5*480),int(1.5*640),3),np.uint8)
+                    cv2.putText(img_resized, 'No Person Detected!',
+                           (210, 340), cv2.FONT_HERSHEY_PLAIN, 3, (255,255, 255), 3, cv2.LINE_AA)
+                
+                #img_resized = cv2.resize(img, (int(1.5*640), int(1.5*480)), interpolation = cv2.INTER_AREA)
                 #rect = cv2.CreateMat(int(1.5*640), int(1.5*480)+80)
                 rect = np.zeros(( 90,int(1.5*640),3),np.uint8)
                 rect[:] = 255 
                 vis = np.concatenate((rect, img_resized), axis=0)
                 #cv2.rectangle(resized, (0, 0), (960, 40), (255,255,255), 150)
                 cv2.putText(vis, f'NN: {round(perf_array[:-1].sum()/1000,1)}ms ({1e6/perf_array[:-1].sum():.2f}fps) - 0.85 mJoule/frame',
-                           (30, 40), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 0), 2, cv2.LINE_4)
+                           (30, 40), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 0), 2, cv2.LINE_AA)
                 #cv2.putText(resized, f'[{1/elapsed:.2f}fps ({1e6/perf_array.sum():.2f}, {1e6/perf_array[:-1].sum():.2f})]',
                 #           (50, 80), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 255), 2, cv2.LINE_4)
                 cv2.putText(vis, f'NN+JPEG: {round(perf_array.sum()/1000,1)}ms ({1e6/perf_array.sum():.2f}fps)',
-                            (30, 80), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 0), 2, cv2.LINE_4)
+                            (30, 80), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 0), 2, cv2.LINE_AA)
                 #cv2.imshow('Image from GAP', resized)
                 #cv2.waitKey(1)
                 resized_pil =Image.fromarray(vis)
