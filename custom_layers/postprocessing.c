@@ -113,16 +113,20 @@ void nms(
 
     for (int i = 0; i < val_boxes; i++){
         if (boxes[i].alive == true){
+            // printf("box1 %.2f %.2f %.2f %.2f %.2f %.2f\n", boxes[i].x1, boxes[i].x2, boxes[i].y1, boxes[i].y2, boxes[i].obj_conf, boxes[i].cls_conf);
 
             for (int j = 0; j < val_boxes; j++){
                 if (i != j && boxes[j].alive == true){
+                    // printf("\tbox2 %.2f %.2f %.2f %.2f %.2f %.2f\n", boxes[j].x1, boxes[j].x2, boxes[j].y1, boxes[j].y2, boxes[j].obj_conf, boxes[j].cls_conf);
 
                     if (iou(&boxes[i], &boxes[j]) >= nms_thresh){
                         if (boxes[i].obj_conf > boxes[j].obj_conf){
                             boxes[j].alive = false;
+                            // printf("\tturn off %.2f %.2f %.2f %.2f %.2f %.2f\n", boxes[j].x1, boxes[j].x2, boxes[j].y1, boxes[j].y2, boxes[j].obj_conf, boxes[j].cls_conf);
                         }
                         else{
                             boxes[i].alive = false;
+                            // printf("\tturn off %.2f %.2f %.2f %.2f %.2f %.2f\n", boxes[i].x1, boxes[i].x2, boxes[i].y1, boxes[i].y2, boxes[i].obj_conf, boxes[i].cls_conf);
                         }
                     }
                 }
@@ -130,6 +134,7 @@ void nms(
 
             // if boxes is alive, add it to the output
             if (boxes[i].alive == 1){
+                // printf("append: %.2f %.2f %.2f %.2f %.2f %.2f\n", boxes[i].x1, boxes[i].x2, boxes[i].y1, boxes[i].y2, boxes[i].obj_conf, boxes[i].cls_conf);
                 Output[count + 0] =  boxes[i].x1;
                 Output[count + 1] =  boxes[i].y1;
                 Output[count + 2] =  boxes[i].x2;

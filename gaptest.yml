@@ -5,7 +5,7 @@ variants:
         board: gap9evk
         platform: gvsoc
         flags:
-            - CI=y
+            - CONFIG_CI=y
             - CONFIG_CNN_SQ8=y
             - CONFIG_CNN_POW2=n
             - CONFIG_CNN_FP16=y
@@ -86,7 +86,7 @@ variants:
         board: gap9evk
         platform: board
         flags:
-            - CI=y
+            - CONFIG_CI=y
             - CONFIG_CNN_SQ8=y
             - CONFIG_CNN_POW2=n
             - CONFIG_CNN_FP16=y

@@ -65,7 +65,7 @@ void copy_inputs() {
 }
 
 
-void ci_output_test(float * model_output, char * GT_file_name, float * GT_buffer){
+void ci_output_test(float * model_output, char * GT_file_name, float * GT_buffer, int n_valid_boxes){
 
     switch_fs_t fs;
     __FS_INIT(fs); 
@@ -74,17 +74,17 @@ void ci_output_test(float * model_output, char * GT_file_name, float * GT_buffer
     int ret_GT = 0;
 
     File_GT = __OPEN_READ(fs, GT_file_name);
-    ret_GT = __READ(File_GT, GT_buffer, CI_TEST_BOX_NUM * OUTPUT_BOX_SIZE * sizeof(float));
+    ret_GT = __READ(File_GT, GT_buffer, n_valid_boxes * CI_BOX_TYPE_SIZE * sizeof(float));
 
     __CLOSE(File_GT);
     __FS_DEINIT(fs);
 
     //check the difference between the model output and the ground truth
     float diff = 0;
-    for (int i = 0; i < CI_TEST_BOX_NUM; i++){
-        for (int j = 0; j < OUTPUT_BOX_SIZE; j++) {
-            diff += Abs(model_output[i * OUTPUT_BOX_SIZE + j] - GT_buffer[i * OUTPUT_BOX_SIZE + j]);
-            //printf("[%d %d] %10f - %10f\n", i, j, model_output[i * OUTPUT_BOX_SIZE + j], GT_buffer[i * OUTPUT_BOX_SIZE + j]);
+    for (int i = 0; i < n_valid_boxes; i++){
+        for (int j = 0; j < CI_BOX_TYPE_SIZE; j++) {
+            diff += Abs(model_output[i * 7 + j] - GT_buffer[i * CI_BOX_TYPE_SIZE + j]);
+            // printf("[%d %d] %10f - %10f\n", i, j, model_output[i * 7 + j], GT_buffer[i * CI_BOX_TYPE_SIZE + j]);
         }
     }
 
@@ -119,7 +119,7 @@ void write_outputs() {
 #ifdef CI
     PRINTF("\t\t***Start CI output test***\n");
     char GT_file[] = STR(TEST_OUTPUT_FILE_NAME); 
-    ci_output_test(Output_1, GT_file, (float *) main_L2_Memory_Dyn);
+    ci_output_test(Output_1, GT_file, (float *) main_L2_Memory_Dyn, final_valid_boxes);
 #endif
 }
 
@@ -133,6 +133,9 @@ static void cluster()
     #endif
 
     mainCNN(Output_1);
+    // for (int i=0; i<1580; i++) {
+    //     printf("[%d] %.2f %.2f %.2f %.2f %.2f %.2f\n", i,  Output_1[i*6+0], Output_1[i*6+1], Output_1[i*6+2], Output_1[i*6+3], Output_1[i*6+4], Output_1[i*6+5]);
+    // }
 }
 
 int test_main(void)
@@ -211,7 +214,12 @@ int test_main(void)
         );
 
     slicing_cycles = gap_fc_readhwtimer() - slicing_cycles;
-
+    // for (int j=0; j<H_INP/2; j++) {
+    //     for (int i=0; i<W_INP/2; i++) {
+    //         for (int c=0; c<12; c++) printf("%d, ", Input_1[j*W_INP/2*12 + i*12 + c]);
+    //         printf("\n");
+    //     }
+    // }
 
     /* ------ INFERENCE ------*/
     PRINTF("\t\t***Call CLUSTER***\n");
@@ -251,6 +259,12 @@ int test_main(void)
         );
     filter_boxes_cycles = gap_fc_readhwtimer() - filter_boxes_cycles;
 
+    // printf("Bounding boxes after filter\n");
+    // float *filtered_boxes = (float *) (main_L2_Memory_Dyn_casted + (RAWS * 6));
+    // for (unsigned int i=0; i<*num_val_boxes; i++) {
+    //     printf("[%d] %.2f %.2f %.2f %.2f %.2f %.2f\n", i,  filtered_boxes[7*i], filtered_boxes[7*i+1], filtered_boxes[7*i+2], filtered_boxes[7*i+3], filtered_boxes[7*i+4], filtered_boxes[7*i+5]);
+    // }
+
     /* ------ conver boxes ------*/
     PRINTF("\t\t***Start conver boxes ***\n");
     bbox_cycles = gap_fc_readhwtimer();
@@ -275,6 +289,11 @@ int test_main(void)
         top_k_boxes
         );
     nms_cycles = gap_fc_readhwtimer() - nms_cycles;
+
+    printf("Bounding boxes after NMS\n");
+    for (int i=0; i<final_valid_boxes; i++) {
+        printf("[%d] %.2f %.2f %.2f %.2f %.2f %.2f\n", i,  Output_1[i*7], Output_1[i*7+1], Output_1[i*7+2], Output_1[i*7+3], Output_1[i*7+4], Output_1[i*7+5]);
+    }
 
     /* ------ DRAW REATANGLES ------*/
     // first read image
@@ -347,10 +366,6 @@ int test_main(void)
     /* ------ END ------*/
     PRINTF("\t\t***Runner completed***\n");
 
-    write_outputs();
-
-    mainCNN_Destruct();
-
 #ifdef PERF
     {
         unsigned int NNCycles = 0, TotalCycles = 0, NNOper = 0, TotalOper = 0;
@@ -388,6 +403,9 @@ int test_main(void)
         printf("\n");
     }
 #endif
+    write_outputs();
+
+    mainCNN_Destruct();
 
     PRINTF("Ended\n");
     pmsis_exit(0);

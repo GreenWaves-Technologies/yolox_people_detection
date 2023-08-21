@@ -1,7 +1,7 @@
 import numpy as np
 import os
 from time import time
-
+from nntool.utils.fast_float import np_fastexp
 
 def exp(x):
     return np.exp(x)
@@ -12,8 +12,7 @@ def decode_C_style(inputs, hw, strides):
     
     i = 0
     add = 0 
-    for j in range(0, len(hw)):
-        h, w = hw[j]
+    for (h, w), stride in zip(hw, strides):
         size = (add + (h * w)) * 6
         grid1, grid2 = 0, -1 
 
@@ -23,11 +22,11 @@ def decode_C_style(inputs, hw, strides):
                 grid1 = 0
                 grid2 += 1
 
-            inputs[i] = (inputs[i]  + grid1 ) * strides[j] 
-            inputs[i + 1] = (inputs[i + 1]  + grid2 ) * strides[j] 
+            inputs[i] = (inputs[i]  + grid1 ) * stride
+            inputs[i + 1] = (inputs[i + 1]  + grid2 ) * stride
 
-            inputs[i + 2] = exp(inputs[i + 2]) * strides[j]
-            inputs[i + 3] = exp(inputs[i + 3]) * strides[j] 
+            inputs[i + 2] = exp(inputs[i + 2]) * stride
+            inputs[i + 3] = exp(inputs[i + 3]) * stride
 
             grid1 += 1
             i += 6
@@ -40,16 +39,15 @@ def decode_C_style(inputs, hw, strides):
 def decode_C_style_imp(inputs, hw, strides):
 
     i = 0
-    for j in range(0, len(hw)):
-        height, width = hw[j]
+    for (height, width), stride in zip(hw, strides):
+        # height, width = hw[j]
         for h in range(0, height):
             for w in range(0, width):
-
-                inputs[i] = (inputs[i] + w) * strides[j] 
-                inputs[i + 1] = (inputs[i + 1] + h) * strides[j] 
-                inputs[i + 2] = exp(inputs[i + 2]) * strides[j]
-                inputs[i + 3] = exp(inputs[i + 3]) * strides[j] 
-
+                inputs[i]     = (inputs[i    ] + w) * stride
+                inputs[i + 1] = (inputs[i + 1] + h) * stride
+                inputs[i + 2] = np_fastexp(inputs[i + 2]) * stride
+                inputs[i + 3] = np_fastexp(inputs[i + 3]) * stride
+                # print(f"[{i}] {inputs[i]:.2f}, {inputs[i+1]:.2f}, {inputs[i+2]:.2f}, {inputs[i+3]:.2f} {inputs[i+4]:.2f} {inputs[i+5]:.2f}")
                 i += 6
     return inputs
 

@@ -11,7 +11,7 @@
 #endif
 
 // CI test parameters
-#define OUTPUT_BOX_SIZE 7 
+#define CI_BOX_TYPE_SIZE 6
 #define CI_TEST_BOX_NUM 2 
 
 // parameters needed for slicing layer

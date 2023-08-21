@@ -18,6 +18,7 @@ The input image resolution is QVGA and the output is the bounding box/es of dete
    * [RGB](#rgb)
    * [BAYER](#bayer)
    * [Output](#output)
+ * [Inference Mode](#inference-mode)
  * [Performance](#performance)
  * [GVSOC Inference](#gvsoc-Inference)
    * [RGB model](#rgb-model)
@@ -91,6 +92,31 @@ The output of the model is a binary file with the name `output.bin` in the `out`
 where `x1` and `y1` are the coordinates of the top left corner of the bounding box, `x2` and `y2` are the coordinates of the bottom right corner of the bounding box, `objectness score` is the score of the bounding box and `class score` is the score of the class of the detected object. The last column is always 1 indicating class `id`.
 
 
+# Inference Mode
+
+In this mode the application runs the model with one input image from file and writes the bounding boxes result to a binary file and the image (with bounding boxes). To change the image on which the model is run, you can change the variable `TEST_INPUT_FILE_NAME` in `CMakeLists.txt`.
+
+The paths of the binary file containing the predicted bounding boxes and the image are defined in the `CMakeLists.txt` and by default are respectively `output.bin` and `output_compressed.jpg`. To further inspect the prediction you can visualize the binary bounding box into the image using `show_boxes.py`:
+
+```bash
+python show_boxes.py input_image.ppm output.bin
+```
+
+To check the correctness of the gvsoc/board inference you can use the python script in `model_generator/nntool_generate_model.py` in `inference` mode. It will execute the same model (quantized as for the gvsoc inference) and predict the bounding boxes.
+
+Example of usage:
+
+```bash
+python model_generator/nntool_generate_model.py                                        \
+      --mode="inference"                                                               \
+      --trained_model weights/yolox-QVGA-bayer-BGR.onnx                                \
+      --stats_path weights/precalculated_stats_bayer_v2_qvga_trainset_nonpadded.pickle \
+      --input_image test_data/input.ppm
+```
+
+## CI mode
+
+In CI mode, the script is used to generate the ground truth bounding boxes which are then compared to the one predicted by Gvsoc/board.
 
 # Performance 
 

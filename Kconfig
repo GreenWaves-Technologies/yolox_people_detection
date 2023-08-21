@@ -42,6 +42,10 @@ menu "YoloX App Menu"
 
     endchoice
 
+    config CI
+        depends on INFERENCE
+        bool "CI Mode: If inference mode it enables check of results"
+        default True
 
     config IMAGE_REL_PATH
     	depends on INFERENCE
