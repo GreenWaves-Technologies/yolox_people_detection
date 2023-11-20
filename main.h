@@ -21,7 +21,7 @@
 
 #define H_CAM 480
 #define W_CAM 640
-#define BYTES_CAM 2
+#define BYTES_CAM 1
 
 
 // parameters needed for decoding layer

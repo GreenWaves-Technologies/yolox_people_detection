@@ -11,6 +11,10 @@
 
 /* Autotiler includes. */
 #include "main.h"
+#include "spi_comm.h"
+#include "ISP_Kernels.h"
+
+#define STREAM_OVER_UART
 
 // parameters needed for decoding layer
 // !!! do not forget to change the stride sizes accordint to the input size !!!  
@@ -37,9 +41,10 @@ AT_DEFAULTFLASH_EXT_ADDR_TYPE main_L3_Flash = 0;
 /* Outputs */
 L2_MEM float Output_1[9480];
 
-pi_device_t Ram;
+//pi_device_t Ram;
+AT_DEFAULTRAM_T DefaultRam;
 static struct pi_default_ram_conf ram_conf;
-uint8_t ext_ram_buf;
+uint32_t ext_ram_buf;
 
 static pi_evt_t ctrl_tasks[2];
 static pi_evt_t ram_tasks[2];
@@ -56,76 +61,13 @@ static void handle_ram_end(void *arg);
 PI_L2 unsigned char *iter_buff[2];
 
 // 2 Rows
-#define ITER_SIZE (W_CAM*2*2)
-#define RAW_SIZE (W_CAM*H_CAM*2) // For now only 10 bits config works
+#define ITER_SIZE (W_CAM*2*BYTES_CAM)
+#define RAW_SIZE (W_CAM*H_CAM*BYTES_CAM) // For now only 10 bits config works
 
 static pi_evt_t proc_task;
 
 pi_device_t* camera;
 PI_L2 unsigned char *buff[2];
-
-// This is called to enqueue new transfers
-static void enqueue_transfer() {
-    // We can enqueue new transfers if there are still a part of the image to
-    // capture and less than 2 transfers are pending (the dma supports up to 2 transfers
-    // at the same time)
-
-    while (remaining_size > 0 && nb_transfers < 2) {
-        int iter_size = (remaining_size < ITER_SIZE) ? remaining_size : ITER_SIZE;
-        pi_evt_t *task = &ctrl_tasks[current_task];
-
-        // Enqueue a transfer. The callback will be called once the transfer is finished
-        // so that  a new one is enqueued while another one is already running
-        pi_camera_capture_async(camera, iter_buff[current_task], iter_size, pi_evt_callback_no_irq_init(task, handle_transfer_end, (void *)current_task));
-
-        current_size[current_task] = iter_size;
-        remaining_size -= iter_size;
-        nb_transfers++;
-        current_task ^= 1;
-    }
-
-}
-
-static void handle_transfer_end(void *arg) {
-    nb_transfers--;
-    int current_buff = (int) arg;
-
-    enqueue_transfer();
-    pi_evt_t *task = &ram_tasks[current_buff];
-    unsigned char * img = iter_buff[current_buff];
-    int rgb_idx=0;
-    for (int a = 0; a < 640; a+=2) {
-        // Shifts bits to delete the 2 LSB, on the 10 useful bits
-        
-        #if 0 //This is using grayscale
-        uint16_t px = (img[a*2+1] << 6) | (img[a*2] >> 2);
-        px += (img[a*2+1+2] << 6) | (img[a*2+2] >> 2);
-        px += (img[a*2+1+(640*2)] << 6) | (img[a*2+(640*2)] >> 2);
-        px += (img[a*2+1+(640*2)+2] << 6) | (img[a*2+(640*2)+2] >> 2);
-        img[rgb_idx++] = px/4;
-        img[rgb_idx++] = px/4;
-        img[rgb_idx++] = px/4;
-        #else
-        uint16_t px = (img[a*2+1+(640*2)] << 6) | (img[a*2+(640*2)] >> 2);
-        px += (img[a*2+1+2] << 6) | (img[a*2+2] >> 2);
-
-        img[rgb_idx++] = (img[a*2+1] << 6) | (img[a*2] >> 2);
-        img[rgb_idx++] = px/2;
-        img[rgb_idx++] = (img[a*2+1+(640*2)+2] << 6) | (img[a*2+(640*2)+2] >> 2);
-        #endif
-
-    }
-    pi_ram_write_async(&Ram, (ext_ram_buf + count_transfers*320*3), img, (uint32_t) 320*3, pi_evt_callback_no_irq_init(&ram_tasks[current_buff], handle_ram_end, NULL));
-
-    count_transfers++;
-}
-
-static void handle_ram_end(void *arg) {
-    saved_size += 320*3;
-    if (nb_transfers == 0 && saved_size == H_INP*W_INP*CHANNELS) {
-        pi_evt_push(&proc_task);
-    }
-}
 
 static void cluster()
 {
@@ -184,6 +126,17 @@ void send_jpeg_to_uart(pi_device_t* uart_dev, uint8_t* img, int img_size, unsign
     }
 }
 
+extern L1_CL_MEM AT_L1_POINTER DeMosaic_L1_Memory;
+extern L2_MEM AT_L2_POINTER DeMosaic_L2_Memory;
+
+static void pre_filtering(){
+    unsigned char * ram_pointer= (unsigned char *) ext_ram_buf;
+    
+    demosaic_image_HWC_L3((unsigned char *)main_L2_Memory_Dyn, (unsigned char *)ram_pointer);
+    
+    white_balance_HWC_L3((unsigned char *)ram_pointer,(unsigned char *) ram_pointer,  95);
+}
+
 int test_main(void)
 {
     PRINTF("Entering main controller\n");
@@ -209,6 +162,10 @@ int test_main(void)
         pmsis_exit(-4);
     }
 
+
+    if(FREQ_FC >240 || FREQ_CL >240 || FREQ_PE >240)
+        pi_pmu_voltage_set(PI_PMU_VOLTAGE_DOMAIN_CHIP, 800);
+
     /* Frequency Settings: defined in the Makefile */
     int cur_fc_freq = pi_freq_set(PI_FREQ_DOMAIN_FC, FREQ_FC*1000*1000);
     int cur_cl_freq = pi_freq_set(PI_FREQ_DOMAIN_CL, FREQ_CL*1000*1000);
@@ -218,10 +175,11 @@ int test_main(void)
         PRINTF("Error changing frequency !\nTest failed...\n");
         pmsis_exit(-4);
     }
+    if(FREQ_FC <=240 && FREQ_CL <=240 && FREQ_PE <=240)
+        pi_pmu_voltage_set(PI_PMU_VOLTAGE_DOMAIN_CHIP, 650);
+    
     PRINTF("FC Frequency as %d Hz, CL Frequency = %d Hz, PERIIPH Frequency = %d Hz\n", 
             pi_freq_get(PI_FREQ_DOMAIN_FC), pi_freq_get(PI_FREQ_DOMAIN_CL), pi_freq_get(PI_FREQ_DOMAIN_PERIPH));
-
-    
 
     // IMPORTANT - MUST BE CALLED AFTER THE CLUSTER IS SWITCHED ON!!!!
     PRINTF("Constructor\n");
@@ -236,11 +194,20 @@ int test_main(void)
     pi_cluster_task(&task, (void (*)(void *))cluster, NULL);
     pi_cluster_task_stacks(&task, NULL, SLAVE_STACK_SIZE);
 
-    pi_device_t uart_dev;
-    init_uart_communication(&uart_dev,1000000);
     
+    #ifdef STREAM_OVER_UART
+    pi_device_t uart_dev;
+    init_uart_communication(&uart_dev,1152000);
+    #else
+    // Initialize SPI
+    pi_device_t spi_slave;
+    struct pi_spi_conf spi_slave_conf;
+    spi_slave_init(&spi_slave, &spi_slave_conf);
+    #endif
+
+
     //Open camera
-    if (pi_open(PI_CAMERA_OV5647, &camera))
+    if (pi_open(PI_CAMERA_HM0360, &camera))
     {
         PRINTF("Failed to open camera\n");
         return -1;
@@ -256,16 +223,16 @@ int test_main(void)
 
     /* Init & open ram. */
     pi_default_ram_conf_init(&ram_conf);
-    pi_open_from_conf(&Ram, &ram_conf);
+    pi_open_from_conf(&DefaultRam, &ram_conf);
 
     pi_evt_sig_init(&proc_task);
     PRINTF("open ram\n");
-    if (pi_ram_open(&Ram)) {
+    if (pi_ram_open(&DefaultRam)) {
         printf("Error ram open !\n");
         pmsis_exit(-5);
     }
     PRINTF("ram opened\n");
-    if (pi_ram_alloc(&Ram, (uint32_t *)(uint32_t ) ext_ram_buf, H_INP * W_INP * CHANNELS) != 0) {
+    if (pi_ram_alloc(&DefaultRam, (uint32_t *)(uint32_t ) ext_ram_buf, H_INP * W_INP * CHANNELS) != 0) {
         printf("Failed to allocate memory in external ram (%ld bytes)\n", H_INP * W_INP * CHANNELS);
         pmsis_exit(-1);
     }
@@ -274,27 +241,32 @@ int test_main(void)
     jpeg_encoder_t enc;
 
     pi_gpio_flags_e flags = PI_GPIO_OUTPUT;
-    pi_gpio_pin_configure(PI_PAD_086, flags);
+    //This is CN6 pin5
+    pi_gpio_pin_configure(PI_PAD_048, flags);
+    //This is GPIO
+    //pi_gpio_pin_configure(PI_PAD_086, flags);
 
     int iter=0;    
     while(1){
-        pi_gpio_pin_toggle(PI_PAD_086);
-        remaining_size = RAW_SIZE;
-        saved_size=0;
-        nb_transfers=0;
-        count_transfers=0;
-        current_buff=0;
-        done=0;
-        current_task = 0;
+        //pi_gpio_pin_toggle(PI_PAD_086);
+        pi_gpio_pin_toggle(PI_PAD_048);
 
-        enqueue_transfer();
         pi_camera_control(camera, PI_CAMERA_CMD_START, 0);
-        pi_evt_wait(&proc_task);
+        pi_camera_capture(camera, (unsigned char*)main_L2_Memory_Dyn, 640*480);
         pi_camera_control(camera, PI_CAMERA_CMD_STOP, 0);
+
+        DeMosaic_L1_Memory = main_L1_Memory;
+        DeMosaic_L2_Memory = main_L2_Memory_Dyn + 640*480;
+
+        pi_cluster_task(&task, (void (*)(void *))pre_filtering, NULL);
+
+        pi_cluster_send_task(&cluster_dev, &task);
         
+        pi_cluster_task(&task, (void (*)(void *))cluster, NULL);
+
         //Copy from ram to: main_L2_Memory_Dyn + (H_INP * W_INP * CHANNELS)
         //The image is saved onto External
-        pi_ram_read(&Ram, ext_ram_buf, main_L2_Memory_Dyn + (H_INP * W_INP * CHANNELS), (uint32_t)(H_INP * W_INP * CHANNELS));
+        pi_ram_read(&DefaultRam, ext_ram_buf, main_L2_Memory_Dyn + (H_INP * W_INP * CHANNELS), (uint32_t)(H_INP * W_INP * CHANNELS));
 
         PRINTF("\t\t***Start FC timer***\n");
         gap_fc_starttimer();
@@ -318,6 +290,7 @@ int test_main(void)
         performances[perf_idx] = pi_time_get_us();
         pi_cluster_send_task_to_cl(&cluster_dev, &task);
         performances[perf_idx] = pi_time_get_us() - performances[perf_idx]; perf_idx++;
+
 
         /* ------ DECODING ------*/
         PRINTF("\t\t***Start decoding***\n");
@@ -377,34 +350,46 @@ int test_main(void)
             );
         performances[perf_idx] = pi_time_get_us() - performances[perf_idx]; perf_idx++;
 
+
         //Draw rectangles and send trought UART
-        pi_ram_read(&Ram, ext_ram_buf, main_L2_Memory_Dyn, (uint32_t) H_INP*W_INP*3);
+        pi_ram_read(&DefaultRam, ext_ram_buf, main_L2_Memory_Dyn, (uint32_t) H_INP*W_INP*3);
         draw_boxes((unsigned char *) main_L2_Memory_Dyn, Output_1, final_valid_boxes, H_INP, W_INP, 3);
 
         /* ------ JPEG COMPRESSION ------ */
+        
         PRINTF("\t\t***Start JPEG compression ***\n");
         int bitstream_size;
-        uint8_t * jpeg_image = (uint8_t *) pi_l2_malloc(40*2048);
+        //uint8_t * jpeg_image = (uint8_t *) pi_l2_malloc(80*2048);
+        uint8_t * jpeg_image = (uint8_t *)(main_L2_Memory_Dyn + H_INP*W_INP*3);
         if (jpeg_image == 0) {
             printf("Error allocating jpeg buffer\n");
             return -1;
         }
-        performances[perf_idx] = pi_time_get_us();
-        jpeg_init(&enc, H_INP, W_INP, cluster_dev, main_L1_Memory);
-        int jpeg_ret = compress(
-            &enc,
-            (uint8_t *) main_L2_Memory_Dyn,
-            jpeg_image,
-            &bitstream_size,
-            H_INP,
-            W_INP,
-            CHANNELS);
-        performances[perf_idx] = pi_time_get_us() - performances[perf_idx]; perf_idx++;
-
-        send_jpeg_to_uart(&uart_dev, jpeg_image, bitstream_size, performances);
+        if(final_valid_boxes){
+            performances[perf_idx] = pi_time_get_us();
+            jpeg_init(&enc, H_INP, W_INP, cluster_dev, main_L1_Memory);
+            int jpeg_ret = compress(
+                &enc,
+                (uint8_t *) main_L2_Memory_Dyn,
+                jpeg_image,
+                &bitstream_size,
+                H_INP,
+                W_INP,
+                CHANNELS);
+            performances[perf_idx] = pi_time_get_us() - performances[perf_idx]; perf_idx++;
+        }else{
+            performances[perf_idx] = 0; perf_idx++;
+        
+        }
+        #ifdef STREAM_OVER_UART
+        if(final_valid_boxes)
+            send_jpeg_to_uart(&uart_dev, jpeg_image, bitstream_size, performances);
+        else
+            send_jpeg_to_uart(&uart_dev, jpeg_image, 0, performances);
+        #else
+        //send_jpeg_spi(&spi_slave,jpeg_image, bitstream_size,performances);
+        #endif
         iter++;
-        pi_l2_free(jpeg_image, 40*2048);
-
         pi_evt_sig_init(&proc_task);
 
     } //end of while 1
