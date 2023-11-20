@@ -44,7 +44,7 @@ L2_MEM float Output_1[9480];
 //pi_device_t Ram;
 AT_DEFAULTRAM_T DefaultRam;
 static struct pi_default_ram_conf ram_conf;
-uint8_t ext_ram_buf;
+uint32_t ext_ram_buf;
 
 static pi_evt_t ctrl_tasks[2];
 static pi_evt_t ram_tasks[2];
@@ -197,7 +197,7 @@ int test_main(void)
     
     #ifdef STREAM_OVER_UART
     pi_device_t uart_dev;
-    init_uart_communication(&uart_dev,1000000);
+    init_uart_communication(&uart_dev,1152000);
     #else
     // Initialize SPI
     pi_device_t spi_slave;
@@ -250,18 +250,6 @@ int test_main(void)
     while(1){
         //pi_gpio_pin_toggle(PI_PAD_086);
         pi_gpio_pin_toggle(PI_PAD_048);
-        // remaining_size = RAW_SIZE;
-        // saved_size=0;
-        // nb_transfers=0;
-        // count_transfers=0;
-        // current_buff=0;
-        // done=0;
-        // current_task = 0;
-
-        // enqueue_transfer();
-        // pi_camera_control(camera, PI_CAMERA_CMD_START, 0);
-        // pi_evt_wait(&proc_task);
-        // pi_camera_control(camera, PI_CAMERA_CMD_STOP, 0);
 
         pi_camera_control(camera, PI_CAMERA_CMD_START, 0);
         pi_camera_capture(camera, (unsigned char*)main_L2_Memory_Dyn, 640*480);

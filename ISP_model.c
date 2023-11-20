@@ -19,7 +19,7 @@
 
 int main(int argc, char **argv)
 {
-	BayerOrder_t bayer_BGGR=BGGR;
+	BayerOrder_t bayer_BGGR=RGGB;
 	//BayerOrder_t bayer_GRBG=GRBG;
 	// This will parse AutoTiler options and perform various initializations
 	if (TilerParseOptions(argc, argv)) {

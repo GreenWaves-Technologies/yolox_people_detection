@@ -49,7 +49,7 @@ menu "YoloX App Menu"
         string "Relative path to test image"
         default "test_data/input.ppm"
 
-    source "$(KCONFIG_DRIVERS_DIR)/camera/drivers_ov5647_options.kconfig"
+    source "$(KCONFIG_DRIVERS_DIR)/camera/drivers_hm0360_options.kconfig"
 
 endmenu
 
