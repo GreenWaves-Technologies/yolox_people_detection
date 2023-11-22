@@ -76,8 +76,8 @@ variants:
             - CONFIG_LIB_GAP_LIB_JPEG=y
             - CONFIG_IO_TYPE_SEMIHOSTING=y
             - CONFIG_DRIVER_TYPE_CAMERA=y
-            - CONFIG_DRIVER_OV5647=y
-            - CONFIG_DRIVER_OV5647_FORMAT_VGA=y
+            - CONFIG_DRIVER_HM0360=y
+            - CONFIG_DRIVER_HM0360_FORMAT_VGA=y
             - CONFIG_DRIVER_UDMAUART=y
             - CONFIG_BOOT_DEVICE_MRAM=y
 
@@ -116,8 +116,8 @@ variants:
             - CONFIG_LIB_GAP_LIB_JPEG=y
             - CONFIG_IO_TYPE_SEMIHOSTING=y
             - CONFIG_DRIVER_TYPE_CAMERA=y
-            - CONFIG_DRIVER_OV5647=y
-            - CONFIG_DRIVER_OV5647_FORMAT_VGA=y
+            - CONFIG_DRIVER_HM0360=y
+            - CONFIG_DRIVER_HM0360_FORMAT_VGA=y
             - CONFIG_DRIVER_UDMAUART=y
             - CONFIG_BOOT_DEVICE_MRAM=y
 
@@ -156,8 +156,9 @@ variants:
             - CONFIG_LIB_GAP_LIB_IMG_IO=y
             - CONFIG_LIB_GAP_LIB_JPEG=y
             - CONFIG_IO_TYPE_SEMIHOSTING=y
-            - CONFIG_DRIVER_TYPE_CAMERA=y
-            - CONFIG_DRIVER_OV5647=y
-            - CONFIG_DRIVER_OV5647_FORMAT_VGA=y
             - CONFIG_DRIVER_UDMAUART=y
             - CONFIG_BOOT_DEVICE_MRAM=y
+            - CONFIG_DRIVER_TYPE_CAMERA=y
+            - CONFIG_DRIVER_HM0360=y
+            - CONFIG_DRIVER_HM0360_FORMAT_VGA=y
+
