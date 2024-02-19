@@ -359,12 +359,8 @@ int test_main(void)
         
         PRINTF("\t\t***Start JPEG compression ***\n");
         int bitstream_size;
-        //uint8_t * jpeg_image = (uint8_t *) pi_l2_malloc(80*2048);
         uint8_t * jpeg_image = (uint8_t *)(main_L2_Memory_Dyn + H_INP*W_INP*3);
-        if (jpeg_image == 0) {
-            printf("Error allocating jpeg buffer\n");
-            return -1;
-        }
+
         if(final_valid_boxes){
             performances[perf_idx] = pi_time_get_us();
             jpeg_init(&enc, H_INP, W_INP, cluster_dev, main_L1_Memory);
