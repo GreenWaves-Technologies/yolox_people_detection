@@ -1,6 +1,39 @@
 #ifndef __main_H__
 #define __main_H__
 
+#define __PREFIX(x) yolox ## x
+// Include basic GAP builtins defined in the Autotiler
+#include "Gap.h"
+
+#ifdef __EMUL__
+#include <sys/types.h>
+#include <unistd.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <sys/param.h>
+#include <string.h>
+#endif
+
+#include "yoloxKernels.h"
+#include "gaplib/ImgIO.h"
+#include "gaplib/fs_switch.h"
+#include "bsp/camera/ov5647.h"
+#include "draw.h"
+#include "slicing.h"
+#include "decoding.h"
+#include "postprocessing.h"
+#include "camera.h"
+#include "jpeg_compress.h"
+#include "img_flush.h"
+
+#if SILENT
+#define PRINTF(...) ((void) 0)
+#else
+#define PRINTF printf
+#endif
+
+extern AT_DEFAULTFLASH_EXT_ADDR_TYPE yolox_L3_Flash;
+
 /* ---------- parameters ----------*/
 
 #define QUOTE(name) #name
@@ -41,37 +74,4 @@
 #define MIN(a, b)        (((a)<(b))?(a):(b))
 
 /* ---------- end ----------*/
-
-#define __PREFIX(x) main ## x
-// Include basic GAP builtins defined in the Autotiler
-#include "Gap.h"
-
-#ifdef __EMUL__
-#include <sys/types.h>
-#include <unistd.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <sys/param.h>
-#include <string.h>
-#endif
-
-#include "mainKernels.h"
-#include "gaplib/ImgIO.h"
-#include "gaplib/fs_switch.h"
-#include "bsp/camera/ov5647.h"
-#include "custom_layers/draw.h"
-#include "custom_layers/slicing.h"
-#include "custom_layers/decoding.h"
-#include "custom_layers/postprocessing.h"
-#include "custom_layers/camera.h"
-#include "custom_layers/jpeg_compress.h"
-#include "custom_layers/img_flush.h"
-
-#if SILENT
-#define PRINTF(...) ((void) 0)
-#else
-#define PRINTF printf
-#endif
-
-extern AT_DEFAULTFLASH_EXT_ADDR_TYPE main_L3_Flash;
 #endif

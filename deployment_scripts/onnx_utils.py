@@ -1,3 +1,4 @@
+import collections
 import onnxruntime as ort
 import onnx
 

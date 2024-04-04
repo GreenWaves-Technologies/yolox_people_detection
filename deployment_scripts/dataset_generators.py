@@ -1,7 +1,6 @@
 import os
 import cv2
 import numpy as np
-from loguru import logger
 from tqdm import tqdm
 from pycocotools.coco import COCO
 
@@ -42,7 +41,7 @@ class CostomCOCODaset():
         self.img_type = img_type
 
         if img_type == "bayer" and input_channels == 3:
-            logger.info("If you are resizing the image via DEMOSAICING, make sure \
+            print("If you are resizing the image via DEMOSAICING, make sure \
                 that input_size is 2 as large as desired input for the model !!!")
  
         self.max_idx = max_size 
@@ -88,13 +87,13 @@ class CostomCOCODaset():
                 input_channels = self.input_channels
             )
 
-        image = self.slicing(image)
+        # image = self.slicing(image)
 
         if not self.transpose_to_chw:
             image = image.transpose(1, 2, 0)
 
         self._idx += 1
-        return image[None] 
+        return image
     
     def __len__(self):
         return self.max_idx
@@ -176,11 +175,11 @@ class GvsocInputGeneratorCOCO(CostomCOCODaset):
         self.model_type = model_type.lower()
 
         if model_type.lower() == "rgb" and input_channels != 3:
-            logger.warning("Input_channels must be 3 for rgb model. Changing to 3")
+            print("Input_channels must be 3 for rgb model. Changing to 3")
             input_channels = 3
 
-        logger.info("Image type is {}".format(self.model_type))
-        logger.info("Input channels is {}".format(input_channels))
+        print("Image type is {}".format(self.model_type))
+        print("Input channels is {}".format(input_channels))
 
         self.gvsoc_inputs_folder = gvsoc_inputs_folder
         if not os.path.exists(self.gvsoc_inputs_folder):

@@ -1,0 +1,1 @@
+int WriteJPEGToFile(unsigned char * image, char * output_file, int bitstream_size);

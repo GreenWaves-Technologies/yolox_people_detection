@@ -1,11 +1,11 @@
 import pickle
 import argparse
 import numpy as np
+from tqdm import tqdm
 
-from loguru import logger
 from dataset_generators import CostomCOCODaset, get_annotations
 from nntool.utils.stats_funcs import qsnr
-from utils import build_graph, clip_stats, check_input_dims
+from nntool_utils import build_graph, clip_stats, check_input_dims, quantize_graph
 
 
 def make_parser():
@@ -26,7 +26,7 @@ def make_parser():
         "--img_type", 
         type=str, 
         choices=["rgb", "bayer"],
-        default="bayer",
+        default="rgb",
         help="type of images to quantize with"
     ) 
     parser.add_argument(
@@ -45,7 +45,7 @@ def make_parser():
         "--input_size", 
         type=int, 
         nargs='+',
-        default=(360, 480), 
+        default=(240, 320), 
         help="input size"
     )
     parser.add_argument(
@@ -78,8 +78,9 @@ def main():
     # get arguments 
     args = make_parser().parse_args()
 
+    print(tuple(args.input_size))
     #create graph
-    graph = build_graph(args.onnx_path)
+    graph = build_graph(args.onnx_path, quantize=False)
 
     # get class person annotations
     annotations = get_annotations(args.coco_annotations_path)
@@ -95,7 +96,6 @@ def main():
         img_type         = args.img_type,
     )
 
-
     # prepare input
     sample = next(iter(quant_dataset))
 
@@ -104,40 +104,24 @@ def main():
 
     # get statistics
     if args.stats:
-        logger.info(f"Using statistics from file {args.stats}")
+        print(f"Using statistics from file {args.stats}")
         with open(args.stats, "rb") as f:
             stats = pickle.load(f)
     else:
-        logger.info(f"Calculating statistics from {args.quant_dataset_size} images")
-        stats = graph.collect_statistics(quant_dataset)
+        print(f"Calculating statistics from {args.quant_dataset_size} images")
+        stats = graph.collect_statistics(tqdm(quant_dataset))
 
-        logger.info(f"Saving statistics to precalculated_stats.pickle")
+        print(f"Saving statistics to precalculated_stats.pickle")
         with open("precalculated_stats.pickle", "wb") as f:
             pickle.dump(stats, f)
 
     if args.clip_stats:
-        logger.info(f"Clipping statistics using stats: {args.clip_stats}")
+        print(f"Clipping statistics using stats: {args.clip_stats}")
         stats = clip_stats(stats, args.clip_stats)
 
-    logger.info(f"Start quantization process !!!")
-    graph.quantize(
-                stats,
-                graph_options={
-                    'bits': 8,
-                    'quantized_dimension': 'channel',
-                    'use_ne16': True,
-                    'hwc': True,
-                },
-
-                node_options= {
-                    'output_1' : 
-                        {
-                            'scheme' : 'float', 
-                            'float_type': 'float32'
-                        },
-                },
-           )
-    logger.info("finished quantization process !!!")
+    print(f"Start quantization process !!!")
+    quantize_graph(graph, stats)
+    print("finished quantization process !!!")
 
 
     # get quantized outputs
@@ -153,7 +137,7 @@ def main():
         print(f"Graph[{i:3}] -> {graph[i].name:>40}:\t{qsnr(fp32[0], fp16[0])}")
 
     # # make inference in gvsoc
-    # logger.info("Generating GVSOC inference tamplete. This might take a couple of minutes !!!")
+    # print("Generating GVSOC inference tamplete. This might take a couple of minutes !!!")
 
     # graph.name = "main"
     # qout = graph.execute([sample], quantize=True, dequantize=False)
@@ -180,7 +164,7 @@ def main():
     #         'l3_flash_device':  'AT_MEM_L3_DEFAULTFLASH',
     #     }
     # ) 
-    # logger.info("Finished generating GVSOC inference tamplete !!!")
+    # print("Finished generating GVSOC inference tamplete !!!")
     
     # qsnrs = graph.qsnrs(qout, res.output_tensors)
     # for i, el in enumerate(qsnrs):
@@ -188,7 +172,7 @@ def main():
     #     if el is not None:
     #         print(f"graph[{i:3}] -> {graph[i].name:>25}: {el}")
 
-    # logger.info("Finished !!!")    
+    # print("Finished !!!")    
 
 
 if __name__ == "__main__":

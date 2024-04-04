@@ -12,12 +12,12 @@ typedef struct{
 
 void xywh2xyxy(float * array, unsigned int rows);
 
-void filter_boxes(float * Input, float * Output, float conf_thresh, unsigned int rows, unsigned int  * num_val_boxes);
+int filter_boxes(float * Input, float * Output, float conf_thresh, unsigned int rows);
 
-void to_bboxes(float * input, Box * output, int num_val_boxes, int top_k_b);
+void to_bboxes(float * input, Box * output, int num_val_boxes);
 
 float iou(Box * box1, Box * box2);
 
-void nms(Box * boxes, float * Output, float nms_thresh, int num_val_boxes, int * val_final_boxes, int top_k_b);
+int nms(Box * boxes, float * Output, float nms_thresh, int num_val_boxes);
 
 int md_comparator(const void *v1, const void *v2);

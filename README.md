@@ -18,7 +18,7 @@ The input image resolution is QVGA and the output is the bounding box/es of dete
    * [RGB](#rgb)
    * [BAYER](#bayer)
    * [Output](#output)
- * [Inference Mode](#inference-mode)
+ * [NNTool Inference Mode](#nntool-inference-mode)
  * [Performance](#performance)
  * [GVSOC Inference](#gvsoc-Inference)
    * [RGB model](#rgb-model)
@@ -92,7 +92,7 @@ The output of the model is a binary file with the name `output.bin` in the `out`
 where `x1` and `y1` are the coordinates of the top left corner of the bounding box, `x2` and `y2` are the coordinates of the bottom right corner of the bounding box, `objectness score` is the score of the bounding box and `class score` is the score of the class of the detected object. The last column is always 1 indicating class `id`.
 
 
-# Inference Mode
+# NNTool Inference Mode
 
 In this mode the application runs the model with one input image from file and writes the bounding boxes result to a binary file and the image (with bounding boxes). To change the image on which the model is run, you can change the variable `TEST_INPUT_FILE_NAME` in `CMakeLists.txt`.
 
@@ -180,7 +180,14 @@ Refer to the [ONNX](https://gitlab.com/xperience-ai/edge-devices/yolox/-/blob/yo
 
 ## Quantization
 
-Originaly **RGB** model was quantized using 1000 random samples from [`COCO 2017` validation](http://images.cocodataset.org/zips/val2017.zip) set. The **BAYER** model however was quantized using `COCO 2017` which was converted to **synthetic BAYER** using the [ApproxVision repository](https://github.com/cucapra/approx-vision). What the repository does in a nutshell is it take a RGB image and convers it to BAYER image. The conversion is done using certain camera intrinsic parameters to reverse all ISP steps and in a way that the output image is as close as possible to the original image.
+Originaly **RGB** model was quantized using 1000 random samples from [`COCO 2017` validation](http://images.cocodataset.org/zips/val2017.zip) set:
+
+```bash
+wget http://images.cocodataset.org/zips/val2017.zip
+unzip val2017.zip
+```
+
+The **BAYER** model however was quantized using `COCO 2017` which was converted to **synthetic BAYER** using the [ApproxVision repository](https://github.com/cucapra/approx-vision). What the repository does in a nutshell is it take a RGB image and convers it to BAYER image. The conversion is done using certain camera intrinsic parameters to reverse all ISP steps and in a way that the output image is as close as possible to the original image.
 
 If one wishes to quantize the `RGB` model to 8 bit one can run the following command:
 

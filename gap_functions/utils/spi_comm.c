@@ -102,26 +102,6 @@ void send_jpeg_spi(pi_device_t* spi_slave,  uint8_t* img, int img_size, unsigned
     }
 }
 
-#if 0
-
-void send_jpeg_to_uart(pi_device_t* uart_dev, uint8_t* img, int img_size, unsigned int *perf_array){
-
-    pi_uart_write(uart_dev, UART_START_JPEG, 2);
-    pi_uart_write(uart_dev, &img_size, 4);
-    pi_uart_write(uart_dev, &perf_array[0], 4*8);
-    //Write Image row by row
-    int size = img_size;
-    int idx = 0;
-    while (size > 0) {
-        int size_to_write = (size > 256) ? 256 : size;
-        pi_uart_write(uart_dev, &(img[idx]), size_to_write);
-        size -= size_to_write;
-        idx += size_to_write;
-    }
-}
-#endif
-
-
 void send_image_spi_ram(pi_device_t* spi_slave,pi_device_t* ram, uint32_t img, uint16_t img_w, uint16_t img_h){
 
     uint8_t tx_buffer[4];

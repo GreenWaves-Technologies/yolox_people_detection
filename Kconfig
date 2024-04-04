@@ -25,8 +25,6 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-source "$(GAP_SDK_HOME)/utils/kconfig/Kconfig"
-
 menu "YoloX App Menu"
 
     comment "Options"
@@ -53,7 +51,7 @@ menu "YoloX App Menu"
         string "Relative path to test image"
         default "test_data/input.ppm"
 
-    source "$(KCONFIG_DRIVERS_DIR)/camera/drivers_hm0360_options.kconfig"
-
 endmenu
 
+source "$(GAP_SDK_HOME)/utils/kconfig/Kconfig"
+source "$(KCONFIG_DRIVERS_DIR)/camera/drivers_hm0360_options.kconfig"

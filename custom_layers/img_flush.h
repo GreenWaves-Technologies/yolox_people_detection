@@ -1,1 +1,0 @@
-int write_jpeg_to_file(unsigned char * image, char * output_file, int bitstream_size);

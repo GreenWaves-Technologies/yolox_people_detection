@@ -23,10 +23,11 @@ void xywh2xyxy(float * input, unsigned int rows){
 }
 
 
-void filter_boxes(float * Input, float * Output, float conf_thresh, unsigned int rows, unsigned int  * num_val_boxes){
+int filter_boxes(float * Input, float * Output, float conf_thresh, unsigned int rows){
 
     int count = 0; 
     int last_valid_idx = 0;
+    int num_val_boxes = 0;
     for (unsigned int i = 0; i < rows; i++){
         if (Input[count + 4] * Input[count + 5] > conf_thresh){
             Output[last_valid_idx + 0] = Input[count + 0];
@@ -37,16 +38,17 @@ void filter_boxes(float * Input, float * Output, float conf_thresh, unsigned int
             Output[last_valid_idx + 5] = Input[count + 5];
             Output[last_valid_idx + 6] = (float) 0.0; 
             last_valid_idx += 7;
-            *num_val_boxes += 1;
+            num_val_boxes += 1;
         }
         count += 6;
     }
+    return num_val_boxes;
 }
 
-void to_bboxes(float * input, Box * output, int num_val_boxes, int top_k_b){
+void to_bboxes(float * input, Box * output, int num_val_boxes){
 
     int count = 0;
-    for (int i = 0; i < top_k_b; i++){
+    for (int i = 0; i < num_val_boxes; i++){
         output[i].x1 = input[count + 0];
         output[i].y1 = input[count + 1];
         output[i].x2 = input[count + 2];
@@ -92,30 +94,21 @@ float iou(Box * box1, Box * box2){
 }
 
 
-void nms(
+int nms(
     Box * boxes, 
     float * Output, 
     float nms_thresh, 
-    int num_val_boxes, 
-    int * val_final_boxes,
-    int top_k_b
-    ){
-
+    int num_val_boxes
+)
+{
     int count = 0;
-    int val_boxes;
+    int val_final_boxes = 0;
 
-    if (num_val_boxes > top_k_b){
-        val_boxes = top_k_b;
-    }
-    else{
-        val_boxes = num_val_boxes;
-    }
-
-    for (int i = 0; i < val_boxes; i++){
+    for (int i = 0; i < num_val_boxes; i++){
         if (boxes[i].alive == true){
             // printf("box1 %.2f %.2f %.2f %.2f %.2f %.2f\n", boxes[i].x1, boxes[i].x2, boxes[i].y1, boxes[i].y2, boxes[i].obj_conf, boxes[i].cls_conf);
 
-            for (int j = 0; j < val_boxes; j++){
+            for (int j = 0; j < num_val_boxes; j++){
                 if (i != j && boxes[j].alive == true){
                     // printf("\tbox2 %.2f %.2f %.2f %.2f %.2f %.2f\n", boxes[j].x1, boxes[j].x2, boxes[j].y1, boxes[j].y2, boxes[j].obj_conf, boxes[j].cls_conf);
 
@@ -143,10 +136,11 @@ void nms(
                 Output[count + 5] =  boxes[i].cls_conf;
                 Output[count + 6] = (float) boxes[i].cls_id;
                 count += 7;
-                *val_final_boxes += 1;
+                val_final_boxes += 1;
             }
         }
     }
+    return val_final_boxes;
 }
 
 
