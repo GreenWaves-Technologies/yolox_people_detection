@@ -25,6 +25,7 @@
 #include "camera.h"
 #include "jpeg_compress.h"
 #include "img_flush.h"
+#include "measurments_utils.h"
 
 #if SILENT
 #define PRINTF(...) ((void) 0)

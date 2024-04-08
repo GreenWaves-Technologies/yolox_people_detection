@@ -123,7 +123,9 @@ static void NNInferenceCluster()
     gap_cl_resethwtimer();
     #endif
 
+GPIO_HIGH();
     yoloxCNN(Output_1);
+GPIO_LOW();
     // for (int i=0; i<1580; i++) {
     //     printf("[%d] %.2f %.2f %.2f %.2f %.2f %.2f\n", i,  Output_1[i*6+0], Output_1[i*6+1], Output_1[i*6+2], Output_1[i*6+3], Output_1[i*6+4], Output_1[i*6+5]);
     // }
@@ -134,6 +136,7 @@ int main(int argc, char *argv[])
     PRINTF("\n\n\t *** NNTOOL main_inference ***\n\n");
 
     /* Configure And open cluster. */
+    OPEN_GPIO_MEAS();
     struct pi_device cluster_dev;
     struct pi_cluster_conf cl_conf;
     pi_cluster_conf_init(&cl_conf);
@@ -165,6 +168,8 @@ int main(int argc, char *argv[])
     }
     printf("FC Frequency as %d Hz, CL Frequency = %d Hz, PERIIPH Frequency = %d Hz\n", 
             pi_freq_get(PI_FREQ_DOMAIN_FC), pi_freq_get(PI_FREQ_DOMAIN_CL), pi_freq_get(PI_FREQ_DOMAIN_PERIPH));
+	pi_pmu_voltage_set(PI_PMU_VOLTAGE_DOMAIN_CHIP, VOLTAGE);
+	printf("Voltage: %dmV\n", pi_pmu_voltage_get(PI_PMU_VOLTAGE_DOMAIN_CHIP));
 
     // IMPORTANT - MUST BE CALLED AFTER THE CLUSTER IS SWITCHED ON!!!!
     PRINTF("Constructor\n");

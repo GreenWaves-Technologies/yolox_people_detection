@@ -24,7 +24,7 @@ if(CONFIG_INFERENCE)
     set(INPUT_FILE_NAME ${TEST_INPUT_FILE_NAME})
     list(APPEND TARGET_PREPROCESSOR -DCI)
   else()
-    if (${CONFIG_IMAGE_ABS_PATH} STREQUAL "")
+    if (CONFIG_IMAGE_ABS_PATH STREQUAL "")
       set(INPUT_FILE_NAME           ${CMAKE_CURRENT_SOURCE_DIR}/${CONFIG_IMAGE_REL_PATH})
     else()
       message(STATUS "${APP_MSG_PREFIX} Absolute path image passed")
@@ -152,7 +152,18 @@ list(APPEND TARGET_INCS -I.
                         -I${CMAKE_CURRENT_SOURCE_DIR}/gap_functions/detection
                         -I${CMAKE_CURRENT_SOURCE_DIR}/gap_functions/utils
                         -I${CMAKE_CURRENT_BINARY_DIR}/${CONFIG_MODEL_BUILDDIR}
-                        -I${CMAKE_CURRENT_SOURCE_DIR})
+                        -I${CMAKE_CURRENT_SOURCE_DIR}
+                        -I$ENV{GAP_SDK_HOME}/utils/power_meas_utils
+)
+
+set(MAX_PERFORMANCE y)
+if (${MAX_PERFORMANCE})
+  set(FREQ    370)
+  set(VOLTAGE 800)
+else()
+  set(FREQ    240)
+  set(VOLTAGE 650)
+endif()
 
 list(APPEND TARGET_CFLAGS   -O3)
 
@@ -161,15 +172,17 @@ list(APPEND TARGET_PREPROCESSOR -DPERF
                                 -DAT_MODEL_PREFIX=${MODEL_PREFIX}
                                 -DSTACK_SIZE=${CONFIG_CL_MASTER_CORE_STACK_SIZE}
                                 -DSLAVE_STACK_SIZE=${CONFIG_CL_SLAVE_CORE_STACK_SIZE}
-                                -DFREQ_CL=370
-                                -DFREQ_FC=370
-                                -DFREQ_PE=340
+                                -DFREQ_CL=${FREQ}
+                                -DFREQ_FC=${FREQ}
+                                -DFREQ_PE=${FREQ}
+                                -DVOLTAGE=${VOLTAGE}
                                 -DINPUT_FILE_NAME=${INPUT_FILE_NAME}
                                 -DOUTPUT_FILE_NAME=${OUTPUT_FILE_NAME}
                                 -DOUTPUT_BIN_FILE_NAME=${OUTPUT_BIN_FILE_NAME}
                                 -DOUTPUT_JPEG_FILE_NAME=${OUTPUT_JPEG_FILE_NAME}
                                 -DTEST_OUTPUT_FILE_NAME=${TEST_OUTPUT_FILE_NAME}
                                 -DCONF_THRESH=${CONF_THRESH}
+                                -DGPIO_MEAS
 )
 
 project(${TARGET_NAME} C ASM)
