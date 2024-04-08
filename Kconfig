@@ -44,12 +44,16 @@ menu "YoloX App Menu"
     config CI
         depends on INFERENCE
         bool "CI Mode: If inference mode it enables check of results"
-        default True
+        default False
 
     config IMAGE_REL_PATH
     	depends on INFERENCE
         string "Relative path to test image"
         default "test_data/input.ppm"
+
+    config IMAGE_ABS_PATH
+    	depends on INFERENCE
+        string "Absolute path to test image"
 
 endmenu
 

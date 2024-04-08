@@ -1,15 +1,26 @@
 DIR_IN=$1
 DIR_OUT=$2
-mkdir -p DIR_IN 
+mkdir -p ${DIR_OUT}
 counter=0
-for file in $(ls ./${DIR_IN})
-do
-    echo "./${DIR_IN}/$file" 
-    cp "./${DIR_IN}/$file" ./input.pgm
-    make all run platform=gvsoc
 
-    mv ./output.bin "./${DIR_OUT}/$file.bin"
+if [[ $DIR_IN == */ ]] 
+then
+    DIR_IN=${DIR_IN: 0: -1}
+fi
+
+
+for file in $(ls ${DIR_IN})
+do
+    echo "${DIR_IN}/$file"
+    cmake -B build \
+            -DCONFIG_PLATFORM_GVSOC=y \
+            -DCONFIG_INFERENCE=y \
+            -DCONFIG_CI=n \
+            -DCONFIG_IMAGE_ABS_PATH=${DIR_IN}/$file
+
+    cmake --build build --target run -j
+
+    mv ./build/output.bin "${DIR_OUT}/$file.bin"
     counter=$((counter+1))
-    echo "$counter : $file FIELS FINISHED"
-    rm ./input.pgm
+    echo "$counter : $file FILES FINISHED"
 done
