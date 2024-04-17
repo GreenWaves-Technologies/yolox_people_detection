@@ -5,10 +5,10 @@ void jpeg_init(jpeg_encoder_t *enc, int height, int width, pi_device_t cluster_d
     struct jpeg_encoder_conf enc_conf;
     jpeg_encoder_conf_init(&enc_conf);
 
-    // enc_conf.flags = 0x0;
+     enc_conf.flags = 0x2;
 
     //For color Jpeg this flag can be added
-    enc_conf.flags |= JPEG_ENCODER_FLAGS_COLOR;
+    enc_conf.flags = JPEG_ENCODER_FLAGS_COLOR | JPEG_ENCODER_FLAGS_CLUSTER_OFFLOAD;
     enc_conf.width  = width;
     enc_conf.height = height;
 

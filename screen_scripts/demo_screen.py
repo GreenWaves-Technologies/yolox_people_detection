@@ -55,7 +55,7 @@ def receive_image(ser,l,t):
                     cv2.putText(img_resized, 'No Person Detected!',
                            (210, 340), cv2.FONT_HERSHEY_PLAIN, 3, (255,255, 255), 3, cv2.LINE_AA)
                 
-                #img_resized = cv2.resize(img, (int(1.5*640), int(1.5*480)), interpolation = cv2.INTER_AREA)
+                img_resized = cv2.resize(img, (int(1.5*640), int(1.5*480)), interpolation = cv2.INTER_AREA)
                 #rect = cv2.CreateMat(int(1.5*640), int(1.5*480)+80)
                 rect = np.zeros(( 90,int(1.5*640),3),np.uint8)
                 rect[:] = 255 
