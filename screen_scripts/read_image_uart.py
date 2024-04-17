@@ -13,7 +13,7 @@ from time import time
 
 
 GAP_UART_BAUDRATE=1152000
-UART_DEV='/dev/ttyUSB1'
+UART_DEV='/dev/ttyUSB2'
 INPUT_W=320
 INPUT_H=240
 PIXEL_SIZE=3
@@ -54,7 +54,7 @@ def receive_image(ser,l,t):
                 #rect = cv2.CreateMat(int(1.5*640), int(1.5*480)+80)
                 rect = np.zeros(( 90,int(1.5*640),3),np.uint8)
                 rect[:] = 255 
-                vis = np.concatenate((rect, img_resized), axis=0)
+                vis = img_resized #np.concatenate((rect, img_resized), axis=0)
                 #cv2.rectangle(resized, (0, 0), (960, 40), (255,255,255), 150)
                 cv2.putText(vis, f'NN: {round(perf_array[:-1].sum()/1000,1)}ms ({1e6/perf_array[:-1].sum():.2f}fps) - 0.85 mJoule/frame',
                            (30, 40), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 0), 2, cv2.LINE_4)

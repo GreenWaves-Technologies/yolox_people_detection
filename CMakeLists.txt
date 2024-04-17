@@ -159,9 +159,11 @@ list(APPEND TARGET_INCS -I.
 set(MAX_PERFORMANCE y)
 if (${MAX_PERFORMANCE})
   set(FREQ    370)
+  set(P_FREQ  360)
   set(VOLTAGE 800)
 else()
   set(FREQ    240)
+  set(P_FREQ  225)
   set(VOLTAGE 650)
 endif()
 
@@ -174,7 +176,7 @@ list(APPEND TARGET_PREPROCESSOR -DPERF
                                 -DSLAVE_STACK_SIZE=${CONFIG_CL_SLAVE_CORE_STACK_SIZE}
                                 -DFREQ_CL=${FREQ}
                                 -DFREQ_FC=${FREQ}
-                                -DFREQ_PE=${FREQ}
+                                -DFREQ_PE=${P_FREQ}
                                 -DVOLTAGE=${VOLTAGE}
                                 -DINPUT_FILE_NAME=${INPUT_FILE_NAME}
                                 -DOUTPUT_FILE_NAME=${OUTPUT_FILE_NAME}

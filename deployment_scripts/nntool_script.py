@@ -56,7 +56,7 @@ if __name__ == '__main__':
         args.stats_path
     )
 
-    print(G.show([G[0]]))
+ 
     print(G.qshow([G[0]]))
     at_settings=model_settings(
         tensor_directory=args.tensors_dir,
@@ -65,7 +65,7 @@ if __name__ == '__main__':
 
         l1_size=128000,
         l2_size=1000000,
-
+        graph_trace_exec=False,
         graph_monitor_cycles=True,
         graph_produce_node_names=True,
         graph_produce_operinfos=True,
@@ -144,7 +144,31 @@ if __name__ == '__main__':
                 image.show()
 
     else:
-        G[0].allocate = True
+        # resizer = G.insert_resizer(
+        #     "input_1",
+        #     from_shape=(240, 320),
+        #     resize_op="bilinear",
+        #     spatial_axes=(0, 1)
+        #     )
+        wb_node = G.insert_isp(
+             "input_1",
+             isp_node_type="white_balance",   
+             percentile=95,
+             spatial_axes=(0, 1)
+             )
+        demosaic_node = G.insert_isp(
+            "input_1",
+            isp_node_type="demosaic_and_downsample",
+            spatial_axes=(0, 1)
+            )
+
+        G[0].allocate = True 
+
+        # force this node to output and put it in L3
+        new_out_node = G.insert_output(wb_node)
+        #new_out_node.at_options.allocate = 1
+        #new_out_node.at_options.out_home_mem_loc = "AT_MEM_L3_DEFAULTRAM"
+        #new_out_node.at_options.out_exec_mem_loc = "AT_MEM_L3_DEFAULTRAM"
         G.gen_at_model(
             write_constants=True,
             directory=os.path.split(args.at_model_path)[0],

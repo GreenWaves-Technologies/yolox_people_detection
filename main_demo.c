@@ -29,6 +29,7 @@ AT_DEFAULTFLASH_EXT_ADDR_TYPE yolox_L3_Flash = 0;
 
 /* Outputs */
 L2_MEM float Output_1[9480];
+L2_MEM unsigned char* Output_3;
 
 //pi_device_t Ram;
 AT_DEFAULTRAM_T DefaultRam;
@@ -43,23 +44,13 @@ extern L2_MEM AT_L2_POINTER DeMosaic_L2_Memory;
 #define ITER_SIZE (W_CAM*2*BYTES_CAM)
 #define RAW_SIZE (W_CAM*H_CAM*BYTES_CAM) // For now only 10 bits config works
 
-static pi_evt_t proc_task;
-
 pi_device_t* camera;
 PI_L2 unsigned char *buff[2];
 
 static void cluster()
 {
     PRINTF("\t\t***Start CLUSTER ***\n");
-    yoloxCNN(Output_1);
-}
-
-static void pre_filtering(){
-    unsigned char * ram_pointer= (unsigned char *) ext_ram_buf;
-    
-    demosaic_image_HWC_L3((unsigned char *)yolox_L2_Memory_Dyn, (unsigned char *)ram_pointer);
-    
-    white_balance_HWC_L3((unsigned char *)ram_pointer,(unsigned char *) ram_pointer,  95);
+    yoloxCNN(Output_1,Output_3);
 }
 
 int main(int argc, char *argv[])
@@ -119,7 +110,12 @@ int main(int argc, char *argv[])
     pi_cluster_task(&task, (void (*)(void *))cluster, NULL);
     pi_cluster_task_stacks(&task, NULL, SLAVE_STACK_SIZE);
 
-    
+    Output_3= pi_l2_malloc(320*240*3);
+    if(Output_3==NULL){
+        printf("Output alloc error\n");
+        return -1;
+    }
+
     #ifdef STREAM_OVER_UART
     pi_device_t uart_dev;
     init_uart_communication(&uart_dev,1152000);
@@ -146,22 +142,6 @@ int main(int argc, char *argv[])
     iter_buff[1] = pi_l2_malloc(ITER_SIZE);
     if (iter_buff[1] == NULL) return -1;
 
-    /* Init & open ram. */
-    pi_default_ram_conf_init(&ram_conf);
-    pi_open_from_conf(&DefaultRam, &ram_conf);
-
-    pi_evt_sig_init(&proc_task);
-    PRINTF("open ram\n");
-    if (pi_ram_open(&DefaultRam)) {
-        printf("Error ram open !\n");
-        pmsis_exit(-5);
-    }
-    PRINTF("ram opened\n");
-    if (pi_ram_alloc(&DefaultRam, (uint32_t *)(uint32_t ) ext_ram_buf, H_INP * W_INP * CHANNELS) != 0) {
-        printf("Failed to allocate memory in external ram (%ld bytes)\n", H_INP * W_INP * CHANNELS);
-        pmsis_exit(-1);
-    }
-
     /* Init and opend jpeg encoder */
     jpeg_encoder_t enc;
 
@@ -170,28 +150,28 @@ int main(int argc, char *argv[])
     pi_gpio_pin_configure(PI_PAD_048, flags);
     //This is GPIO
     //pi_gpio_pin_configure(PI_PAD_086, flags);
-
-    int iter=0;    
+    
+    pi_evt_t   end_of_capture_evt;
+    int iter=0;
+    char im_name[128];
     while(1){
         //pi_gpio_pin_toggle(PI_PAD_086);
         pi_gpio_pin_toggle(PI_PAD_048);
 
+        pi_camera_capture_async(camera, (unsigned char*) Input_1, 640*480,pi_evt_sig_init(&end_of_capture_evt));
         pi_camera_control(camera, PI_CAMERA_CMD_START, 0);
-        pi_camera_capture(camera, (unsigned char*)yolox_L2_Memory_Dyn, 640*480);
+        pi_evt_wait(&end_of_capture_evt);
         pi_camera_control(camera, PI_CAMERA_CMD_STOP, 0);
 
-        DeMosaic_L1_Memory = yolox_L1_Memory;
-        DeMosaic_L2_Memory = yolox_L2_Memory_Dyn + 640*480;
-
-        pi_cluster_task(&task, (void (*)(void *))pre_filtering, NULL);
-
-        pi_cluster_send_task(&cluster_dev, &task);
+        //To save raw image decoment this:
+        // sprintf(im_name,"../raw_%03d.pgm",iter);
+        // WriteImageToFile(im_name, 640, 480, sizeof(uint8_t), Input_1, GRAY_SCALE_IO);
         
         pi_cluster_task(&task, (void (*)(void *))cluster, NULL);
 
-        //Copy from ram to: yolox_L2_Memory_Dyn + (H_INP * W_INP * CHANNELS)
-        //The image is saved onto External
-        pi_ram_read(&DefaultRam, ext_ram_buf, yolox_L2_Memory_Dyn + (H_INP * W_INP * CHANNELS), (uint32_t)(H_INP * W_INP * CHANNELS));
+        //To save Debayer image decomment this:        
+        // sprintf(im_name,"../ISP_%03d.pgm",iter);
+        // WriteImageToFile(im_name, 320, 240,3*sizeof(uint8_t), Input_1, RGB888_IO);
 
         PRINTF("\t\t***Start FC timer***\n");
         gap_fc_starttimer();
@@ -253,8 +233,7 @@ int main(int argc, char *argv[])
         performances[perf_idx] = pi_time_get_us() - performances[perf_idx]; perf_idx++;
 
         //Draw rectangles and send trought UART
-        pi_ram_read(&DefaultRam, ext_ram_buf, yolox_L2_Memory_Dyn, (uint32_t) H_INP*W_INP*CHANNELS);
-        draw_boxes((unsigned char *) yolox_L2_Memory_Dyn, Output_1, final_valid_boxes, H_INP, W_INP, CHANNELS);
+        draw_boxes((unsigned char *) Output_3, Output_1, final_valid_boxes, H_INP, W_INP, CHANNELS);
 
         /* ------ JPEG COMPRESSION ------ */
         
@@ -267,7 +246,7 @@ int main(int argc, char *argv[])
             jpeg_init(&enc, H_INP, W_INP, cluster_dev, yolox_L1_Memory);
             int jpeg_ret = compress(
                 &enc,
-                (uint8_t *) yolox_L2_Memory_Dyn,
+                (uint8_t *) Output_3,
                 jpeg_image,
                 &bitstream_size,
                 H_INP,
@@ -286,7 +265,6 @@ int main(int argc, char *argv[])
         //send_jpeg_spi(&spi_slave,jpeg_image, bitstream_size,performances);
         #endif
         iter++;
-        pi_evt_sig_init(&proc_task);
 
     } //end of while 1
     pi_l2_free(iter_buff[0], ITER_SIZE);
