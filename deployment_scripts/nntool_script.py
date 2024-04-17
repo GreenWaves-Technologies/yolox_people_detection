@@ -145,6 +145,15 @@ if __name__ == '__main__':
 
     else:
         #Add ISP Nodes directly in NNTool to get generated in the AT model
+        # To add a resizer that goes to a different shape of the input (i.e. if network input is not QVGA)
+        # There is not need to express the "to shape" since NNTool knows already the input shape of network.
+        # resizer = G.insert_resizer(
+        #     "input_1",
+        #     from_shape=(240, 320),
+        #     resize_op="bilinear",
+        #     spatial_axes=(0, 1)
+        #     )
+
         #We start from white balance since it is attached to the input
         wb_node = G.insert_isp(
              "input_1",
