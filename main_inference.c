@@ -24,8 +24,6 @@ AT_DEFAULTFLASH_EXT_ADDR_TYPE yolox_L3_Flash = 0;
 
 /* Outputs */
 L2_MEM float Output_1[9480];
-L2_MEM unsigned char* Output_3;
-
 
 /* Copy inputs function */
 void ReadInput(unsigned char *input_ptr) {
@@ -33,11 +31,11 @@ void ReadInput(unsigned char *input_ptr) {
     PRINTF("\n\t\t*** READING INPUT FROM PPM FILE ***\n");
     status = ReadImageFromFile(
         STR(INPUT_FILE_NAME),
-        W_CAM,
-        H_CAM, 
-        BYTES_CAM, 
+        W_INP, 
+        H_INP, 
+        CHANNELS, 
         input_ptr,
-        W_CAM * H_CAM * BYTES_CAM * sizeof(char), 
+        W_INP * H_INP * CHANNELS * sizeof(char), 
         IMGIO_OUTPUT_CHAR,
         0 // transpose from HWC to CHW 
     );
@@ -126,7 +124,7 @@ static void NNInferenceCluster()
     #endif
 
 GPIO_HIGH();
-    yoloxCNN(Output_1,Output_3);
+    yoloxCNN(Output_1);
 GPIO_LOW();
     // for (int i=0; i<1580; i++) {
     //     printf("[%d] %.2f %.2f %.2f %.2f %.2f %.2f\n", i,  Output_1[i*6+0], Output_1[i*6+1], Output_1[i*6+2], Output_1[i*6+3], Output_1[i*6+4], Output_1[i*6+5]);
@@ -181,11 +179,7 @@ int main(int argc, char *argv[])
         PRINTF("Graph constructor exited with error: %d\n(check the generated file mainKernels.c to see which memory have failed to be allocated)\n", ConstructorErr);
         return -6;
     }
-    Output_3= pi_l2_malloc(320*240*3);
-    if(Output_3==NULL){
-        printf("Output alloc error\n");
-        return -1;
-    }
+    
     struct pi_cluster_task task;
     pi_cluster_task(&task, (void (*)(void *))NNInferenceCluster, NULL);
     pi_cluster_task_stacks(&task, NULL, SLAVE_STACK_SIZE);
@@ -265,10 +259,23 @@ int main(int argc, char *argv[])
     }
 
     /* ------ DRAW REATANGLES ------*/
+    // first read image
+    if (ReadImageFromFile(
+        STR(INPUT_FILE_NAME),
+        W_INP, 
+        H_INP, 
+        CHANNELS, 
+        (unsigned char *) yolox_L2_Memory_Dyn,
+        W_INP * H_INP * CHANNELS * sizeof(char), 
+        IMGIO_OUTPUT_CHAR,
+        0) != 0)
+    { 
+        PRINTF("Error reading image\n");
+    }
 
     PRINTF("\t\t***Start draw reactangles ***\n");
     draw_boxes(
-        (unsigned char *) Output_3,
+        (unsigned char *) yolox_L2_Memory_Dyn,
         Output_1,
         final_valid_boxes,
         H_INP,
@@ -288,7 +295,7 @@ int main(int argc, char *argv[])
     jpeg_init(&enc, H_INP, W_INP, cluster_dev, yolox_L1_Memory);
     int jpeg_ret = compress(
         &enc,
-        (uint8_t *) Output_3,
+        (uint8_t *) yolox_L2_Memory_Dyn,
         jpeg_image,
         &bitstream_size,
         H_INP,
@@ -313,7 +320,7 @@ int main(int argc, char *argv[])
         W_INP, 
         H_INP, 
         CHANNELS, 
-        (unsigned char *) Output_3,
+        (unsigned char *) yolox_L2_Memory_Dyn,
         RGB888_IO // GRAY_SCALE_IO
     );
     performances[5] = 0;

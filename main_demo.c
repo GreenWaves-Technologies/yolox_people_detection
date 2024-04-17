@@ -28,7 +28,7 @@ AT_DEFAULTFLASH_EXT_ADDR_TYPE yolox_L3_Flash = 0;
 
 /* Outputs */
 L2_MEM float Output_1[9480];
-L2_MEM unsigned char* Output_3;
+// L2_MEM unsigned char* Output_3;
 
 //pi_device_t Ram;
 AT_DEFAULTRAM_T DefaultRam;
@@ -49,7 +49,7 @@ PI_L2 unsigned char *buff[2];
 static void cluster()
 {
     PRINTF("\t\t***Start CLUSTER ***\n");
-    yoloxCNN(Output_1,Output_3);
+    yoloxCNN(Output_1);
 }
 
 int main(int argc, char *argv[])
@@ -109,11 +109,11 @@ int main(int argc, char *argv[])
     pi_cluster_task(&task, (void (*)(void *))cluster, NULL);
     pi_cluster_task_stacks(&task, NULL, SLAVE_STACK_SIZE);
 
-    Output_3= pi_l2_malloc(320*240*3);
-    if(Output_3==NULL){
-        printf("Output alloc error\n");
-        return -1;
-    }
+    // Output_3= pi_l2_malloc(320*240*3);
+    // if(Output_3==NULL){
+    //     printf("Output alloc error\n");
+    //     return -1;
+    // }
 
     #ifdef STREAM_OVER_UART
     pi_device_t uart_dev;
@@ -170,7 +170,7 @@ int main(int argc, char *argv[])
 
         //To save Debayer image decomment this:        
         // sprintf(im_name,"../ISP_%03d.pgm",iter);
-        // WriteImageToFile(im_name, 320, 240,3*sizeof(uint8_t), Input_1, RGB888_IO);
+        // WriteImageToFile(im_name, 320, 240,3*sizeof(uint8_t), Output_3, RGB888_IO);
 
         PRINTF("\t\t***Start FC timer***\n");
         gap_fc_starttimer();
@@ -238,7 +238,7 @@ int main(int argc, char *argv[])
         
         PRINTF("\t\t***Start JPEG compression ***\n");
         int bitstream_size;
-        //uint8_t * jpeg_image = (uint8_t *) pi_l2_malloc(80*2048);
+        
         uint8_t * jpeg_image = (uint8_t *)(yolox_L2_Memory_Dyn) + H_INP*W_INP*CHANNELS;
         if(final_valid_boxes){
             performances[perf_idx] = pi_time_get_us();

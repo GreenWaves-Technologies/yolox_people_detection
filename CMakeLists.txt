@@ -25,7 +25,7 @@ if(CONFIG_INFERENCE)
     list(APPEND TARGET_PREPROCESSOR -DCI)
   else()
     if (CONFIG_IMAGE_ABS_PATH STREQUAL "")
-      set(INPUT_FILE_NAME           ${CMAKE_CURRENT_SOURCE_DIR}/raw_000.pgm)
+      set(INPUT_FILE_NAME           ${CMAKE_CURRENT_SOURCE_DIR}/${CONFIG_IMAGE_REL_PATH})
     else()
       message(STATUS "${APP_MSG_PREFIX} Absolute path image passed")
       set(INPUT_FILE_NAME           ${CONFIG_IMAGE_ABS_PATH})
@@ -33,6 +33,7 @@ if(CONFIG_INFERENCE)
   endif()
   message(STATUS "${APP_MSG_PREFIX} Building App in INFERENCE Mode: with image ${INPUT_FILE_NAME}")
   set(MAIN                main_inference.c)
+  set(ISP )
 
 elseif(CONFIG_DEMO)
   message(STATUS "${APP_MSG_PREFIX} Building App in DEMO Mode")
@@ -41,6 +42,7 @@ elseif(CONFIG_DEMO)
   set(CONF_THRESH 0.35)
   list(APPEND TARGET_PREPROCESSOR -DDEMO -DSILENT)
   set(MAIN                main_demo.c)
+  set(ISP --isp)
 
 endif()
 
@@ -77,6 +79,7 @@ add_custom_command(
            --at_model_path=${NN_AT_MODEL_PATH}
            --tensors_dir=${NN_AT_TENSORS_DIR}
            --flash_type="AT_MEM_L3_MRAMFLASH"
+           ${ISP}
 )
 add_custom_target(${NNTOOL_TARGET_PREFIX}clean_model
   COMMENT "clean_model: removing ${COMMON_MODEL_BUILDDIR}/${MODEL_GEN}"
@@ -103,27 +106,6 @@ add_custom_target(clean_gt_file
   COMMENT "clean_gt_file: removing ${TEST_OUTPUT_FILE_NAME}"
   COMMAND rm -rf ${TEST_OUTPUT_FILE_NAME}
 )
-
-# this is not needed anymore
-# if(CONFIG_DEMO)
-#   set(ISP_GEN_PATH $ENV{TILER_ISP_GENERATOR_PATH})
-#   set(ISP_KER_PATH $ENV{TILER_ISP_KERNEL_PATH})
-#   set(MODEL_SRC_ISP ${CMAKE_SOURCE_DIR}/gap_functions/ISP_model.c)
-#   set(MODEL_GEN_ISP_C ${CMAKE_BINARY_DIR}/ISP_Kernels.c)
-
-#   add_custom_command(
-#     OUTPUT  ${CMAKE_BINARY_DIR}/GenTileISP
-#     DEPENDS ${MODEL_SRC_ISP} ${ISP_GEN_PATH}/ISP_Generators.c
-#     COMMAND gcc -o ${CMAKE_BINARY_DIR}/GenTileISP -I$ENV{TILER_INC} -I${ISP_GEN_PATH} ${MODEL_SRC_ISP} ${ISP_GEN_PATH}/ISP_Generators.c $ENV{TILER_LIB} ${SDL2_LDFLAGS}
-#   )
-
-#   add_custom_command(
-#     OUTPUT              ${MODEL_GEN_ISP_C}
-#     DEPENDS             ${CMAKE_BINARY_DIR}/GenTileISP
-#     COMMAND             ${CMAKE_BINARY_DIR}/GenTileISP
-#   )
-#   list(APPEND TARGET_SRCS ${ISP_KER_PATH}/ISP_BasicKernels.c ${MODEL_GEN_ISP_C})
-# endif()
 
 ###############################################################################
 # Application dependencies

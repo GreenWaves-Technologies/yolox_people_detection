@@ -36,6 +36,9 @@ def create_parser():
                         help="Confidence threshold")
     parser.add_argument('--remove_focus_layer', action="store_true",
                         help="Pass argument if you want to remove the focus layer")
+    parser.add_argument('--isp',   action='store_true',
+                        help="Add ISP layers in front of the network")
+    
 
     return parser
 
@@ -144,37 +147,40 @@ if __name__ == '__main__':
                 image.show()
 
     else:
-        #Add ISP Nodes directly in NNTool to get generated in the AT model
-        # To add a resizer that goes to a different shape of the input (i.e. if network input is not QVGA)
-        # There is not need to express the "to shape" since NNTool knows already the input shape of network.
-        # resizer = G.insert_resizer(
-        #     "input_1",
-        #     from_shape=(240, 320),
-        #     resize_op="bilinear",
-        #     spatial_axes=(0, 1)
-        #     )
+        print("HELLLO")
+        print(args.isp)
+        if args.isp:
+            print("CIAO MAMMA!!!!")
+            #Add ISP Nodes directly in NNTool to get generated in the AT model
+            # To add a resizer that goes to a different shape of the input (i.e. if network input is not QVGA)
+            # There is not need to express the "to shape" since NNTool knows already the input shape of network.
+            # resizer = G.insert_resizer(
+            #     "input_1",
+            #     from_shape=(240, 320),
+            #     resize_op="bilinear",
+            #     spatial_axes=(0, 1)
+            #     )
 
-        #We start from white balance since it is attached to the input
-        wb_node = G.insert_isp(
-             "input_1",
-             isp_node_type="white_balance",   
-             percentile=95,
-             spatial_axes=(0, 1)
-             )
-        demosaic_node = G.insert_isp(
-            "input_1",
-            isp_node_type="demosaic_and_downsample",
-            spatial_axes=(0, 1)
-            )
-
+            #We start from white balance since it is attached to the input
+            wb_node = G.insert_isp(
+                "input_1",
+                isp_node_type="white_balance",   
+                percentile=95,
+                spatial_axes=(0, 1)
+                )
+            demosaic_node = G.insert_isp(
+                "input_1",
+                isp_node_type="demosaic_and_downsample",
+                spatial_axes=(0, 1)
+                )
+            # output of Demosaiced and white balanced image can be saved to show results with these options"
+            new_out_node = G.insert_output(wb_node)
+            new_out_node.at_options.allocate = 1
+            # force this node to output and put it in L3
+            # these options does not work
+            #new_out_node.at_options.out_home_mem_loc = "AT_MEM_L3_DEFAULTRAM"
+            #new_out_node.at_options.out_exec_mem_loc = "AT_MEM_L3_DEFAULTRAM"
         G[0].allocate = True 
-
-        # force this node to output and put it in L3
-        new_out_node = G.insert_output(wb_node)
-        # these options does not work
-        #new_out_node.at_options.allocate = 1
-        #new_out_node.at_options.out_home_mem_loc = "AT_MEM_L3_DEFAULTRAM"
-        #new_out_node.at_options.out_exec_mem_loc = "AT_MEM_L3_DEFAULTRAM"
         G.gen_at_model(
             write_constants=True,
             directory=os.path.split(args.at_model_path)[0],
