@@ -13,7 +13,6 @@
 #include "yolox.h"
 #include "spi_comm.h"
 #include "uart_comm.h"
-#include "ISP_Kernels.h"
 
 #define STREAM_OVER_UART
 

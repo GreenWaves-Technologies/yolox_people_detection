@@ -104,25 +104,26 @@ add_custom_target(clean_gt_file
   COMMAND rm -rf ${TEST_OUTPUT_FILE_NAME}
 )
 
-if(CONFIG_DEMO)
-  set(ISP_GEN_PATH $ENV{TILER_ISP_GENERATOR_PATH})
-  set(ISP_KER_PATH $ENV{TILER_ISP_KERNEL_PATH})
-  set(MODEL_SRC_ISP ${CMAKE_SOURCE_DIR}/gap_functions/ISP_model.c)
-  set(MODEL_GEN_ISP_C ${CMAKE_BINARY_DIR}/ISP_Kernels.c)
+# this is not needed anymore
+# if(CONFIG_DEMO)
+#   set(ISP_GEN_PATH $ENV{TILER_ISP_GENERATOR_PATH})
+#   set(ISP_KER_PATH $ENV{TILER_ISP_KERNEL_PATH})
+#   set(MODEL_SRC_ISP ${CMAKE_SOURCE_DIR}/gap_functions/ISP_model.c)
+#   set(MODEL_GEN_ISP_C ${CMAKE_BINARY_DIR}/ISP_Kernels.c)
 
-  add_custom_command(
-    OUTPUT  ${CMAKE_BINARY_DIR}/GenTileISP
-    DEPENDS ${MODEL_SRC_ISP} ${ISP_GEN_PATH}/ISP_Generators.c
-    COMMAND gcc -o ${CMAKE_BINARY_DIR}/GenTileISP -I$ENV{TILER_INC} -I${ISP_GEN_PATH} ${MODEL_SRC_ISP} ${ISP_GEN_PATH}/ISP_Generators.c $ENV{TILER_LIB} ${SDL2_LDFLAGS}
-  )
+#   add_custom_command(
+#     OUTPUT  ${CMAKE_BINARY_DIR}/GenTileISP
+#     DEPENDS ${MODEL_SRC_ISP} ${ISP_GEN_PATH}/ISP_Generators.c
+#     COMMAND gcc -o ${CMAKE_BINARY_DIR}/GenTileISP -I$ENV{TILER_INC} -I${ISP_GEN_PATH} ${MODEL_SRC_ISP} ${ISP_GEN_PATH}/ISP_Generators.c $ENV{TILER_LIB} ${SDL2_LDFLAGS}
+#   )
 
-  add_custom_command(
-    OUTPUT              ${MODEL_GEN_ISP_C}
-    DEPENDS             ${CMAKE_BINARY_DIR}/GenTileISP
-    COMMAND             ${CMAKE_BINARY_DIR}/GenTileISP
-  )
-  list(APPEND TARGET_SRCS ${ISP_KER_PATH}/ISP_BasicKernels.c ${MODEL_GEN_ISP_C})
-endif()
+#   add_custom_command(
+#     OUTPUT              ${MODEL_GEN_ISP_C}
+#     DEPENDS             ${CMAKE_BINARY_DIR}/GenTileISP
+#     COMMAND             ${CMAKE_BINARY_DIR}/GenTileISP
+#   )
+#   list(APPEND TARGET_SRCS ${ISP_KER_PATH}/ISP_BasicKernels.c ${MODEL_GEN_ISP_C})
+# endif()
 
 ###############################################################################
 # Application dependencies
