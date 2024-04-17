@@ -144,12 +144,8 @@ if __name__ == '__main__':
                 image.show()
 
     else:
-        # resizer = G.insert_resizer(
-        #     "input_1",
-        #     from_shape=(240, 320),
-        #     resize_op="bilinear",
-        #     spatial_axes=(0, 1)
-        #     )
+        #Add ISP Nodes directly in NNTool to get generated in the AT model
+        #We start from white balance since it is attached to the input
         wb_node = G.insert_isp(
              "input_1",
              isp_node_type="white_balance",   
@@ -166,6 +162,7 @@ if __name__ == '__main__':
 
         # force this node to output and put it in L3
         new_out_node = G.insert_output(wb_node)
+        # these options does not work
         #new_out_node.at_options.allocate = 1
         #new_out_node.at_options.out_home_mem_loc = "AT_MEM_L3_DEFAULTRAM"
         #new_out_node.at_options.out_exec_mem_loc = "AT_MEM_L3_DEFAULTRAM"
