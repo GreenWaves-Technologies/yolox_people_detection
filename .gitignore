@@ -1,3 +1,4 @@
 build
 BUILD
 __pycache__
+sdk_gaptest*.config
